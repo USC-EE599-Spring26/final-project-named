@@ -81,3 +81,94 @@ class ProfileViewModel: ObservableObject {
         }
     }
 }
+
+@MainActor
+final class TaskManagementViewModel: ObservableObject {
+    @Published var title = ""
+    @Published var instructions = ""
+    @Published var scheduleTime = Date()
+    @Published private(set) var statusMessage = ""
+    @Published private(set) var hasError = false
+    @Published private(set) var isProcessing = false
+
+    func createTask() async {
+        guard !isProcessing else { return }
+
+        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedTitle.isEmpty else {
+            hasError = true
+            statusMessage = "Task title is required."
+            return
+        }
+
+        guard let store = AppDelegateKey.defaultValue?.store else {
+            hasError = true
+            statusMessage = "Care store is unavailable."
+            return
+        }
+
+        isProcessing = true
+        defer { isProcessing = false }
+
+        do {
+            let schedule = makeDailySchedule(time: scheduleTime)
+            var task = OCKTask(
+                id: makeTaskID(from: trimmedTitle),
+                title: trimmedTitle,
+                carePlanUUID: nil,
+                schedule: schedule
+            )
+            let trimmedInstructions = instructions.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmedInstructions.isEmpty {
+                task.instructions = trimmedInstructions
+            }
+            task.asset = "checkmark.circle"
+            _ = try await store.addTask(task)
+
+            NotificationCenter.default.post(
+                .init(name: Notification.Name(rawValue: Constants.shouldRefreshView))
+            )
+            hasError = false
+            statusMessage = "Task added successfully."
+            title = ""
+            instructions = ""
+        } catch {
+            hasError = true
+            statusMessage = "Failed to add task: \(error.localizedDescription)"
+        }
+    }
+
+    private func makeDailySchedule(time: Date) -> OCKSchedule {
+        let components = Calendar.current.dateComponents(
+            [.hour, .minute],
+            from: time
+        )
+        let startDate = Calendar.current.date(
+            bySettingHour: components.hour ?? 8,
+            minute: components.minute ?? 0,
+            second: 0,
+            of: Date()
+        ) ?? Date()
+
+        return OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: startDate,
+                    end: nil,
+                    interval: DateComponents(day: 1)
+                )
+            ]
+        )
+    }
+
+    private func makeTaskID(from title: String) -> String {
+        let slug = title
+            .lowercased()
+            .components(separatedBy: CharacterSet.alphanumerics.inverted)
+            .filter { !$0.isEmpty }
+            .joined(separator: "_")
+        let sanitizedTitle = slug.isEmpty ? "custom_task" : slug
+        let shortUUID = UUID().uuidString.prefix(8).lowercased()
+        return "\(sanitizedTitle)_\(shortUUID)"
+    }
+}

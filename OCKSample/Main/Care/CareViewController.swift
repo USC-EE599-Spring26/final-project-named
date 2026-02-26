@@ -39,14 +39,32 @@ import UIKit
 @MainActor
 final class CareViewController: OCKDailyPageViewController, @unchecked Sendable {
 
-	private var isSyncing = false
-	private var isLoading = false
+    private var isSyncing = false
+    private var isLoading = false
     private var style: Styler {
         CustomStylerKey.defaultValue
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureViewControllerObservers()
+    }
+
+    /*
+     This will be called each time the selected date changes.
+     Use this as an opportunity to rebuild the content shown to the user.
+     */
+    override func dailyPageViewController(
+        _ dailyPageViewController: OCKDailyPageViewController,
+        prepare listViewController: OCKListViewController,
+        for date: Date
+    ) {
+        prepareDailyPage(listViewController: listViewController, date: date)
+    }
+}
+
+extension CareViewController {
+    fileprivate func configureViewControllerObservers() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .refresh,
             target: self,
@@ -79,8 +97,10 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             object: nil
         )
     }
+}
 
-    @objc private func updateSynchronizationProgress(
+extension CareViewController {
+    @objc fileprivate func updateSynchronizationProgress(
         _ notification: Notification
     ) {
         guard let receivedInfo = notification.userInfo as? [String: Any],
@@ -88,36 +108,36 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             return
         }
 
-		switch progress {
-		case 100:
-			self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-				title: "\(progress)",
-				style: .plain, target: self,
-				action: #selector(self.synchronizeWithRemote)
-			)
-			self.navigationItem.rightBarButtonItem?.tintColor = self.view.tintColor
+        switch progress {
+        case 100:
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+                title: "\(progress)",
+                style: .plain, target: self,
+                action: #selector(self.synchronizeWithRemote)
+            )
+            self.navigationItem.rightBarButtonItem?.tintColor = self.view.tintColor
 
-			// Give sometime for the user to see 100
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-				guard let self else { return }
-				self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-					barButtonSystemItem: .refresh,
-					target: self,
-					action: #selector(self.synchronizeWithRemote)
-				)
-				self.navigationItem.rightBarButtonItem?.tintColor = self.navigationItem.leftBarButtonItem?.tintColor
-			}
-		default:
-			self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-				title: "\(progress)",
-				style: .plain, target: self,
-				action: #selector(self.synchronizeWithRemote)
-			)
-			self.navigationItem.rightBarButtonItem?.tintColor = self.view.tintColor
-		}
+            // Give sometime for the user to see 100
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                guard let self else { return }
+                self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+                    barButtonSystemItem: .refresh,
+                    target: self,
+                    action: #selector(self.synchronizeWithRemote)
+                )
+                self.navigationItem.rightBarButtonItem?.tintColor = self.navigationItem.leftBarButtonItem?.tintColor
+            }
+        default:
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+                title: "\(progress)",
+                style: .plain, target: self,
+                action: #selector(self.synchronizeWithRemote)
+            )
+            self.navigationItem.rightBarButtonItem?.tintColor = self.view.tintColor
+        }
     }
 
-    @objc private func synchronizeWithRemote() {
+    @objc fileprivate func synchronizeWithRemote() {
         guard !isSyncing else {
             return
         }
@@ -126,7 +146,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             let errorString = error?.localizedDescription ?? "Successful sync with remote!"
             Logger.feed.info("\(errorString)")
             DispatchQueue.main.async { [weak self] in
-				guard let self else { return }
+                guard let self else { return }
                 if error != nil {
                     self.navigationItem.rightBarButtonItem?.tintColor = .red
                 } else {
@@ -137,21 +157,18 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         }
     }
 
-    @objc private func reloadView(_ notification: Notification? = nil) {
+    @objc fileprivate func reloadView(_ notification: Notification? = nil) {
         guard !isLoading else {
             return
         }
         self.reload()
     }
+}
 
-    /*
-     This will be called each time the selected date changes.
-     Use this as an opportunity to rebuild the content shown to the user.
-     */
-    override func dailyPageViewController(
-        _ dailyPageViewController: OCKDailyPageViewController,
-        prepare listViewController: OCKListViewController,
-        for date: Date
+extension CareViewController {
+    fileprivate func prepareDailyPage(
+        listViewController: OCKListViewController,
+        date: Date
     ) {
         self.isLoading = true
 
@@ -180,14 +197,14 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         fetchAndDisplayTasks(on: listViewController, for: date)
     }
 
-    private func isSameDay(as date: Date) -> Bool {
+    fileprivate func isSameDay(as date: Date) -> Bool {
         Calendar.current.isDate(
             date,
             inSameDayAs: Date()
         )
     }
 
-    private func modifyDateIfNeeded(_ date: Date) -> Date {
+    fileprivate func modifyDateIfNeeded(_ date: Date) -> Date {
         guard date < .now else {
             return date
         }
@@ -196,33 +213,32 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         }
         return date.endOfDay
     }
+}
 
-    private func fetchAndDisplayTasks(
+extension CareViewController {
+    fileprivate func fetchAndDisplayTasks(
         on listViewController: OCKListViewController,
         for date: Date
     ) {
         Task {
             let tasks = await self.fetchTasks(on: date)
-			appendTasks(tasks, to: listViewController, date: date)
+            appendTasks(tasks, to: listViewController, date: date)
         }
     }
 
-    private func fetchTasks(on date: Date) async -> [any OCKAnyTask] {
+    fileprivate func fetchTasks(on date: Date) async -> [any OCKAnyTask] {
         var query = OCKTaskQuery(for: date)
         query.excludesTasksWithNoEvents = true
         do {
             let tasks = try await store.fetchAnyTasks(query: query)
-            let orderedTasks = TaskID.ordered.compactMap { orderedTaskID in
-                tasks.first(where: { $0.id == orderedTaskID })
-            }
-            return orderedTasks
+            return sortTasksForDisplay(tasks)
         } catch {
             Logger.feed.error("Could not fetch tasks: \(error, privacy: .public)")
             return []
         }
     }
 
-    private func taskViewControllers(
+    fileprivate func taskViewControllers(
         _ task: any OCKAnyTask,
         on date: Date
     ) -> [UIViewController]? {
@@ -300,11 +316,15 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             #endif
 
         default:
-            return nil
+            let card = EventQueryView<InstructionsTaskView>(
+                query: query
+            )
+            .formattedHostingController()
+            return [card]
         }
     }
 
-    private func appendTasks(
+    fileprivate func appendTasks(
         _ tasks: [any OCKAnyTask],
         to listViewController: OCKListViewController,
         date: Date
@@ -326,10 +346,30 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         }.forEach { (cards: [UIViewController]) in
             cards.forEach {
                 let card = $0
-				listViewController.appendViewController(card, animated: true)
+                listViewController.appendViewController(card, animated: true)
             }
         }
-		self.isLoading = false
+        self.isLoading = false
+    }
+
+    fileprivate func sortTasksForDisplay(
+        _ tasks: [any OCKAnyTask]
+    ) -> [any OCKAnyTask] {
+        let knownOrder = Dictionary(
+            uniqueKeysWithValues: TaskID.ordered.enumerated().map { ($0.element, $0.offset) }
+        )
+
+        return tasks.sorted { left, right in
+            let leftKnownIndex = knownOrder[left.id] ?? Int.max
+            let rightKnownIndex = knownOrder[right.id] ?? Int.max
+            if leftKnownIndex != rightKnownIndex {
+                return leftKnownIndex < rightKnownIndex
+            }
+
+            let leftTitle = left.title ?? left.id
+            let rightTitle = right.title ?? right.id
+            return leftTitle.localizedCaseInsensitiveCompare(rightTitle) == .orderedAscending
+        }
     }
 }
 

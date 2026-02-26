@@ -345,7 +345,7 @@ extension CareViewController {
         date: Date
     ) {
         let isCurrentDay = isSameDay(as: date)
-        tasks.compactMap {
+        let allCards: [UIViewController] = tasks.compactMap {
             let cards = self.taskViewControllers(
                 $0,
                 on: date
@@ -358,13 +358,23 @@ extension CareViewController {
                 $0.view.alpha = !isCurrentDay ? 0.4 : 1.0
             }
             return cards
-        }.forEach { (cards: [UIViewController]) in
-            cards.forEach {
-                let card = $0
-                listViewController.appendViewController(card, animated: true)
+        }.flatMap { $0 }
+
+        allCards.enumerated().forEach { index, card in
+            listViewController.appendViewController(card, animated: true)
+            if index < allCards.count - 1 {
+                appendCardSpacer(to: listViewController)
             }
         }
+
         self.isLoading = false
+    }
+
+    fileprivate func appendCardSpacer(
+        to listViewController: OCKListViewController
+    ) {
+        let spacer = CardSpacerView(spacing: 10)
+        listViewController.appendView(spacer, animated: false)
     }
 
     fileprivate func sortTasksForDisplay(
@@ -385,6 +395,26 @@ extension CareViewController {
             let rightTitle = right.title ?? right.id
             return leftTitle.localizedCaseInsensitiveCompare(rightTitle) == .orderedAscending
         }
+    }
+}
+
+private final class CardSpacerView: UIView {
+    private let spacing: CGFloat
+
+    init(spacing: CGFloat) {
+        self.spacing = spacing
+        super.init(frame: .zero)
+        backgroundColor = .clear
+        isUserInteractionEnabled = false
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override var intrinsicContentSize: CGSize {
+        CGSize(width: UIView.noIntrinsicMetric, height: spacing)
     }
 }
 

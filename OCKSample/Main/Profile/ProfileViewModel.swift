@@ -86,6 +86,7 @@ class ProfileViewModel: ObservableObject {
 final class TaskManagementViewModel: ObservableObject {
     @Published var title = ""
     @Published var instructions = ""
+    @Published var assetSymbol = "checkmark.circle"
     @Published var scheduleTime = Date()
     @Published private(set) var tasks: [ManagedTaskItem] = []
     @Published private(set) var statusMessage = ""
@@ -114,6 +115,7 @@ final class TaskManagementViewModel: ObservableObject {
 
         do {
             let schedule = makeDailySchedule(time: scheduleTime)
+            let selectedAsset = sanitizeAssetSymbol(assetSymbol)
             var task = OCKTask(
                 id: makeTaskID(from: trimmedTitle),
                 title: trimmedTitle,
@@ -124,7 +126,7 @@ final class TaskManagementViewModel: ObservableObject {
             if !trimmedInstructions.isEmpty {
                 task.instructions = trimmedInstructions
             }
-            task.asset = "checkmark.circle"
+            task.asset = selectedAsset
             _ = try await store.addTask(task)
 
             NotificationCenter.default.post(
@@ -134,6 +136,7 @@ final class TaskManagementViewModel: ObservableObject {
             statusMessage = "Task added successfully."
             title = ""
             instructions = ""
+            assetSymbol = "checkmark.circle"
             await refreshTasks()
         } catch {
             hasError = true
@@ -158,9 +161,19 @@ final class TaskManagementViewModel: ObservableObject {
                 nextTaskCache[task.id] = task
                 let rawTitle = task.title ?? ""
                 let displayTitle = rawTitle.isEmpty ? task.id : rawTitle
+                let rawAsset: String?
+                if let careTask = task as? OCKTask {
+                    rawAsset = careTask.asset
+                } else if let healthTask = task as? OCKHealthKitTask {
+                    rawAsset = healthTask.asset
+                } else {
+                    rawAsset = nil
+                }
+                let displayAsset = sanitizeAssetSymbol(rawAsset)
                 return ManagedTaskItem(
                     id: task.id,
-                    title: displayTitle
+                    title: displayTitle,
+                    assetSymbol: displayAsset
                 )
             }
             taskCache = nextTaskCache
@@ -242,9 +255,16 @@ final class TaskManagementViewModel: ObservableObject {
         let shortUUID = UUID().uuidString.prefix(8).lowercased()
         return "\(sanitizedTitle)_\(shortUUID)"
     }
+
+    private func sanitizeAssetSymbol(_ input: String?) -> String {
+        let trimmed = (input ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "checkmark.circle" : trimmed
+    }
 }
 
 struct ManagedTaskItem: Identifiable {
     let id: String
     let title: String
+    let assetSymbol: String
 }

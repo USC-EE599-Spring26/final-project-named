@@ -18,6 +18,18 @@ struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
     @StateObject private var taskViewModel = TaskManagementViewModel()
     @ObservedObject var loginViewModel: LoginViewModel
+    private let suggestedSymbols = [
+        "checkmark.circle",
+        "pills.fill",
+        "pills.circle.fill",
+        "cross.case.fill",
+        "waveform.path.ecg",
+        "heart.circle.fill",
+        "figure.walk",
+        "calendar.badge.clock",
+        "mouth.fill",
+        "bell.fill"
+    ]
 
     var body: some View {
         ScrollView {
@@ -115,6 +127,37 @@ struct ProfileView: View {
                 .lineLimit(2...4)
                 .textFieldStyle(.roundedBorder)
 
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Task icon (SF Symbol)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                HStack(spacing: 10) {
+                    Image(systemName: safeSymbolName(taskViewModel.assetSymbol))
+                        .font(.title3)
+                        .frame(width: 26, height: 26)
+                        .foregroundColor(.accentColor)
+
+                    TextField("SF Symbol name (e.g. pills.fill)", text: $taskViewModel.assetSymbol)
+                        .textFieldStyle(.roundedBorder)
+                }
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(suggestedSymbols, id: \.self) { symbol in
+                            Button {
+                                taskViewModel.assetSymbol = symbol
+                            } label: {
+                                Image(systemName: symbol)
+                                    .frame(width: 24, height: 24)
+                                    .padding(6)
+                            }
+                            .buttonStyle(.bordered)
+                        }
+                    }
+                }
+            }
+
             DatePicker(
                 "Reminder time",
                 selection: $taskViewModel.scheduleTime,
@@ -149,6 +192,11 @@ struct ProfileView: View {
             } else {
                 ForEach(taskViewModel.tasks) { task in
                     HStack(alignment: .top) {
+                        Image(systemName: safeSymbolName(task.assetSymbol))
+                            .font(.body)
+                            .frame(width: 24, height: 24)
+                            .foregroundColor(.accentColor)
+
                         VStack(alignment: .leading, spacing: 4) {
                             Text(task.title)
                                 .font(.body)
@@ -177,6 +225,11 @@ struct ProfileView: View {
         .background(Color(.secondarySystemBackground))
         .cornerRadius(16)
         .shadow(radius: 5, x: 0, y: 1)
+    }
+
+    private func safeSymbolName(_ rawSymbol: String) -> String {
+        let trimmed = rawSymbol.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "checkmark.circle" : trimmed
     }
 
 }

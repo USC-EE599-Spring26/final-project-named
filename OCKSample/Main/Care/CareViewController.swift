@@ -182,8 +182,8 @@ extension CareViewController {
         if isCurrentDay {
             if Calendar.current.isDate(date, inSameDayAs: Date()) {
                 // Add a non-CareKit view into the list
-                let tipTitle = "Benefits of exercising"
-                let tipText = "Learn how activity can promote a healthy pregnancy."
+                let tipTitle = String(localized: "TIP_RECOVERY_TITLE")
+                let tipText = String(localized: "TIP_RECOVERY_TEXT")
                 let tipView = TipView()
                 tipView.headerView.titleLabel.text = tipTitle
                 tipView.headerView.detailLabel.text = tipText
@@ -247,7 +247,7 @@ extension CareViewController {
         query.taskIDs = [task.id]
 
         switch task.id {
-        case TaskID.steps:
+        case TaskID.recoveryStepCount, TaskID.steps:
             let card = EventQueryView<NumericProgressTaskView>(
                 query: query
             )
@@ -255,7 +255,7 @@ extension CareViewController {
 
             return [card]
 
-        case TaskID.ovulationTestResult:
+        case TaskID.restingHeartRateTrend, TaskID.ovulationTestResult:
             let card = EventQueryView<LabeledValueTaskView>(
                 query: query
             )
@@ -263,7 +263,11 @@ extension CareViewController {
 
             return [card]
 
-        case TaskID.stretch:
+        case TaskID.levothyroxineMedication,
+            TaskID.calciumSupplement,
+            TaskID.voiceRestExercise,
+            TaskID.followUpReminder,
+            TaskID.stretch:
             let card = EventQueryView<InstructionsTaskView>(
                 query: query
             )
@@ -271,7 +275,7 @@ extension CareViewController {
 
             return [card]
 
-        case TaskID.kegels:
+        case TaskID.incisionCareCheck, TaskID.kegels:
             /*
              Since the kegel task is only scheduled every other day, there will be cases
              where it is not contained in the tasks array returned from the query.
@@ -311,6 +315,17 @@ extension CareViewController {
 
             return [nauseaCard]
 
+            #else
+            return []
+            #endif
+
+        case TaskID.symptomScore:
+            #if os(iOS)
+            let card = OCKButtonLogTaskViewController(
+                query: query,
+                store: self.store
+            )
+            return [card]
             #else
             return []
             #endif

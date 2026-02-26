@@ -9,6 +9,15 @@
 import Foundation
 
 enum TaskID {
+    static let levothyroxineMedication = "levothyroxineMedication"
+    static let calciumSupplement = "calciumSupplement"
+    static let incisionCareCheck = "incisionCareCheck"
+    static let symptomScore = "symptomScore"
+    static let voiceRestExercise = "voiceRestExercise"
+    static let followUpReminder = "followUpReminder"
+    static let recoveryStepCount = "recoveryStepCount"
+    static let restingHeartRateTrend = "restingHeartRateTrend"
+
     static let doxylamine = "doxylamine"
     static let nausea = "nausea"
     static let stretch = "stretch"
@@ -21,11 +30,19 @@ enum TaskID {
     }
 
     static var orderedObjective: [String] {
-        [ Self.steps, Self.ovulationTestResult ]
+        [
+            Self.levothyroxineMedication,
+            Self.calciumSupplement,
+            Self.incisionCareCheck,
+            Self.voiceRestExercise,
+            Self.followUpReminder,
+            Self.recoveryStepCount,
+            Self.restingHeartRateTrend
+        ]
     }
 
     static var orderedSubjective: [String] {
-        [ Self.doxylamine, Self.kegels, Self.stretch, Self.nausea]
+        [ Self.symptomScore ]
     }
 
     static var orderedWatchOS: [String] {

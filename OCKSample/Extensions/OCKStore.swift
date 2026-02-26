@@ -44,42 +44,117 @@ extension OCKStore {
 
     // Adds tasks and contacts into the store
     func populateDefaultCarePlansTasksContacts(
-		startDate: Date = Date()
-	) async throws {
+        startDate: Date = Date()
+    ) async throws {
 
-        let thisMorning = Calendar.current.startOfDay(for: startDate)
-        let aFewDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: thisMorning)!
-        let beforeBreakfast = Calendar.current.date(byAdding: .hour, value: 8, to: aFewDaysAgo)!
-        let afterLunch = Calendar.current.date(byAdding: .hour, value: 14, to: aFewDaysAgo)!
+        let calendar = Calendar.current
+        let thisMorning = calendar.startOfDay(for: startDate)
+        let medicationStart = calendar.date(
+            bySettingHour: 6,
+            minute: 30,
+            second: 0,
+            of: thisMorning
+        ) ?? thisMorning
+        let noonStart = calendar.date(
+            bySettingHour: 12,
+            minute: 0,
+            second: 0,
+            of: thisMorning
+        ) ?? thisMorning
+        let eveningStart = calendar.date(
+            bySettingHour: 19,
+            minute: 30,
+            second: 0,
+            of: thisMorning
+        ) ?? thisMorning
+        let weeklyStart = calendar.date(
+            bySettingHour: 10,
+            minute: 0,
+            second: 0,
+            of: thisMorning
+        ) ?? thisMorning
+        let twoWeeksLater = calendar.date(
+            byAdding: .day,
+            value: 14,
+            to: thisMorning
+        )
 
-        let schedule = OCKSchedule(
+        let levothyroxineSchedule = OCKSchedule(
             composing: [
                 OCKScheduleElement(
-                    start: beforeBreakfast,
+                    start: medicationStart,
                     end: nil,
                     interval: DateComponents(day: 1)
-                ),
-                OCKScheduleElement(
-                    start: afterLunch,
-                    end: nil,
-                    interval: DateComponents(day: 2)
                 )
             ]
         )
-
-        var doxylamine = OCKTask(
-            id: TaskID.doxylamine,
-            title: String(localized: "TAKE_DOXYLAMINE"),
+        var levothyroxineMedication = OCKTask(
+            id: TaskID.levothyroxineMedication,
+            title: String(localized: "TASK_LEVOTHYROXINE_TITLE"),
             carePlanUUID: nil,
-            schedule: schedule
+            schedule: levothyroxineSchedule
         )
-        doxylamine.instructions = String(localized: "DOXYLAMINE_INSTRUCTIONS")
-        doxylamine.asset = "pills.fill"
+        levothyroxineMedication.instructions = String(
+            localized: "TASK_LEVOTHYROXINE_INSTRUCTIONS"
+        )
+        levothyroxineMedication.asset = "pills.fill"
+        levothyroxineMedication.userInfo = [
+            Constants.taskCardStyleKey: "instructions",
+            Constants.taskDomainKey: Constants.thyroidDomainValue
+        ]
 
-        let nauseaSchedule = OCKSchedule(
+        let calciumSchedule = OCKSchedule(
             composing: [
                 OCKScheduleElement(
-                    start: beforeBreakfast,
+                    start: noonStart,
+                    end: nil,
+                    interval: DateComponents(day: 1)
+                )
+            ]
+        )
+        var calciumSupplement = OCKTask(
+            id: TaskID.calciumSupplement,
+            title: String(localized: "TASK_CALCIUM_TITLE"),
+            carePlanUUID: nil,
+            schedule: calciumSchedule
+        )
+        calciumSupplement.instructions = String(
+            localized: "TASK_CALCIUM_INSTRUCTIONS"
+        )
+        calciumSupplement.asset = "pills.circle.fill"
+        calciumSupplement.userInfo = [
+            Constants.taskCardStyleKey: "instructions",
+            Constants.taskDomainKey: Constants.thyroidDomainValue
+        ]
+
+        let incisionSchedule = OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: eveningStart,
+                    end: twoWeeksLater,
+                    interval: DateComponents(day: 1)
+                )
+            ]
+        )
+        var incisionCareCheck = OCKTask(
+            id: TaskID.incisionCareCheck,
+            title: String(localized: "TASK_INCISION_TITLE"),
+            carePlanUUID: nil,
+            schedule: incisionSchedule
+        )
+        incisionCareCheck.instructions = String(
+            localized: "TASK_INCISION_INSTRUCTIONS"
+        )
+        incisionCareCheck.asset = "cross.case.fill"
+        incisionCareCheck.userInfo = [
+            Constants.taskCardStyleKey: "simple",
+            Constants.taskDomainKey: Constants.thyroidDomainValue
+        ]
+
+        let symptomSchedule = OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: eveningStart,
                     end: nil,
                     interval: DateComponents(day: 1),
                     text: String(localized: "ANYTIME_DURING_DAY"),
@@ -88,100 +163,138 @@ extension OCKStore {
                 )
             ]
         )
-
-        var nausea = OCKTask(
-            id: TaskID.nausea,
-            title: String(localized: "TRACK_NAUSEA"),
+        var symptomScore = OCKTask(
+            id: TaskID.symptomScore,
+            title: String(localized: "TASK_SYMPTOM_SCORE_TITLE"),
             carePlanUUID: nil,
-            schedule: nauseaSchedule
+            schedule: symptomSchedule
         )
-        nausea.impactsAdherence = false
-        nausea.instructions = String(localized: "NAUSEA_INSTRUCTIONS")
-        nausea.asset = "bed.double"
+        symptomScore.instructions = String(
+            localized: "TASK_SYMPTOM_SCORE_INSTRUCTIONS"
+        )
+        symptomScore.impactsAdherence = false
+        symptomScore.asset = "waveform.path.ecg"
+        symptomScore.userInfo = [
+            Constants.taskCardStyleKey: "buttonLog",
+            Constants.taskDomainKey: Constants.thyroidDomainValue
+        ]
 
-        let kegelElement = OCKScheduleElement(
-            start: beforeBreakfast,
-            end: nil,
-            interval: DateComponents(day: 2)
-        )
-        let kegelSchedule = OCKSchedule(
-            composing: [kegelElement]
-        )
-        var kegels = OCKTask(
-            id: TaskID.kegels,
-            title: String(localized: "KEGEL_EXERCISES"),
-            carePlanUUID: nil,
-            schedule: kegelSchedule
-        )
-        kegels.impactsAdherence = true
-        kegels.instructions = String(localized: "KEGEL_INSTRUCTIONS")
-
-        let stretchElement = OCKScheduleElement(
-            start: beforeBreakfast,
-            end: nil,
-            interval: DateComponents(day: 1)
-        )
-        let stretchSchedule = OCKSchedule(
-            composing: [stretchElement]
-        )
-        var stretch = OCKTask(
-            id: TaskID.stretch,
-            title: String(localized: "STRETCH"),
-            carePlanUUID: nil,
-            schedule: stretchSchedule
-        )
-        stretch.impactsAdherence = true
-        stretch.asset = "figure.walk"
-
-        _ = try await addTasksIfNotPresent(
-            [
-                nausea,
-                doxylamine,
-                kegels,
-                stretch
+        let voiceRestSchedule = OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: medicationStart,
+                    end: nil,
+                    interval: DateComponents(day: 2)
+                )
             ]
         )
+        var voiceRestExercise = OCKTask(
+            id: TaskID.voiceRestExercise,
+            title: String(localized: "TASK_VOICE_REST_TITLE"),
+            carePlanUUID: nil,
+            schedule: voiceRestSchedule
+        )
+        voiceRestExercise.instructions = String(
+            localized: "TASK_VOICE_REST_INSTRUCTIONS"
+        )
+        voiceRestExercise.asset = "mouth.fill"
+        voiceRestExercise.userInfo = [
+            Constants.taskCardStyleKey: "instructions",
+            Constants.taskDomainKey: Constants.thyroidDomainValue
+        ]
+
+        let followUpSchedule = OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: weeklyStart,
+                    end: nil,
+                    interval: DateComponents(day: 7)
+                )
+            ]
+        )
+        var followUpReminder = OCKTask(
+            id: TaskID.followUpReminder,
+            title: String(localized: "TASK_FOLLOW_UP_TITLE"),
+            carePlanUUID: nil,
+            schedule: followUpSchedule
+        )
+        followUpReminder.instructions = String(
+            localized: "TASK_FOLLOW_UP_INSTRUCTIONS"
+        )
+        followUpReminder.asset = "calendar.badge.clock"
+        followUpReminder.userInfo = [
+            Constants.taskCardStyleKey: "checklist",
+            Constants.taskDomainKey: Constants.thyroidDomainValue
+        ]
+
+        _ = try await addTasksIfNotPresent([
+            levothyroxineMedication,
+            calciumSupplement,
+            incisionCareCheck,
+            symptomScore,
+            voiceRestExercise,
+            followUpReminder
+        ])
 
         var contact1 = OCKContact(
-            id: "jane",
-            givenName: "Jane",
-            familyName: "Daniels",
+            id: "endocrine_surgeon",
+            givenName: "Alex",
+            familyName: "Chen",
             carePlanUUID: nil
         )
-        contact1.title = "Family Practice Doctor"
-        contact1.role = "Dr. Daniels is a family practice doctor with 8 years of experience."
-        contact1.emailAddresses = [OCKLabeledValue(label: CNLabelEmailiCloud, value: "janedaniels@uky.edu")]
-        contact1.phoneNumbers = [OCKLabeledValue(label: CNLabelWork, value: "(800) 257-2000")]
-        contact1.messagingNumbers = [OCKLabeledValue(label: CNLabelWork, value: "(800) 357-2040")]
+        contact1.title = String(localized: "CONTACT_ENDOCRINE_SURGEON_TITLE")
+        contact1.role = String(localized: "CONTACT_ENDOCRINE_SURGEON_ROLE")
+        contact1.emailAddresses = [
+            OCKLabeledValue(
+                label: CNLabelWork,
+                value: "endo.surgery@uscmed.org"
+            )
+        ]
+        contact1.phoneNumbers = [
+            OCKLabeledValue(label: CNLabelWork, value: "(800) 257-2000")
+        ]
+        contact1.messagingNumbers = [
+            OCKLabeledValue(label: CNLabelWork, value: "(800) 357-2040")
+        ]
         contact1.address = {
             let address = OCKPostalAddress(
-				street: "1500 San Pablo St",
-				city: "Los Angeles",
-				state: "CA",
-				postalCode: "90033",
-				country: "US"
-			)
+                street: "1500 San Pablo St",
+                city: "Los Angeles",
+                state: "CA",
+                postalCode: "90033",
+                country: "US"
+            )
             return address
         }()
 
         var contact2 = OCKContact(
-            id: "matthew",
-            givenName: "Matthew",
-            familyName: "Reiff",
+            id: "thyroid_nurse",
+            givenName: "Mia",
+            familyName: "Lopez",
             carePlanUUID: nil
         )
-        contact2.title = "OBGYN"
-        contact2.role = "Dr. Reiff is an OBGYN with 13 years of experience."
-        contact2.phoneNumbers = [OCKLabeledValue(label: CNLabelWork, value: "(800) 257-1000")]
-        contact2.messagingNumbers = [OCKLabeledValue(label: CNLabelWork, value: "(800) 257-1234")]
+        contact2.title = String(localized: "CONTACT_THYROID_NURSE_TITLE")
+        contact2.role = String(localized: "CONTACT_THYROID_NURSE_ROLE")
+        contact2.emailAddresses = [
+            OCKLabeledValue(
+                label: CNLabelWork,
+                value: "thyroid.nurse@uscmed.org"
+            )
+        ]
+        contact2.phoneNumbers = [
+            OCKLabeledValue(label: CNLabelWork, value: "(800) 257-1000")
+        ]
+        contact2.messagingNumbers = [
+            OCKLabeledValue(label: CNLabelWork, value: "(800) 257-1234")
+        ]
         contact2.address = {
-			let address = OCKPostalAddress(
-				street: "1500 San Pablo St",
-				city: "Los Angeles",
-				state: "CA",
-				postalCode: "90033",
-				country: "US"
-			)
+            let address = OCKPostalAddress(
+                street: "1500 San Pablo St",
+                city: "Los Angeles",
+                state: "CA",
+                postalCode: "90033",
+                country: "US"
+            )
             return address
         }()
 

@@ -45,5 +45,8 @@ enum Constants {
     static let shouldRefreshView = "shouldRefreshView"
     static let userLoggedIn = "userLoggedIn"
     static let userTypeKey = "userType"
+    static let taskCardStyleKey = "taskCardStyle"
+    static let taskDomainKey = "taskDomain"
+    static let thyroidDomainValue = "thyroid-post-op"
     static let appName = "ParseCareKitSample"
 }

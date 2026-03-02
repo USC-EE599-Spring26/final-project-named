@@ -39,11 +39,9 @@ import UIKit
 @MainActor
 final class CareViewController: OCKDailyPageViewController, @unchecked Sendable {
 
-	private var isSyncing = false
-	private var isLoading = false
-    private var style: Styler {
-        CustomStylerKey.defaultValue
-    }
+    private var isSyncing = false
+    private var isLoading = false
+    private var style: Styler { CustomStylerKey.defaultValue }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,45 +86,43 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             return
         }
 
-		switch progress {
-		case 100:
-			self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-				title: "\(progress)",
-				style: .plain, target: self,
-				action: #selector(self.synchronizeWithRemote)
-			)
-			self.navigationItem.rightBarButtonItem?.tintColor = self.view.tintColor
+        switch progress {
+        case 100:
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+                title: "\(progress)",
+                style: .plain, target: self,
+                action: #selector(self.synchronizeWithRemote)
+            )
+            self.navigationItem.rightBarButtonItem?.tintColor = self.view.tintColor
 
-			// Give sometime for the user to see 100
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-				guard let self else { return }
-				self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-					barButtonSystemItem: .refresh,
-					target: self,
-					action: #selector(self.synchronizeWithRemote)
-				)
-				self.navigationItem.rightBarButtonItem?.tintColor = self.navigationItem.leftBarButtonItem?.tintColor
-			}
-		default:
-			self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-				title: "\(progress)",
-				style: .plain, target: self,
-				action: #selector(self.synchronizeWithRemote)
-			)
-			self.navigationItem.rightBarButtonItem?.tintColor = self.view.tintColor
-		}
+            // Give sometime for the user to see 100
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                guard let self else { return }
+                self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+                    barButtonSystemItem: .refresh,
+                    target: self,
+                    action: #selector(self.synchronizeWithRemote)
+                )
+                self.navigationItem.rightBarButtonItem?.tintColor = self.navigationItem.leftBarButtonItem?.tintColor
+            }
+        default:
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+                title: "\(progress)",
+                style: .plain, target: self,
+                action: #selector(self.synchronizeWithRemote)
+            )
+            self.navigationItem.rightBarButtonItem?.tintColor = self.view.tintColor
+        }
     }
 
     @objc private func synchronizeWithRemote() {
-        guard !isSyncing else {
-            return
-        }
+        guard !isSyncing else { return }
         isSyncing = true
         AppDelegateKey.defaultValue?.store.synchronize { error in
             let errorString = error?.localizedDescription ?? "Successful sync with remote!"
             Logger.feed.info("\(errorString)")
             DispatchQueue.main.async { [weak self] in
-				guard let self else { return }
+                guard let self else { return }
                 if error != nil {
                     self.navigationItem.rightBarButtonItem?.tintColor = .red
                 } else {
@@ -138,10 +134,8 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     }
 
     @objc private func reloadView(_ notification: Notification? = nil) {
-        guard !isLoading else {
-            return
-        }
-        self.reload()
+        guard !isLoading else { return }
+        reload()
     }
 
     /*
@@ -161,31 +155,17 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         let isCurrentDay = isSameDay(as: date)
 
         #if os(iOS)
-        // Only show the tip view on the current date
-        if isCurrentDay {
-            if Calendar.current.isDate(date, inSameDayAs: Date()) {
-                // Add a non-CareKit view into the list
-                let tipTitle = "Benefits of exercising"
-                let tipText = "Learn how activity can promote a healthy pregnancy."
-                let tipView = TipView()
-                tipView.headerView.titleLabel.text = tipTitle
-                tipView.headerView.detailLabel.text = tipText
-                tipView.imageView.image = UIImage(named: "exercise.jpg")
-                tipView.customStyle = CustomStylerKey.defaultValue
-                listViewController.appendView(tipView, animated: false)
-            }
-        }
+        appendRecoveryTipIfNeeded(
+            for: date,
+            isCurrentDay: isCurrentDay,
+            to: listViewController
+        )
         #endif
 
         fetchAndDisplayTasks(on: listViewController, for: date)
     }
 
-    private func isSameDay(as date: Date) -> Bool {
-        Calendar.current.isDate(
-            date,
-            inSameDayAs: Date()
-        )
-    }
+    private func isSameDay(as date: Date) -> Bool { Calendar.current.isDate(date, inSameDayAs: Date()) }
 
     private func modifyDateIfNeeded(_ date: Date) -> Date {
         guard date < .now else {
@@ -203,7 +183,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     ) {
         Task {
             let tasks = await self.fetchTasks(on: date)
-			appendTasks(tasks, to: listViewController, date: date)
+            appendTasks(tasks, to: listViewController, date: date)
         }
     }
 
@@ -212,10 +192,13 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         query.excludesTasksWithNoEvents = true
         do {
             let tasks = try await store.fetchAnyTasks(query: query)
-            let orderedTasks = TaskID.ordered.compactMap { orderedTaskID in
+            /*let orderedTasks = TaskID.ordered.compactMap { orderedTaskID in
                 tasks.first(where: { $0.id == orderedTaskID })
             }
-            return orderedTasks
+            let knownTaskIDs = Set(orderedTasks.map { $0.id })
+            let customTasks = tasks.filter { !knownTaskIDs.contains($0.id) }
+            return orderedTasks + customTasks*/
+            return tasks
         } catch {
             Logger.feed.error("Could not fetch tasks: \(error, privacy: .public)")
             return []
@@ -267,6 +250,18 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 
             return [card]
 
+        case let id where id.hasPrefix("custom-task-"):
+            return customTaskViewControllers(
+                for: task,
+                query: query,
+                store: self.store
+            )
+
+        case let id where id.hasPrefix("custom-healthkit-"):
+            return customHealthKitTaskViewControllers(
+                for: task,
+                query: query
+            )
         #if os(iOS)
         // Create a card for the doxylamine task if there are events for it on this day.
         case TaskID.doxylamine:
@@ -300,7 +295,19 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             #endif
 
         default:
-            return nil
+            #if os(iOS)
+            let card = OCKSimpleTaskViewController(
+                query: query,
+                store: self.store
+            )
+            return [card]
+            #else
+            let card = EventQueryView<SimpleTaskView>(
+                query: query
+            )
+            .formattedHostingController()
+            return [card]
+            #endif
         }
     }
 
@@ -326,11 +333,170 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         }.forEach { (cards: [UIViewController]) in
             cards.forEach {
                 let card = $0
-				listViewController.appendViewController(card, animated: true)
+                listViewController.appendViewController(card, animated: true)
             }
         }
-		self.isLoading = false
+        self.isLoading = false
     }
+}
+
+private func customTaskViewControllers(
+    for task: any OCKAnyTask,
+    query: OCKEventQuery,
+    store: OCKAnyStoreProtocol
+) -> [UIViewController] {
+    var selectedCard = CareKitCard.simple
+    var savedTask: OCKTask?// in order to access the asset for the featured card
+
+    if let regularTask = task as? OCKTask {
+        selectedCard = regularTask.card
+        savedTask = regularTask
+    }
+
+    if selectedCard == .button {
+        let card = OCKButtonLogTaskViewController(
+            query: query,
+            store: store
+        )
+        return [card]
+    }
+
+    if selectedCard == .checklist {
+        let card = OCKChecklistTaskViewController(
+            query: query,
+            store: store
+        )
+        return [card]
+    }
+
+    if selectedCard == .grid {
+        let card = OCKGridTaskViewController(
+            query: query,
+            store: store
+        )
+        return [card]
+    }
+
+    if selectedCard == .instruction {
+        let card = OCKInstructionsTaskViewController(
+            query: query,
+            store: store
+        )
+        return [card]
+    }
+
+    if selectedCard == .featured {
+        let card = featuredTaskViewController(for: savedTask)
+        return [card]
+    }
+
+    if selectedCard == .link {
+        let card = linkTaskViewController(for: savedTask)
+        return [card]
+    }
+
+    let card = OCKSimpleTaskViewController(
+        query: query,
+        store: store
+    )
+    return [card]
+}
+
+private func featuredTaskViewController(
+    for task: OCKTask?
+) -> UIViewController {
+    let featuredView = OCKFeaturedContentView(imageOverlayStyle: .light)
+    featuredView.directionalLayoutMargins = NSDirectionalEdgeInsets(
+        top: 20,
+        leading: 20,
+        bottom: 36,
+        trailing: 20
+    )
+    featuredView.label.text = task?.title ?? "Voice Recovery Milestone"
+    featuredView.imageView.image = UIImage(
+        systemName: task?.asset ?? "mic.fill",
+        withConfiguration: UIImage.SymbolConfiguration(
+            pointSize: 120,
+            weight: .regular
+        )
+    )
+    featuredView.imageView.contentMode = .center
+
+    let viewController = UIViewController()
+    viewController.view = featuredView
+    return viewController
+}
+
+private func linkTaskViewController(
+    for task: OCKTask?
+) -> UIViewController {
+    let title = Text(task?.title ?? "Recovery Resource")
+    let detail = Text("Keck Medicine")
+    let instructions = Text(
+        task?.instructions ??
+        "Open the Keck Medicine thyroidectomy page for recovery guidance."
+    )
+
+    let card = LinkView(
+        title: title,
+        detail: detail,
+        instructions: instructions,
+        links: [
+            .website(
+                "https://www.keckmedicine.org/treatments/total-thyroidectomy/",
+                title: "Open Keck Medicine"
+            )
+        ]
+    )
+    .formattedHostingController()
+
+    return card
+}
+
+private func appendRecoveryTipIfNeeded(
+    for date: Date,
+    isCurrentDay: Bool,
+    to listViewController: OCKListViewController
+) {
+    guard isCurrentDay else { return }
+    guard Calendar.current.isDate(date, inSameDayAs: Date()) else { return }
+
+    let tipView = TipView()
+    tipView.headerView.titleLabel.text = "Voice Recovery Tips"
+    tipView.headerView.detailLabel.text = """
+    Hydration, gentle voice rest, and walking can support thyroid surgery recovery.
+    """
+    tipView.imageView.image = UIImage(systemName: "mic.fill")
+    tipView.imageView.contentMode = .scaleAspectFit
+    tipView.imageView.tintColor = UIColor(red: 0.70, green: 0.23, blue: 0.23, alpha: 1.0)
+    tipView.imageView.backgroundColor = UIColor(red: 0.99, green: 0.97, blue: 0.93, alpha: 1.0)
+    tipView.customStyle = CustomStylerKey.defaultValue
+    listViewController.appendView(tipView, animated: false)
+}
+
+private func customHealthKitTaskViewControllers(
+    for task: any OCKAnyTask,
+    query: OCKEventQuery
+) -> [UIViewController] {
+    var selectedCard = CareKitCard.numericProgress
+
+    if let healthKitTask = task as? OCKHealthKitTask {
+        selectedCard = healthKitTask.card
+    }
+
+    if selectedCard == .labeledValue {
+        let card = EventQueryView<LabeledValueTaskView>(
+            query: query
+        )
+        .formattedHostingController()
+        return [card]
+    }
+
+    let card = EventQueryView<NumericProgressTaskView>(
+        query: query
+    )
+    .formattedHostingController()
+    return [card]
 }
 
 private extension View {

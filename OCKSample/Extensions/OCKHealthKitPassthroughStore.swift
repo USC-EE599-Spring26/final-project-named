@@ -15,8 +15,8 @@ import os.log
 extension OCKHealthKitPassthroughStore {
 
     func populateDefaultHealthKitTasks(
-		startDate: Date = Date()
-	) async throws {
+        startDate: Date = Date()
+    ) async throws {
 
         let countUnit = HKUnit.count()
         let stepTargetValue = OCKOutcomeValue(
@@ -64,7 +64,7 @@ extension OCKHealthKitPassthroughStore {
                 categoryIdentifier: .ovulationTestResult
             )
         )
-        ovulationTestResult.asset = "circle.dotted"
+        ovulationTestResult.asset = "waveform.path.ecg"
         let tasks = [ steps, ovulationTestResult ]
 
         _ = try await addTasksIfNotPresent(tasks)

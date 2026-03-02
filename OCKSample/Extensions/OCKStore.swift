@@ -74,7 +74,7 @@ extension OCKStore {
             schedule: schedule
         )
         doxylamine.instructions = String(localized: "DOXYLAMINE_INSTRUCTIONS")
-        doxylamine.asset = "pills.fill"
+        doxylamine.asset = "drop.fill"
 
         let nauseaSchedule = OCKSchedule(
             composing: [
@@ -97,7 +97,7 @@ extension OCKStore {
         )
         nausea.impactsAdherence = false
         nausea.instructions = String(localized: "NAUSEA_INSTRUCTIONS")
-        nausea.asset = "bed.double"
+        nausea.asset = "waveform.path.ecg"
 
         let kegelElement = OCKScheduleElement(
             start: beforeBreakfast,
@@ -115,6 +115,7 @@ extension OCKStore {
         )
         kegels.impactsAdherence = true
         kegels.instructions = String(localized: "KEGEL_INSTRUCTIONS")
+        kegels.asset = "fork.knife"
 
         let stretchElement = OCKScheduleElement(
             start: beforeBreakfast,
@@ -131,7 +132,8 @@ extension OCKStore {
             schedule: stretchSchedule
         )
         stretch.impactsAdherence = true
-        stretch.asset = "figure.walk"
+        stretch.instructions = "Use gentle voice rest, avoid throat clearing, and speak only as needed."
+        stretch.asset = "mic.fill"
 
         _ = try await addTasksIfNotPresent(
             [
@@ -148,8 +150,8 @@ extension OCKStore {
             familyName: "Daniels",
             carePlanUUID: nil
         )
-        contact1.title = "Family Practice Doctor"
-        contact1.role = "Dr. Daniels is a family practice doctor with 8 years of experience."
+        contact1.title = "Endocrine Surgeon"
+        contact1.role = "Dr. Daniels manages post-thyroid-surgery follow-up and recovery planning."
         contact1.emailAddresses = [OCKLabeledValue(label: CNLabelEmailiCloud, value: "janedaniels@uky.edu")]
         contact1.phoneNumbers = [OCKLabeledValue(label: CNLabelWork, value: "(800) 257-2000")]
         contact1.messagingNumbers = [OCKLabeledValue(label: CNLabelWork, value: "(800) 357-2040")]
@@ -170,8 +172,8 @@ extension OCKStore {
             familyName: "Reiff",
             carePlanUUID: nil
         )
-        contact2.title = "OBGYN"
-        contact2.role = "Dr. Reiff is an OBGYN with 13 years of experience."
+        contact2.title = "Speech-Language Pathologist"
+        contact2.role = "Dr. Reiff supports voice and swallowing recovery after thyroid surgery."
         contact2.phoneNumbers = [OCKLabeledValue(label: CNLabelWork, value: "(800) 257-1000")]
         contact2.messagingNumbers = [OCKLabeledValue(label: CNLabelWork, value: "(800) 257-1234")]
         contact2.address = {

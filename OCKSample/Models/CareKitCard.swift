@@ -19,7 +19,7 @@ enum CareKitCard: String, CaseIterable, Identifiable {
     case link = "Link"
     case numericProgress = "Numeric Progress"
     case simple = "Simple"
-    //add
+    // add
     var supportHealthKitTask: Bool {
         switch self {
         case .numericProgress, .labeledValue:

@@ -13,6 +13,11 @@ import HealthKit
 import SwiftUI
 import os.log
 
+struct RegularTaskPayload {
+    let assetName: String
+    let linkURL: String?
+}
+
 @MainActor
 class ProfileViewModel: ObservableObject {
 
@@ -42,6 +47,7 @@ class ProfileViewModel: ObservableObject {
         guard let patient = patient as? OCKPatient else {
             return
         }
+        objectWillChange.send()
         self.patient = patient
     }
 
@@ -74,6 +80,7 @@ class ProfileViewModel: ObservableObject {
         if patientHasBeenUpdated {
             if let anyPatient = try await AppDelegateKey.defaultValue?.store.updateAnyPatient(patientToUpdate),
                let updatedPatient = anyPatient as? OCKPatient {
+                objectWillChange.send()
                 self.patient = updatedPatient
                 Logger.profile.info("Successfully updated patient and synced local state.")
             } else {
@@ -83,411 +90,219 @@ class ProfileViewModel: ObservableObject {
     }
 }
 
-enum TaskCardStyle: String, CaseIterable, Identifiable {
-    case instructions
-    case simple
-    case buttonLog
-    case checklist
-    case featured
-    case grid
-    case link
-    case numericProgress
-    case labeledValue
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .instructions:
-            return "Instruction"
-        case .simple:
-            return "Simple"
-        case .buttonLog:
-            return "Button"
-        case .checklist:
-            return "Checklist"
-        case .featured:
-            return "Featured"
-        case .grid:
-            return "Grid"
-        case .link:
-            return "Link"
-        case .numericProgress:
-            return "Numeric Progress"
-        case .labeledValue:
-            return "Labeled Value"
-        }
-    }
-
-    static var creationOptions: [TaskCardStyle] {
-        [ .buttonLog, .checklist, .featured, .grid, .instructions, .labeledValue, .link, .numericProgress, .simple ]
-    }
-
-    var healthKitCompatibleStyle: TaskCardStyle {
-        switch self {
-        case .numericProgress, .labeledValue:
-            return self
-        default:
-            return .numericProgress
-        }
-    }
-}
-
-enum ManagedTaskType: Equatable {
-    case task
-    case healthKitTask
-    case unknown
-
-    var displayName: String {
-        switch self {
-        case .task:
-            return "Task"
-        case .healthKitTask:
-            return "HealthKitTask"
-        case .unknown:
-            return "Task"
-        }
-    }
-}
-
 @MainActor
-final class TaskManagementViewModel: ObservableObject {
-    @Published var title = ""
-    @Published var instructions = ""
-    @Published var assetSymbol = "checkmark.circle"
-    @Published var selectedCardStyle: TaskCardStyle = .instructions
-    @Published var scheduleTime = Date()
-    @Published private(set) var tasks: [ManagedTaskItem] = []
-    @Published private(set) var statusMessage = ""
-    @Published private(set) var hasError = false
-    @Published private(set) var isProcessing = false
-    private var taskCache: [String: any OCKAnyTask] = [:]
-}
+class AddHealthKitTaskViewModel: ObservableObject {
+    // OCKHealthKitTask
+    func saveTask(
+        title: String,
+        instructions: String,
+        scheduleStart: Date,
+        cardType: CareKitCard,
+        assetName: String
+    ) {
+        // Validate form input.
+        let taskTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let taskInstructions = instructions.trimmingCharacters(in: .whitespacesAndNewlines)
 
-extension TaskManagementViewModel {
-    func createCareTask() async {
-        guard !isProcessing else { return }
-
-        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedTitle.isEmpty else {
-            hasError = true
-            statusMessage = "Task title is required."
+        guard !taskTitle.isEmpty, !taskInstructions.isEmpty else {
             return
         }
 
-        guard let store = AppDelegateKey.defaultValue?.store else {
-            hasError = true
-            statusMessage = "Care store is unavailable."
-            return
-        }
-
-        isProcessing = true
-        defer { isProcessing = false }
-
-        do {
-            var task = OCKTask(
-                id: makeTaskID(from: trimmedTitle),
-                title: trimmedTitle,
-                carePlanUUID: nil,
-                schedule: makeDailySchedule(time: scheduleTime)
-            )
-            applySharedTaskConfiguration(
-                to: &task,
-                cardStyle: selectedCardStyle
-            )
-            _ = try await store.addTask(task)
-            await onCreateSucceeded(message: "Task added successfully.")
-        } catch {
-            hasError = true
-            statusMessage = "Failed to add task: \(error.localizedDescription)"
-        }
-    }
-
-    func createHealthKitTask() async {
-        guard !isProcessing else { return }
-
-        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedTitle.isEmpty else {
-            hasError = true
-            statusMessage = "Task title is required."
-            return
-        }
-
-        guard let healthKitStore = AppDelegateKey.defaultValue?.healthKitStore else {
-            hasError = true
-            statusMessage = "HealthKit store is unavailable."
-            return
-        }
-
-        isProcessing = true
-        defer { isProcessing = false }
-
-        do {
-            let selectedStyle = selectedCardStyle
-            let effectiveStyle = selectedStyle.healthKitCompatibleStyle
-            var task = OCKHealthKitTask(
-                id: makeTaskID(from: trimmedTitle),
-                title: trimmedTitle,
-                carePlanUUID: nil,
-                schedule: makeDailySchedule(time: scheduleTime),
-                healthKitLinkage: healthKitLinkage(for: effectiveStyle)
-            )
-            applySharedTaskConfiguration(
-                to: &task,
-                cardStyle: effectiveStyle
-            )
-            _ = try await healthKitStore.addTasksIfNotPresent([task])
-
-            let status: String
-            if selectedStyle == effectiveStyle {
-                status = "HealthKitTask added successfully."
-            } else {
-                status = "HealthKitTask added. Card View changed to \(effectiveStyle.displayName)."
-            }
-            await onCreateSucceeded(message: status)
-        } catch {
-            hasError = true
-            statusMessage = "Failed to add HealthKitTask: \(error.localizedDescription)"
-        }
-    }
-
-    func refreshTasks() async {
+        // Get the shared stores.
         guard let appDelegate = AppDelegateKey.defaultValue else {
-            hasError = true
-            statusMessage = "App delegate is unavailable."
             return
         }
 
-        guard let store = appDelegate.store else {
-            hasError = true
-            statusMessage = "Care store is unavailable."
+        guard let healthKitStore = appDelegate.healthKitStore else {
             return
         }
 
-        let healthKitStore = appDelegate.healthKitStore
+        // Build a task from form data.
+        let task = makeHealthKitTask(
+            title: taskTitle,
+            instructions: taskInstructions,
+            scheduleStart: scheduleStart,
+            cardType: cardType,
+            assetName: assetName
+        )
 
-        do {
-            var query = OCKTaskQuery(for: Date())
-            query.excludesTasksWithNoEvents = false
-
-            var fetchedTasks = try await store.fetchAnyTasks(query: query)
-            if let healthKitStore {
-                let healthKitTasks = try await healthKitStore.fetchTasks(query: query)
-                fetchedTasks.append(contentsOf: healthKitTasks)
-            }
-
-            var nextTaskCache: [String: any OCKAnyTask] = [:]
-            let mappedTasks = fetchedTasks.map { task -> ManagedTaskItem in
-                nextTaskCache[task.id] = task
-                let rawTitle = task.title ?? ""
-                let displayTitle = rawTitle.isEmpty ? task.id : rawTitle
-                let rawAsset: String?
-                if let careTask = task as? OCKTask {
-                    rawAsset = careTask.asset
-                } else if let healthTask = task as? OCKHealthKitTask {
-                    rawAsset = healthTask.asset
-                } else {
-                    rawAsset = nil
-                }
-                let displayAsset = sanitizeAssetSymbol(rawAsset)
-                let userInfo = taskUserInfo(for: task)
-                let displayStyle = TaskCardStyle(
-                    rawValue: userInfo?[Constants.taskCardStyleKey] ?? ""
-                ) ?? .instructions
-                let displayTaskType: ManagedTaskType
-                if task is OCKHealthKitTask {
-                    displayTaskType = .healthKitTask
-                } else if task is OCKTask {
-                    displayTaskType = .task
-                } else {
-                    displayTaskType = .unknown
-                }
-                return ManagedTaskItem(
-                    id: task.id,
-                    title: displayTitle,
-                    assetSymbol: displayAsset,
-                    cardStyle: displayStyle,
-                    taskType: displayTaskType
+        // Save task.
+        healthKitStore.addTasks([task]) { result in
+            switch result {
+            case .success:
+                healthKitStore.requestHealthKitPermissionsForAllTasksInStore()
+                NotificationCenter.default.post(
+                    name: .init(rawValue: Constants.shouldRefreshView),
+                    object: nil
                 )
-            }
-            taskCache = nextTaskCache
-            tasks = mappedTasks.sorted {
-                $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
-            }
 
-            if hasError {
-                hasError = false
-                statusMessage = ""
+            case .failure(let error):
+                Logger.profile.error("Could not save HealthKit task: \(error)")
             }
-        } catch {
-            hasError = true
-            statusMessage = "Failed to load tasks: \(error.localizedDescription)"
         }
     }
 
-    func deleteTask(id: String) async {
-        guard !isProcessing else { return }
+    func saveRegularTask(
+        title: String,
+        instructions: String,
+        scheduleStart: Date,
+        cardType: CareKitCard,
+        payload: RegularTaskPayload
+    ) {
+        // Validate form input.
+        let taskTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let taskInstructions = instructions.trimmingCharacters(in: .whitespacesAndNewlines)
 
+        guard !taskTitle.isEmpty, !taskInstructions.isEmpty else {
+            return
+        }
+
+        // Get the shared stores.
         guard let appDelegate = AppDelegateKey.defaultValue else {
-            hasError = true
-            statusMessage = "App delegate is unavailable."
-            return
-        }
-        guard let store = appDelegate.store else {
-            hasError = true
-            statusMessage = "Care store is unavailable."
-            return
-        }
-        guard let anyTask = taskCache[id], let task = anyTask as? OCKTask else {
-            hasError = true
-            statusMessage = "Only Task entries are deletable here."
             return
         }
 
-        isProcessing = true
-        defer { isProcessing = false }
-
-        do {
-            _ = try await store.deleteTask(task)
-            NotificationCenter.default.post(
-                .init(name: Notification.Name(rawValue: Constants.shouldRefreshView))
-            )
-            hasError = false
-            statusMessage = "Task deleted."
-            await refreshTasks()
-        } catch {
-            hasError = true
-            statusMessage = "Failed to delete task: \(error.localizedDescription)"
-        }
-    }
-
-    func resetDraft() {
-        title = ""
-        instructions = ""
-        assetSymbol = "checkmark.circle"
-        selectedCardStyle = .instructions
-        scheduleTime = Date()
-        hasError = false
-        statusMessage = ""
-    }
-}
-
-private extension TaskManagementViewModel {
-    func onCreateSucceeded(message: String) async {
-        NotificationCenter.default.post(
-            .init(name: Notification.Name(rawValue: Constants.shouldRefreshView))
+        // Build a task from form data.
+        let task = makeRegularTask(
+            title: taskTitle,
+            instructions: taskInstructions,
+            scheduleStart: scheduleStart,
+            cardType: cardType,
+            payload: payload
         )
-        hasError = false
-        statusMessage = message
-        title = ""
-        instructions = ""
-        assetSymbol = "checkmark.circle"
-        selectedCardStyle = .instructions
-        await refreshTasks()
+
+        // Save task.
+        appDelegate.store.addTasks([task]) { result in
+            switch result {
+            case .success:
+                NotificationCenter.default.post(
+                    name: .init(rawValue: Constants.shouldRefreshView),
+                    object: nil
+                )
+
+            case .failure(let error):
+                Logger.profile.error("Could not save OCKTask: \(error)")
+            }
+        }
     }
+    // MARK: Helpers (private)
 
-    func makeDailySchedule(time: Date) -> OCKSchedule {
-        let components = Calendar.current.dateComponents(
-            [.hour, .minute],
-            from: time
-        )
-        let startDate = Calendar.current.date(
-            bySettingHour: components.hour ?? 8,
-            minute: components.minute ?? 0,
-            second: 0,
-            of: Date()
-        ) ?? Date()
-
-        return OCKSchedule(
+    private func makeHealthKitTask(
+        title: String,
+        instructions: String,
+        scheduleStart: Date,
+        cardType: CareKitCard,
+        assetName: String
+    ) -> OCKHealthKitTask {
+        let unit = HKUnit.count()
+        let target = OCKOutcomeValue(1000.0, units: unit.unitString)
+        let schedule = OCKSchedule(
             composing: [
                 OCKScheduleElement(
-                    start: startDate,
+                    start: scheduleStart,
                     end: nil,
-                    interval: DateComponents(day: 1)
+                    interval: DateComponents(day: 1),
+                    text: "Daily",
+                    targetValues: [target],
+                    duration: .allDay
                 )
             ]
         )
-    }
 
-    func makeTaskID(from title: String) -> String {
-        let slug = title
-            .lowercased()
-            .components(separatedBy: CharacterSet.alphanumerics.inverted)
-            .filter { !$0.isEmpty }
-            .joined(separator: "_")
-        let sanitizedTitle = slug.isEmpty ? "custom_task" : slug
-        let shortUUID = UUID().uuidString.prefix(8).lowercased()
-        return "\(sanitizedTitle)_\(shortUUID)"
-    }
-
-    func sanitizeAssetSymbol(_ input: String?) -> String {
-        let trimmed = (input ?? "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? "checkmark.circle" : trimmed
-    }
-
-    func taskUserInfo(for task: any OCKAnyTask) -> [String: String]? {
-        if let careTask = task as? OCKTask {
-            return careTask.userInfo
-        }
-        if let healthTask = task as? OCKHealthKitTask {
-            return healthTask.userInfo
-        }
-        return nil
-    }
-
-    func healthKitLinkage(for style: TaskCardStyle) -> OCKHealthKitLinkage {
-        switch style {
-        case .labeledValue:
-            return OCKHealthKitLinkage(
-                quantityIdentifier: .restingHeartRate,
-                quantityType: .discrete,
-                unit: HKUnit.count().unitDivided(by: .minute())
-            )
-        default:
-            return OCKHealthKitLinkage(
+        var task = OCKHealthKitTask(
+            id: "custom-healthkit-\(UUID().uuidString)",
+            title: title,
+            carePlanUUID: nil,
+            schedule: schedule,
+            healthKitLinkage: OCKHealthKitLinkage(
                 quantityIdentifier: .stepCount,
                 quantityType: .cumulative,
-                unit: .count()
+                unit: unit
             )
-        }
+        )
+        task.instructions = instructions
+        task.asset = assetName
+        task.card = cardType
+        task.impactsAdherence = true
+        return task
     }
 
-    func applySharedTaskConfiguration(
-        to task: inout OCKTask,
-        cardStyle: TaskCardStyle
-    ) {
-        let trimmedInstructions = instructions.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !trimmedInstructions.isEmpty {
-            task.instructions = trimmedInstructions
-        }
-        task.asset = sanitizeAssetSymbol(assetSymbol)
-        task.userInfo = [
-            Constants.taskCardStyleKey: cardStyle.rawValue,
-            Constants.taskDomainKey: Constants.thyroidDomainValue
-        ]
+    private func makeRegularTask(
+        title: String,
+        instructions: String,
+        scheduleStart: Date,
+        cardType: CareKitCard,
+        payload: RegularTaskPayload
+    ) -> OCKTask {
+        let schedule = OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: scheduleStart,
+                    end: nil,
+                    interval: DateComponents(day: 1),
+                    text: "Daily",
+                    targetValues: [],
+                    duration: .allDay
+                )
+            ]
+        )
+
+        var task = OCKTask(
+            id: "custom-task-\(UUID().uuidString)",
+            title: title,
+            carePlanUUID: nil,
+            schedule: schedule
+        )
+        task.instructions = instructions
+        task.asset = payload.assetName
+        task.card = cardType
+        task.linkURL = payload.linkURL
+        task.impactsAdherence = true
+        return task
     }
 
-    func applySharedTaskConfiguration(
-        to task: inout OCKHealthKitTask,
-        cardStyle: TaskCardStyle
-    ) {
-        let trimmedInstructions = instructions.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !trimmedInstructions.isEmpty {
-            task.instructions = trimmedInstructions
-        }
-        task.asset = sanitizeAssetSymbol(assetSymbol)
-        task.userInfo = [
-            Constants.taskCardStyleKey: cardStyle.rawValue,
-            Constants.taskDomainKey: Constants.thyroidDomainValue
-        ]
-    }
 }
 
-struct ManagedTaskItem: Identifiable {
-    let id: String
-    let title: String
-    let assetSymbol: String
-    let cardStyle: TaskCardStyle
-    let taskType: ManagedTaskType
+@MainActor
+class DeleteTasksViewModel: ObservableObject {
+    @Published var tasks: [OCKAnyTask] = []
+    @Published var errorMessage: String?
+
+    func loadTasks() async {
+        guard let appDelegate = AppDelegateKey.defaultValue else {
+            return
+        }
+
+        var query = OCKTaskQuery()
+        query.sortDescriptors = [.title(ascending: true)]
+
+        do {
+            tasks = try await appDelegate.storeCoordinator.fetchAnyTasks(query: query)
+            errorMessage = nil
+        } catch {
+            errorMessage = "Could not load tasks."
+            Logger.profile.error("Could not load tasks: \(error)")
+        }
+    }
+
+    func deleteTask(_ task: OCKAnyTask) async {
+        guard let appDelegate = AppDelegateKey.defaultValue else {
+            return
+        }
+
+        do {
+            _ = try await appDelegate.storeCoordinator.deleteAnyTask(task)
+            tasks.removeAll { currentTask in
+                currentTask.uuid == task.uuid
+            }
+            NotificationCenter.default.post(
+                name: .init(rawValue: Constants.shouldRefreshView),
+                object: nil
+            )
+            errorMessage = nil
+        } catch {
+            errorMessage = "Could not delete task."
+            Logger.profile.error("Could not delete task: \(error)")
+        }
+    }
 }

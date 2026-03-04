@@ -45,8 +45,8 @@ enum Constants {
     static let shouldRefreshView = "shouldRefreshView"
     static let userLoggedIn = "userLoggedIn"
     static let userTypeKey = "userType"
-    static let taskCardStyleKey = "taskCardStyle"
-    static let taskDomainKey = "taskDomain"
-    static let thyroidDomainValue = "thyroid-post-op"
     static let appName = "ParseCareKitSample"
+    static let card = "card"
+    static let linkURL = "linkURL"
+    static let defaultRecoveryResourceURL = "https://www.keckmedicine.org/treatments/total-thyroidectomy/"
 }

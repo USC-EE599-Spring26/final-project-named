@@ -13,7 +13,6 @@
 
 import ParseSwift
 import SwiftUI
-import UIKit
 
 /*
  Anything is @ is a wrapper that subscribes and refreshes
@@ -21,30 +20,43 @@ import UIKit
  in Section 2 for an explanation
  */
 struct LoginView: View {
-    @Environment(\.tintColorFlip) var tintColorFlip
     @ObservedObject var viewModel: LoginViewModel
     @State var usersname = ""
+    @State var email = ""
     @State var password = ""
     @State var firstName: String = ""
     @State var lastName: String = ""
     @State var signupLoginSegmentValue = 0
-
+    // modify:Add the color scheme you want for your app
+    private let backgroundTopColor = Color(red: 1.00, green: 0.97, blue: 0.90)
+    private let backgroundMiddleColor = Color(red: 0.99, green: 0.90, blue: 0.76)
+    private let backgroundBottomColor = Color(red: 0.95, green: 0.82, blue: 0.67)
+    private let segmentBackgroundColor = Color(red: 0.78, green: 0.87, blue: 0.72)
+    private let textFieldBackgroundColor = Color(red: 1.00, green: 0.99, blue: 0.96)
+    private let titleColor = Color(red: 0.34, green: 0.23, blue: 0.18)
+    private let primaryButtonColor = Color(red: 0.78, green: 0.45, blue: 0.24)
+    private let secondaryButtonColor = Color(red: 0.42, green: 0.49, blue: 0.62)
+    // modify:Add the color scheme you want for your app
     var body: some View {
         VStack {
-            // Change the title to the name of your application
-            Text("APP_NAME")
-                .font(.largeTitle)
-                .foregroundColor(.white)
-                .padding()
-            // Change this image to something that represents your application
-            Image("exercise.jpg")
-                .resizable()
-                .frame(width: 150, height: 150, alignment: .center)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(Color(.white), lineWidth: 4))
-                .shadow(radius: 10)
-                .padding()
+            VStack(spacing: 10) {
+                Image("heart")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 90, height: 90, alignment: .center)
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .stroke(titleColor.opacity(0.35), lineWidth: 2)
+                    )
+                    .shadow(color: titleColor.opacity(0.2), radius: 8, x: 0, y: 4)
 
+                Text("APP_NAME")
+                    .font(.largeTitle)
+                    .foregroundColor(titleColor)
+            }
+            .padding(.top, 12)
+            .padding(.bottom, 8)
             /*
              Example of how to do the picker here:
              https://www.swiftkickmobile.com/creating-a-segmented-control-in-swiftui/
@@ -55,35 +67,41 @@ struct LoginView: View {
                 Text("SIGN_UP").tag(1)
             }
             .pickerStyle(.segmented)
-            .background(Color(tintColorFlip))
+            .background(segmentBackgroundColor)
             .cornerRadius(20.0)
             .padding()
 
             VStack(alignment: .leading) {
                 TextField("USERNAME", text: $usersname)
                     .padding()
-                    .background(.white)
+                    .background(textFieldBackgroundColor)
                     .cornerRadius(20.0)
-                    .shadow(radius: 10.0, x: 20, y: 10)
+                    .shadow(color: titleColor.opacity(0.12), radius: 8, x: 0, y: 4)
                 SecureField("PASSWORD", text: $password)
                     .padding()
-                    .background(.white)
+                    .background(textFieldBackgroundColor)
                     .cornerRadius(20.0)
-                    .shadow(radius: 10.0, x: 20, y: 10)
+                    .shadow(color: titleColor.opacity(0.12), radius: 8, x: 0, y: 4)
 
                 switch signupLoginSegmentValue {
                 case 1:
+                    TextField("EMAIL", text: $email)
+                        .padding()
+                        .background(textFieldBackgroundColor)
+                        .cornerRadius(20.0)
+                        .shadow(color: titleColor.opacity(0.12), radius: 8, x: 0, y: 4)
+
                     TextField("GIVEN_NAME", text: $firstName)
                         .padding()
-                        .background(.white)
+                        .background(textFieldBackgroundColor)
                         .cornerRadius(20.0)
-                        .shadow(radius: 10.0, x: 20, y: 10)
+                        .shadow(color: titleColor.opacity(0.12), radius: 8, x: 0, y: 4)
 
                     TextField("FAMILY_NAME", text: $lastName)
                         .padding()
-                        .background(.white)
+                        .background(textFieldBackgroundColor)
                         .cornerRadius(20.0)
-                        .shadow(radius: 10.0, x: 20, y: 10)
+                        .shadow(color: titleColor.opacity(0.12), radius: 8, x: 0, y: 4)
                 default:
                     EmptyView()
                 }
@@ -99,19 +117,20 @@ struct LoginView: View {
                 case 1:
                     Task {
                         await viewModel.signup(
-							.patient,
-							username: usersname,
-							password: password,
-							firstName: firstName,
-							lastName: lastName
-						)
+                            .patient,
+                            username: usersname,
+                            email: email,
+                            password: password,
+                            firstName: firstName,
+                            lastName: lastName
+                        )
                     }
                 default:
                     Task {
                         await viewModel.login(
-							username: usersname,
-							password: password
-						)
+                            username: usersname,
+                            password: password
+                        )
                     }
                 }
             }, label: {
@@ -130,7 +149,7 @@ struct LoginView: View {
                         .frame(width: 300)
                 }
             })
-            .background(Color(.green))
+            .background(primaryButtonColor)
             .cornerRadius(15)
 
             Button(action: {
@@ -149,7 +168,7 @@ struct LoginView: View {
                     EmptyView()
                 }
             })
-            .background(Color(.lightGray))
+            .background(secondaryButtonColor)
             .cornerRadius(15)
 
             // If an error occurs show it on the screen
@@ -160,16 +179,38 @@ struct LoginView: View {
             Spacer()
         }
         .background(
-            LinearGradient(
-                gradient: Gradient(
-                    colors: [
-                        Color(tintColorFlip),
-                        Color.accentColor
-					]
-                ),
-                startPoint: .top,
-                endPoint: .bottom
-            )
+            ZStack {
+                LinearGradient(
+                    gradient: Gradient(
+                        colors: [
+                            backgroundTopColor,
+                            backgroundMiddleColor,
+                            backgroundBottomColor
+                            ]
+                    ),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+
+                Circle()
+                    .fill(Color.white.opacity(0.45))
+                    .frame(width: 220, height: 220)
+                    .offset(x: -130, y: -320)
+                    .blur(radius: 8)
+
+                Circle()
+                    .fill(Color(red: 0.87, green: 0.93, blue: 0.83).opacity(0.45))
+                    .frame(width: 180, height: 180)
+                    .offset(x: 150, y: -270)
+                    .blur(radius: 12)
+
+                Circle()
+                    .fill(Color(red: 1.00, green: 0.89, blue: 0.84).opacity(0.35))
+                    .frame(width: 260, height: 260)
+                    .offset(x: 140, y: 420)
+                    .blur(radius: 24)
+            }
+            .ignoresSafeArea()
         )
     }
 }

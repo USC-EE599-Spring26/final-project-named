@@ -20,7 +20,7 @@ extension OCKHealthKitPassthroughStore {
 
         let countUnit = HKUnit.count()
         let stepTargetValue = OCKOutcomeValue(
-            4000.0,
+            2000.0,
             units: countUnit.unitString
         )
         let stepTargetValues = [ stepTargetValue ]
@@ -33,9 +33,9 @@ extension OCKHealthKitPassthroughStore {
             duration: .allDay,
             targetValues: stepTargetValues
         )
-        var recoveryStepCount = OCKHealthKitTask(
-            id: TaskID.recoveryStepCount,
-            title: String(localized: "TASK_RECOVERY_STEPS_TITLE"),
+        var steps = OCKHealthKitTask(
+            id: TaskID.steps,
+            title: String(localized: "STEPS"),
             carePlanUUID: nil,
             schedule: stepSchedule,
             healthKitLinkage: OCKHealthKitLinkage(
@@ -44,15 +44,10 @@ extension OCKHealthKitPassthroughStore {
                 unit: countUnit
             )
         )
-        recoveryStepCount.asset = "figure.walk"
-        recoveryStepCount.instructions = String(localized: "TASK_RECOVERY_STEPS_INSTRUCTIONS")
-        recoveryStepCount.userInfo = [
-            Constants.taskCardStyleKey: "numericProgress",
-            Constants.taskDomainKey: Constants.thyroidDomainValue
-        ]
+        steps.asset = "figure.walk"
 
-        let restingHeartRateSchedule = OCKSchedule.dailyAtTime(
-            hour: 7,
+        let ovulationTestResultSchedule = OCKSchedule.dailyAtTime(
+            hour: 8,
             minutes: 0,
             start: startDate,
             end: nil,
@@ -60,24 +55,17 @@ extension OCKHealthKitPassthroughStore {
             duration: .allDay,
             targetValues: []
         )
-        var restingHeartRateTrend = OCKHealthKitTask(
-            id: TaskID.restingHeartRateTrend,
-            title: String(localized: "TASK_RESTING_HR_TITLE"),
+        var ovulationTestResult = OCKHealthKitTask(
+            id: TaskID.ovulationTestResult,
+            title: String(localized: "OVULATION_TEST_RESULT"),
             carePlanUUID: nil,
-            schedule: restingHeartRateSchedule,
+            schedule: ovulationTestResultSchedule,
             healthKitLinkage: OCKHealthKitLinkage(
-                quantityIdentifier: .restingHeartRate,
-                quantityType: .discrete,
-                unit: HKUnit.count().unitDivided(by: .minute())
+                categoryIdentifier: .ovulationTestResult
             )
         )
-        restingHeartRateTrend.asset = "heart.circle.fill"
-        restingHeartRateTrend.instructions = String(localized: "TASK_RESTING_HR_INSTRUCTIONS")
-        restingHeartRateTrend.userInfo = [
-            Constants.taskCardStyleKey: "labeledValue",
-            Constants.taskDomainKey: Constants.thyroidDomainValue
-        ]
-        let tasks = [ recoveryStepCount, restingHeartRateTrend ]
+        ovulationTestResult.asset = "waveform.path.ecg"
+        let tasks = [ steps, ovulationTestResult ]
 
         _ = try await addTasksIfNotPresent(tasks)
 

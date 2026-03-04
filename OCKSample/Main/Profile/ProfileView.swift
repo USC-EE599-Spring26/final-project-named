@@ -13,43 +13,44 @@ import os.log
 import SwiftUI
 
 struct ProfileView: View {
-
-    @CareStoreFetchRequest(query: query()) private var patients
+    private static var query = OCKPatientQuery(for: Date())
+    @CareStoreFetchRequest(query: query) private var patients
     @StateObject private var viewModel = ProfileViewModel()
-    @StateObject private var taskViewModel = TaskManagementViewModel()
     @ObservedObject var loginViewModel: LoginViewModel
-    @State private var isPresentingAddTask = false
+    @State var isPresentingAddTask = false
+    @State var isPresentingDeleteTasks = false
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ScrollView {
-                VStack(spacing: 20) {
-                    VStack(alignment: .leading) {
-                        TextField(
-                            "GIVEN_NAME",
-                            text: $viewModel.firstName
-                        )
-                        .padding()
-                        .cornerRadius(20.0)
-                        .shadow(radius: 10.0, x: 20, y: 10)
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Profile")
+                        .font(.system(size: 34, weight: .bold))
+                        .padding(.top, 8)
 
-                        TextField(
-                            "FAMILY_NAME",
-                            text: $viewModel.lastName
-                        )
-                        .padding()
-                        .cornerRadius(20.0)
-                        .shadow(radius: 10.0, x: 20, y: 10)
+                    VStack(spacing: 14) {
+                        TextField("First Name",
+                                  text: $viewModel.firstName)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
 
-                        DatePicker(
-                            "BIRTHDAY",
-                            selection: $viewModel.birthday,
-                            displayedComponents: [DatePickerComponents.date]
-                        )
-                        .padding()
-                        .cornerRadius(20.0)
-                        .shadow(radius: 10.0, x: 20, y: 10)
+                        TextField("Last Name",
+                                  text: $viewModel.lastName)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+
+                        DatePicker("Birthday",
+                                   selection: $viewModel.birthday,
+                                   displayedComponents: [DatePickerComponents.date])
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
                     }
+                    .padding(18)
+                    .background(Color(red: 0.97, green: 0.95, blue: 0.90))
+                    .cornerRadius(24)
 
                     Button(action: {
                         Task {
@@ -60,267 +61,274 @@ struct ProfileView: View {
                             }
                         }
                     }, label: {
-                        Text(
-                            "SAVE_PROFILE"
-                        )
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(width: 300, height: 50)
+                        Text("Save Profile")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity, minHeight: 52)
                     })
-                    .background(Color(.green))
-                    .cornerRadius(15)
+                    .background(Color(red: 0.74, green: 0.58, blue: 0.41))
+                    .cornerRadius(18)
 
-                    taskListSection
-
-                    // Notice that "action" is a closure (which is essentially
-                    // a function as argument like we discussed in class)
                     Button(action: {
                         Task {
                             await loginViewModel.logout()
                         }
                     }, label: {
-                        Text(
-                            "LOG_OUT"
-                        )
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(width: 300, height: 50)
+                        Text("Log Out")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity, minHeight: 52)
                     })
-                    .background(Color(.red))
-                    .cornerRadius(15)
+                    .background(Color(red: 0.82, green: 0.40, blue: 0.34))
+                    .cornerRadius(18)
+
+                    Button(action: {
+                        isPresentingDeleteTasks = true
+                    }, label: {
+                        Text("Delete Tasks")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity, minHeight: 52)
+                    })
+                    .background(Color(red: 0.62, green: 0.60, blue: 0.62))
+                    .cornerRadius(18)
+                    .sheet(isPresented: $isPresentingDeleteTasks) {
+                        DeleteTasksView(isPresented: $isPresentingDeleteTasks)
+                    }
                 }
-                .padding(.vertical, 12)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 32)
             }
-            .navigationTitle("Profile")
+            .background(Color(red: 0.99, green: 0.97, blue: 0.93))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Add Task") {
-                        taskViewModel.resetDraft()
+                    Button {
                         isPresentingAddTask = true
+                    } label: {
+                        Image(systemName: "plus")
                     }
+                    .accessibilityLabel("Add Task")
                 }
             }
             .sheet(isPresented: $isPresentingAddTask) {
-                AddTaskSheetView(taskViewModel: taskViewModel)
+                AddHealthKitTaskView(isPresented: $isPresentingAddTask)
             }
-        }
-        .onReceive(patients.publisher) { publishedPatient in
-            viewModel.updatePatient(publishedPatient.result)
-        }
-        .task {
-            await taskViewModel.refreshTasks()
-        }
-    }
-
-    static func query() -> OCKPatientQuery {
-        OCKPatientQuery(for: Date())
-    }
-
-    private var taskListSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Tasks")
-                .font(.headline)
-
-            if !taskViewModel.statusMessage.isEmpty {
-                Text(taskViewModel.statusMessage)
-                    .font(.footnote)
-                    .foregroundColor(taskViewModel.hasError ? .red : .green)
+            .onAppear {
+                if let patient = patients.first?.result {
+                    viewModel.updatePatient(patient)
+                }
             }
-
-            if taskViewModel.tasks.isEmpty {
-                Text("No tasks yet.")
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-            } else {
-                ForEach(taskViewModel.tasks) { task in
-                    HStack(alignment: .top) {
-                        Image(systemName: safeSymbolName(task.assetSymbol))
-                            .font(.body)
-                            .frame(width: 24, height: 24)
-                            .foregroundColor(.accentColor)
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(task.title)
-                                .font(.body)
-                            Text(task.taskType.displayName)
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            Text(task.cardStyle.displayName)
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            Text(task.id)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        Spacer()
-                        Button(role: .destructive) {
-                            Task {
-                                await taskViewModel.deleteTask(id: task.id)
-                            }
-                        } label: {
-                            Text("Delete")
-                        }
-                        .buttonStyle(.bordered)
-                        .disabled(taskViewModel.isProcessing || task.taskType != .task)
-                    }
-                    .padding(10)
-                    .background(Color(.systemBackground))
-                    .cornerRadius(10)
+            .onChange(of: patients.count) { _ in
+                if let patient = patients.first?.result {
+                    viewModel.updatePatient(patient)
                 }
             }
         }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(16)
-        .shadow(radius: 5, x: 0, y: 1)
     }
-
-    private func safeSymbolName(_ rawSymbol: String) -> String {
-        let trimmed = rawSymbol.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? "checkmark.circle" : trimmed
-    }
-
 }
 
-private struct AddTaskSheetView: View {
-    @Environment(\.dismiss) private var dismiss
-    @ObservedObject var taskViewModel: TaskManagementViewModel
-
-    private let suggestedSymbols = [
-        "checkmark.circle",
-        "pills.fill",
-        "pills.circle.fill",
-        "cross.case.fill",
-        "waveform.path.ecg",
-        "heart.circle.fill",
-        "figure.walk",
-        "calendar.badge.clock",
-        "mouth.fill",
-        "bell.fill"
-    ]
+struct AddHealthKitTaskView: View {
+    @Binding var isPresented: Bool
+    private let viewModel = AddHealthKitTaskViewModel()
+    @State private var title = ""
+    @State private var instructions = ""
+    @State private var linkURL = ""
+    @State private var scheduleStart = Date()
+    @State private var selectedCard: CareKitCard = .numericProgress
+    @State private var selectedAsset = "cross.case.fill"
+    @State private var errorMessage: String?
+    // Choose task type first, then update the allowed card options.
+    @State private var selectedTaskType = "OCKHealthKitTask"
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             Form {
-                Section {
-                    TextField("Task title", text: $taskViewModel.title)
-                    TextField(
-                        "Instructions (optional)",
-                        text: $taskViewModel.instructions,
-                        axis: .vertical
-                    )
-                    .lineLimit(2...4)
-
-                    Picker("Card View", selection: $taskViewModel.selectedCardStyle) {
-                        ForEach(TaskCardStyle.creationOptions) { style in
-                            Text(style.displayName).tag(style)
+                Section("Task") {
+                    Picker("Task Type", selection: $selectedTaskType) {
+                        Text("OCKTask").tag("OCKTask")
+                        Text("OCKHealthKitTask").tag("OCKHealthKitTask")
+                    } // User can choose which task type to create.
+                    .onChange(of: selectedTaskType) { newValue in
+                        if newValue == "OCKHealthKitTask" {
+                            selectedCard = .numericProgress
+                        } else {
+                            selectedCard = .button
                         }
                     }
-                    .pickerStyle(.menu)
-                }
-
-                Section("Icon") {
-                    HStack(spacing: 10) {
-                        Image(systemName: safeSymbolName(taskViewModel.assetSymbol))
-                            .font(.title3)
-                            .frame(width: 26, height: 26)
-                            .foregroundColor(.accentColor)
-
-                        TextField(
-                            "SF Symbol name (e.g. pills.fill)",
-                            text: $taskViewModel.assetSymbol
-                        )
+                    TextField("Title", text: $title)
+                    TextField("Instructions", text: $instructions)
+                    if selectedTaskType == "OCKTask" && selectedCard == .link {
+                        TextField("Link URL", text: $linkURL)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .keyboardType(.URL)
                     }
-
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            ForEach(suggestedSymbols, id: \.self) { symbol in
-                                Button {
-                                    taskViewModel.assetSymbol = symbol
-                                } label: {
-                                    Image(systemName: symbol)
-                                        .frame(width: 24, height: 24)
-                                        .padding(6)
-                                }
-                                .buttonStyle(.bordered)
-                            }
-                        }
-                    }
-                }
-
-                Section("Schedule") {
                     DatePicker(
-                        "Reminder time",
-                        selection: $taskViewModel.scheduleTime,
-                        displayedComponents: .hourAndMinute
+                        "Schedule",
+                        selection: $scheduleStart,
+                        displayedComponents: [.date, .hourAndMinute]
                     )
-                }
-
-                Section("Create") {
-                    HStack {
-                        Text("Task")
-                        Spacer()
-                        Button("Add") {
-                            Task {
-                                await taskViewModel.createCareTask()
-                                if !taskViewModel.hasError {
-                                    dismiss()
-                                }
-                            }
+                    Picker("Card Type", selection: $selectedCard) {
+                        if selectedTaskType == "OCKTask" {
+                            Text(CareKitCard.button.rawValue).tag(CareKitCard.button)
+                            Text(CareKitCard.checklist.rawValue).tag(CareKitCard.checklist)
+                            Text(CareKitCard.featured.rawValue).tag(CareKitCard.featured)
+                            Text(CareKitCard.grid.rawValue).tag(CareKitCard.grid)
+                            Text(CareKitCard.instruction.rawValue).tag(CareKitCard.instruction)
+                            Text(CareKitCard.link.rawValue).tag(CareKitCard.link)
+                            Text(CareKitCard.simple.rawValue).tag(CareKitCard.simple)
+                        } else {
+                            Text(CareKitCard.numericProgress.rawValue).tag(CareKitCard.numericProgress)
+                            Text(CareKitCard.labeledValue.rawValue).tag(CareKitCard.labeledValue)
                         }
-                        .buttonStyle(.plain)
-                        .foregroundColor(.red)
-                        .disabled(taskViewModel.isProcessing || isTitleEmpty)
                     }
-
-                    HStack {
-                        Text("HealthKitTask")
-                        Spacer()
-                        Button("Add") {
-                            Task {
-                                await taskViewModel.createHealthKitTask()
-                                if !taskViewModel.hasError {
-                                    dismiss()
-                                }
-                            }
+                    Picker("Asset", selection: $selectedAsset) {
+                        ForEach(
+                            [
+                                "cross.case.fill",
+                                "heart.fill",
+                                "pills.fill",
+                                "waveform.path.ecg"
+                            ],
+                            id: \.self
+                        ) { asset in
+                            Text(asset)
+                                .tag(asset)
                         }
-                        .buttonStyle(.plain)
-                        .foregroundColor(.red)
-                        .disabled(taskViewModel.isProcessing || isTitleEmpty)
                     }
-
-                    Text("HealthKitTask syncs from Health data and is read-only.")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
                 }
-
-                if !taskViewModel.statusMessage.isEmpty {
-                    Text(taskViewModel.statusMessage)
-                        .font(.footnote)
-                        .foregroundColor(taskViewModel.hasError ? .red : .green)
+                if let errorMessage = errorMessage {
+                    Section {
+                        Text(errorMessage)
+                            .foregroundStyle(.red)
+                    }
+                }
+                Section {
+                    Button("Save") {
+                        saveTask()
+                    }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(Color(red: 0.99, green: 0.97, blue: 0.93))
             .navigationTitle("Add Task")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
-                        dismiss()
+                        isPresented = false
                     }
-                    .disabled(taskViewModel.isProcessing)
                 }
             }
         }
     }
 
-    private var isTitleEmpty: Bool {
-        taskViewModel.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    private func saveTask() {
+        let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanInstructions = instructions.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanTitle.isEmpty, !cleanInstructions.isEmpty else {
+            errorMessage = "Please fill in Title and Instructions."
+            return
+        }
+
+        errorMessage = nil
+        if selectedTaskType == "OCKTask" {
+            var cleanLinkURL: String?
+            if selectedCard == .link {
+                guard let validatedLinkURL = normalizedHTTPURL(
+                    linkURL.trimmingCharacters(in: .whitespacesAndNewlines)
+                ) else {
+                    errorMessage = "Please enter a valid http(s) URL for Link card."
+                    return
+                }
+                cleanLinkURL = validatedLinkURL
+            }
+
+            viewModel.saveRegularTask(
+                title: cleanTitle,
+                instructions: cleanInstructions,
+                scheduleStart: scheduleStart,
+                cardType: selectedCard,
+                payload: .init(
+                    assetName: selectedAsset,
+                    linkURL: cleanLinkURL
+                )
+            )
+        } else {
+            viewModel.saveTask(
+                title: cleanTitle,
+                instructions: cleanInstructions,
+                scheduleStart: scheduleStart,
+                cardType: selectedCard,
+                assetName: selectedAsset
+            )
+        }
+        isPresented = false
     }
 
-    private func safeSymbolName(_ rawSymbol: String) -> String {
-        let trimmed = rawSymbol.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? "checkmark.circle" : trimmed
+    private func normalizedHTTPURL(_ value: String) -> String? {
+        guard let parsedURL = URL(string: value),
+              let scheme = parsedURL.scheme?.lowercased(),
+              scheme == "http" || scheme == "https" else {
+            return nil
+        }
+        return value
+    }
+}
+
+struct DeleteTasksView: View {
+    @Binding var isPresented: Bool
+    @StateObject private var viewModel = DeleteTasksViewModel()
+
+    var body: some View {
+        NavigationView {
+            List {
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .foregroundStyle(.red)
+                }
+
+                if viewModel.tasks.isEmpty {
+                    Text("No tasks to delete.")
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(viewModel.tasks, id: \.uuid) { task in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(task.title ?? task.id)
+                                    .font(.headline)
+                                Text(task.id)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+
+                            Spacer()
+
+                            Button("Delete") {
+                                Task {
+                                    await viewModel.deleteTask(task)
+                                }
+                            }
+                            .foregroundColor(.red)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+            .background(Color(red: 0.99, green: 0.97, blue: 0.93))
+            .navigationTitle("Delete Tasks")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        isPresented = false
+                    }
+                }
+            }
+            .task {
+                await viewModel.loadTasks()
+            }
+        }
     }
 }
 

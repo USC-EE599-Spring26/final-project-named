@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 "START_SURVEY" = "Start Survey";
 
 // MARK: Login
-"APP_NAME" = "Thyroid Recovery Care";
+"APP_NAME" = "VocalERAS";
 "LOGIN_PICKER" = "Login Picker";
 "LOGIN" = "Login";
 "LOGIN_ANONYMOUSLY" = "Login Anonymously";
@@ -77,86 +77,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 "OPEN_APP_IPHONE" = "Please open the app on your iPhone";
 
 // MARK: Care View
-"NAUSEA_DOXYLAMINE_INTAKE" = "Nausea & Doxylamine Intake";
+"NAUSEA_DOXYLAMINE_INTAKE" = "Hydration & Symptom Recovery";
 "THIS_WEEK" = "This Week";
-"NAUSEA" = "Nausea";
-"DOXYLAMINE" = "Doxylamine";
-"TIP_RECOVERY_TITLE" = "Post-op Recovery Tip";
-"TIP_RECOVERY_TEXT" = "Take medicine on time, record symptoms daily, and gradually increase activity.";
+"NAUSEA" = "Symptoms";
+"DOXYLAMINE" = "Hydration";
 
 // MARK: Profile
 "BIRTHDAY" = "Birthday";
 "SAVE_PROFILE" = "Save Profile";
 "LOG_OUT" = "Log Out";
-"TASK_MANAGEMENT_TITLE" = "Task Management";
-"TASK_CREATE_BUTTON" = "Add Task";
-"TASK_EMPTY_STATE" = "No tasks available";
-"TASK_DELETE_BUTTON" = "Delete";
-"TASK_KIND_SECTION" = "Task Type";
-"TASK_KIND_PICKER" = "Type";
-"TASK_KIND_CARE" = "Care Task";
-"TASK_KIND_HEALTHKIT" = "HealthKit Task";
-"TASK_BASIC_SECTION" = "Basic Information";
-"TASK_TITLE" = "Title";
-"TASK_INSTRUCTIONS" = "Instructions";
-"TASK_ASSET" = "Asset (SF Symbol)";
-"TASK_CARD_STYLE" = "Card Style";
-"CARD_STYLE_INSTRUCTIONS" = "Instructions";
-"CARD_STYLE_SIMPLE" = "Simple";
-"CARD_STYLE_CHECKLIST" = "Checklist";
-"CARD_STYLE_BUTTON_LOG" = "Button Log";
-"CARD_STYLE_GRID" = "Grid";
-"CARD_STYLE_NUMERIC_PROGRESS" = "Numeric Progress";
-"CARD_STYLE_LABELED_VALUE" = "Labeled Value";
-"TASK_SCHEDULE_SECTION" = "Schedule";
-"TASK_SCHEDULE_PRESET" = "Preset";
-"SCHEDULE_DAILY" = "Daily";
-"SCHEDULE_EVERY_OTHER_DAY" = "Every Other Day";
-"SCHEDULE_WEEKLY" = "Weekly";
-"TASK_HOUR" = "Hour";
-"TASK_MINUTE" = "Minute";
-"TASK_HEALTH_SECTION" = "Health Metric";
-"TASK_HEALTH_METRIC" = "Metric";
-"HEALTH_METRIC_STEP_COUNT" = "Step Count";
-"HEALTH_METRIC_RESTING_HR" = "Resting Heart Rate";
-"TASK_CREATE_TITLE" = "Create Task";
-"TASK_CREATE_CONFIRM" = "Create";
-"TASK_ERROR_STORE_UNAVAILABLE" = "Care store is unavailable.";
-"TASK_ERROR_DELETE_UNSUPPORTED" = "Task type does not support delete.";
-"TASK_ERROR_TITLE_REQUIRED" = "Task title is required.";
-"TASK_ERROR_ASSET_REQUIRED" = "Asset symbol is required.";
 
 // MARK: TASKS
-"TAKE_DOXYLAMINE" = "Take Doxylamine";
-"DOXYLAMINE_INSTRUCTIONS" = "Take 25mg of doxylamine when you experience nausea";
+"TAKE_DOXYLAMINE" = "Hydration Reminder";
+"DOXYLAMINE_INSTRUCTIONS" = "Sip water regularly and keep your throat moist during voice recovery.";
 "ANYTIME_DURING_DAY" = "Anytime throughout the day";
-"TRACK_NAUSEA" = "Track your nausea";
-"NAUSEA_INSTRUCTIONS" = "Tap the button below anytime you experience nausea";
-"KEGEL_EXERCISES" = "Kegel Exercises";
-"KEGEL_INSTRUCTIONS" = "Perform kegel exercises";
-"STRETCH" = "Stretch";
-"STEPS" = "Steps";
-"OVULATION_TEST_RESULT" = "Ovulation Test Result";
-"TASK_LEVOTHYROXINE_TITLE" = "Take Levothyroxine";
-"TASK_LEVOTHYROXINE_INSTRUCTIONS" = "Take on an empty stomach every morning, 30 minutes before breakfast.";
-"TASK_CALCIUM_TITLE" = "Calcium Supplement";
-"TASK_CALCIUM_INSTRUCTIONS" = "Take calcium daily as prescribed and avoid taking it with thyroid hormone.";
-"TASK_INCISION_TITLE" = "Incision Care Check";
-"TASK_INCISION_INSTRUCTIONS" = "Check the incision for redness, swelling, or discharge.";
-"TASK_SYMPTOM_SCORE_TITLE" = "Daily Symptom Score";
-"TASK_SYMPTOM_SCORE_INSTRUCTIONS" = "Log pain, fatigue, numbness, or palpitations using today's symptom score.";
-"TASK_VOICE_REST_TITLE" = "Voice Rest Exercise";
-"TASK_VOICE_REST_INSTRUCTIONS" = "Practice gentle voice-rest and hydration every other day.";
-"TASK_FOLLOW_UP_TITLE" = "Follow-up Reminder";
-"TASK_FOLLOW_UP_INSTRUCTIONS" = "Track weekly follow-up milestones and upcoming visits.";
-"TASK_RECOVERY_STEPS_TITLE" = "Recovery Step Count";
-"TASK_RECOVERY_STEPS_INSTRUCTIONS" = "Track daily walking volume and increase gradually as tolerated.";
-"TASK_RESTING_HR_TITLE" = "Resting Heart Rate Trend";
-"TASK_RESTING_HR_INSTRUCTIONS" = "Review resting heart rate trends to monitor recovery stability.";
-"CONTACT_ENDOCRINE_SURGEON_TITLE" = "Endocrine Surgeon";
-"CONTACT_ENDOCRINE_SURGEON_ROLE" = "Leads post-thyroidectomy care planning and follow-up decisions.";
-"CONTACT_THYROID_NURSE_TITLE" = "Thyroid Specialty Nurse";
-"CONTACT_THYROID_NURSE_ROLE" = "Coordinates symptom monitoring, medication education, and daily recovery support.";
+"TRACK_NAUSEA" = "Log Voice or Swallowing Symptoms";
+"NAUSEA_INSTRUCTIONS" = "Tap the button below when you notice hoarseness, vocal fatigue, or swallowing discomfort.";
+"KEGEL_EXERCISES" = "Swallowing Comfort Check";
+"KEGEL_INSTRUCTIONS" = "Record whether swallowing feels painful, tight, or difficult today.";
+"STRETCH" = "Voice Rest Guidance";
+"STEPS" = "Daily Walking Goal";
+"OVULATION_TEST_RESULT" = "Voice Recovery Check";
+"LINK" = "Why do you need Thyroid Removal";
 
 // MARK: Charts
 "CHOOSE_DATE_INTERVAL" = "Chose date interval";

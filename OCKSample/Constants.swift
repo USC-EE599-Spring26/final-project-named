@@ -47,4 +47,6 @@ enum Constants {
     static let userTypeKey = "userType"
     static let appName = "ParseCareKitSample"
     static let card = "card"
+    static let linkURL = "linkURL"
+    static let defaultRecoveryResourceURL = "https://www.keckmedicine.org/treatments/total-thyroidectomy/"
 }

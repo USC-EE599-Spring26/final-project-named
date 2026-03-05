@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 "START_SURVEY" = "Start Survey";
 
 // MARK: Login
-"APP_NAME" = "VocalERAS";
+"APP_NAME" = "ThyroRecover";
 "LOGIN_PICKER" = "Login Picker";
 "LOGIN" = "Login";
 "LOGIN_ANONYMOUSLY" = "Login Anonymously";
@@ -98,6 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 "STRETCH" = "Voice Rest Guidance";
 "STEPS" = "Daily Walking Goal";
 "OVULATION_TEST_RESULT" = "Voice Recovery Check";
+"LINK" = "Why do you need Thyroid Removal";
 
 // MARK: Charts
 "CHOOSE_DATE_INTERVAL" = "Chose date interval";

@@ -135,12 +135,25 @@ extension OCKStore {
         stretch.instructions = "Use gentle voice rest, avoid throat clearing, and speak only as needed."
         stretch.asset = "mic.fill"
 
+        var keckResource = OCKTask(
+            id: TaskID.keckResource,
+            title: "Open Keck Medicine",
+            carePlanUUID: nil,
+            schedule: stretchSchedule
+        )
+        keckResource.impactsAdherence = false
+        keckResource.instructions = "Open the Keck Medicine thyroidectomy page for recovery guidance."
+        keckResource.asset = "safari"
+        keckResource.card = .link
+        keckResource.linkURL = Constants.defaultRecoveryResourceURL
+
         _ = try await addTasksIfNotPresent(
             [
                 nausea,
                 doxylamine,
                 kegels,
-                stretch
+                stretch,
+                keckResource
             ]
         )
 

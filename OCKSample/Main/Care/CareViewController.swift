@@ -260,7 +260,8 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         case let id where id.hasPrefix("custom-healthkit-"):
             return customHealthKitTaskViewControllers(
                 for: task,
-                query: query
+                query: query,
+                store: self.store
             )
         #if os(iOS)
         // Create a card for the doxylamine task if there are events for it on this day.
@@ -318,6 +319,9 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     ) {
         let isCurrentDay = isSameDay(as: date)
         tasks.compactMap {
+            let isLinkCardTask = ($0 as? OCKTask)?.card == .link
+            let shouldEnableInteraction = isCurrentDay || isLinkCardTask
+
             let cards = self.taskViewControllers(
                 $0,
                 on: date
@@ -326,8 +330,8 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                 if let carekitView = $0.view as? OCKView {
                     carekitView.customStyle = style
                 }
-                $0.view.isUserInteractionEnabled = isCurrentDay
-                $0.view.alpha = !isCurrentDay ? 0.4 : 1.0
+                $0.view.isUserInteractionEnabled = shouldEnableInteraction
+                $0.view.alpha = shouldEnableInteraction ? 1.0 : 0.4
             }
             return cards
         }.forEach { (cards: [UIViewController]) in
@@ -462,14 +466,9 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 @MainActor private func featuredTaskViewController(
     for task: OCKTask?
 ) -> UIViewController {
-    let featuredView = OCKFeaturedContentView(imageOverlayStyle: .light)
-    featuredView.directionalLayoutMargins = NSDirectionalEdgeInsets(
-        top: 20,
-        leading: 20,
-        bottom: 36,
-        trailing: 20
-    )
-    featuredView.label.text = task?.title ?? "Voice Recovery Milestone"
+    let featuredView = TipView()
+    featuredView.headerView.titleLabel.text = task?.title ?? "Voice Recovery Milestone"
+    featuredView.headerView.detailLabel.text = task?.instructions ?? "Complete this recovery milestone today."
     featuredView.imageView.image = UIImage(
         systemName: task?.asset ?? "mic.fill",
         withConfiguration: UIImage.SymbolConfiguration(
@@ -478,6 +477,8 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         )
     )
     featuredView.imageView.contentMode = .center
+    featuredView.imageView.tintColor = UIColor(red: 0.70, green: 0.23, blue: 0.23, alpha: 1.0)
+    featuredView.imageView.backgroundColor = UIColor(red: 0.99, green: 0.97, blue: 0.93, alpha: 1.0)
 
     let viewController = UIViewController()
     viewController.view = featuredView
@@ -487,8 +488,12 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 @MainActor private func linkTaskViewController(
     for task: OCKTask?
 ) -> UIViewController {
+    let resourceURLString = resolvedLinkURLString(for: task)
+    let openLinkTitle = task?.title ?? "Open Link"
+    let detailText = URL(string: resourceURLString)?.host?
+        .replacingOccurrences(of: "www.", with: "") ?? "Recovery Resource"
     let title = Text(task?.title ?? "Recovery Resource")
-    let detail = Text("Keck Medicine")
+    let detail = Text(detailText)
     let instructions = Text(
         task?.instructions ??
         "Open the Keck Medicine thyroidectomy page for recovery guidance."
@@ -500,14 +505,36 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         instructions: instructions,
         links: [
             .website(
-                "https://www.keckmedicine.org/treatments/total-thyroidectomy/",
-                title: "Open Keck Medicine"
+                resourceURLString,
+                title: openLinkTitle
             )
         ]
     )
+    .contentShape(Rectangle())
+    .onTapGesture {
+        guard let url = URL(string: resourceURLString) else { return }
+        UIApplication.shared.open(url)
+    }
     .formattedHostingController()
 
     return card
+}
+
+private func resolvedLinkURLString(for task: OCKTask?) -> String {
+    if let taskURLString = normalizedHTTPURLString(task?.linkURL) {
+        return taskURLString
+    }
+    return Constants.defaultRecoveryResourceURL
+}
+
+private func normalizedHTTPURLString(_ value: String?) -> String? {
+    guard let value,
+          let parsedURL = URL(string: value),
+          let scheme = parsedURL.scheme?.lowercased(),
+          scheme == "http" || scheme == "https" else {
+        return nil
+    }
+    return value
 }
 
 @MainActor private func appendRecoveryTipIfNeeded(
@@ -534,7 +561,8 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 
 @MainActor private func customHealthKitTaskViewControllers(
     for task: any OCKAnyTask,
-    query: OCKEventQuery
+    query: OCKEventQuery,
+    store: OCKAnyStoreProtocol
 ) -> [UIViewController] {
     var selectedCard = CareKitCard.numericProgress
 
@@ -544,14 +572,16 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 
     if selectedCard == .labeledValue {
         let card = EventQueryView<LabeledValueTaskView>(
-            query: query
+            query: query,
+            // controller: controller
         )
         .formattedHostingController()
         return [card]
     }
 
     let card = EventQueryView<NumericProgressTaskView>(
-        query: query
+        query: query,
+        // store: store
     )
     .formattedHostingController()
     return [card]

@@ -14,7 +14,7 @@ extension OCKTask {
     var card: CareKitCard {
         get {
             guard let cardInfo = userInfo?[Constants.card],
-                  let careKitCard = CareKitCard(rawValue: cardInfo) else {
+                  let careKitCard = CareKitCard.fromStoredValue(cardInfo) else {
                 return .grid // Default card if none was saved
             }
             return careKitCard // Saved card type
@@ -26,6 +26,22 @@ extension OCKTask {
             }
             // Set the new card type
             userInfo?[Constants.card] = newValue.rawValue
+        }
+    }
+
+    var linkURL: String? {
+        get {
+            userInfo?[Constants.linkURL]
+        }
+        set {
+            if userInfo == nil {
+                userInfo = .init()
+            }
+            if let newValue {
+                userInfo?[Constants.linkURL] = newValue
+            } else {
+                userInfo?.removeValue(forKey: Constants.linkURL)
+            }
         }
     }
 }

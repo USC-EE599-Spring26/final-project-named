@@ -132,9 +132,12 @@ struct AddHealthKitTaskView: View {
     private let viewModel = AddHealthKitTaskViewModel()
     @State private var title = ""
     @State private var instructions = ""
+    @State private var linkURL = ""
+    @State private var checkListItem=""
     @State private var scheduleStart = Date()
     @State private var selectedCard: CareKitCard = .numericProgress
     @State private var selectedAsset = "cross.case.fill"
+    @State private var numericGoalText = "1000"
     @State private var errorMessage: String?
     // Choose task type first, then update the allowed card options.
     @State private var selectedTaskType = "OCKHealthKitTask"
@@ -156,6 +159,19 @@ struct AddHealthKitTaskView: View {
                     }
                     TextField("Title", text: $title)
                     TextField("Instructions", text: $instructions)
+                    if selectedTaskType == "OCKTask" && selectedCard == .link {
+                        TextField("Link URL", text: $linkURL)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .keyboardType(.URL)
+                    }
+                    if selectedTaskType == "OCKTask" && selectedCard == .checklist {
+                       TextField("Checklist Item", text: $checkListItem)
+                    }
+                    if selectedTaskType == "OCKHealthKitTask" && selectedCard == .numericProgress {
+                        TextField("Goal", text: $numericGoalText)
+                            .keyboardType(.decimalPad)
+                    }
                     DatePicker(
                         "Schedule",
                         selection: $scheduleStart,
@@ -171,8 +187,8 @@ struct AddHealthKitTaskView: View {
                             Text(CareKitCard.link.rawValue).tag(CareKitCard.link)
                             Text(CareKitCard.simple.rawValue).tag(CareKitCard.simple)
                         } else {
-                            Text(CareKitCard.numericProgress.rawValue).tag(CareKitCard.numericProgress)
-                            Text(CareKitCard.labeledValue.rawValue).tag(CareKitCard.labeledValue)
+                            Text("Recover Exercise").tag(CareKitCard.numericProgress)
+                            Text("heartRate").tag(CareKitCard.labeledValue)
                         }
                     }
                     Picker("Asset", selection: $selectedAsset) {
@@ -215,6 +231,15 @@ struct AddHealthKitTaskView: View {
         }
     }
 
+    private func normalizedHTTPURL(_ value: String) -> String? {
+        guard let parsedURL = URL(string: value),
+              let scheme = parsedURL.scheme?.lowercased(),
+              scheme == "http" || scheme == "https" else {
+            return nil
+        }
+        return value
+    }
+
     private func saveTask() {
         let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanInstructions = instructions.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -225,20 +250,55 @@ struct AddHealthKitTaskView: View {
 
         errorMessage = nil
         if selectedTaskType == "OCKTask" {
+            var cleanLinkURL: String?
+            var cleanChecklistItem: String?
+            if selectedCard == .link {
+                guard let validatedLinkURL = normalizedHTTPURL(
+                    linkURL.trimmingCharacters(in: .whitespacesAndNewlines)
+                ) else {
+                    errorMessage = "Please enter a valid http(s) URL for Link card."
+                    return
+                }
+                cleanLinkURL = validatedLinkURL
+            }
+            if selectedCard == .checklist {
+                let checklistItem = checkListItem.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !checklistItem.isEmpty else {
+                    errorMessage = "Please enter a checklist item for Checklist card."
+                    return
+                }
+                cleanChecklistItem = checklistItem
+            }
             viewModel.saveRegularTask(
                 title: cleanTitle,
                 instructions: cleanInstructions,
                 scheduleStart: scheduleStart,
                 cardType: selectedCard,
-                assetName: selectedAsset
+                payload: .init(
+                    assetName: selectedAsset,
+                    linkURL: cleanLinkURL,
+                    checklistItem: cleanChecklistItem
+                )
             )
         } else {
+            var numericGoalValue: Double?
+            if selectedCard == .numericProgress {
+                guard let parsedGoal = Double(numericGoalText.trimmingCharacters(in: .whitespacesAndNewlines)),
+                      parsedGoal > 0 else {
+                    errorMessage = "Please enter a valid goal greater than 0."
+                    return
+                }
+                numericGoalValue = parsedGoal
+            }
             viewModel.saveTask(
                 title: cleanTitle,
                 instructions: cleanInstructions,
                 scheduleStart: scheduleStart,
                 cardType: selectedCard,
-                assetName: selectedAsset
+                payload: .init(
+                    assetName: selectedAsset,
+                    numericGoalValue: numericGoalValue
+                )
             )
         }
         isPresented = false

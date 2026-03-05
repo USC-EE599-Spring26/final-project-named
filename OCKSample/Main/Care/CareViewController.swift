@@ -344,7 +344,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     }
 }
 
-@MainActor private func customTaskViewControllers(
+private func customTaskViewControllers(
     for task: any OCKAnyTask,
     query: OCKEventQuery,
     store: OCKAnyStoreProtocol
@@ -406,7 +406,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     return [card]
 }
 
-@MainActor private func featuredTaskViewController(
+private func featuredTaskViewController(
     for task: OCKTask?
 ) -> UIViewController {
     let featuredView = OCKFeaturedContentView(imageOverlayStyle: .light)
@@ -431,7 +431,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     return viewController
 }
 
-@MainActor private func linkTaskViewController(
+private func linkTaskViewController(
     for task: OCKTask?
 ) -> UIViewController {
     let resourceURLString = resolvedLinkURLString(for: task)

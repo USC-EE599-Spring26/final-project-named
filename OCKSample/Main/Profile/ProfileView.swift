@@ -118,7 +118,7 @@ struct ProfileView: View {
                     viewModel.updatePatient(patient)
                 }
             }
-            .onChange(of: patients.count) { _ in
+            .onChange(of: patients.count) { _, _ in
                 if let patient = patients.first?.result {
                     viewModel.updatePatient(patient)
                 }
@@ -148,7 +148,7 @@ struct AddHealthKitTaskView: View {
                         Text("OCKTask").tag("OCKTask")
                         Text("OCKHealthKitTask").tag("OCKHealthKitTask")
                     } // User can choose which task type to create.
-                    .onChange(of: selectedTaskType) { newValue in
+                    .onChange(of: selectedTaskType) { _, newValue in
                         if newValue == "OCKHealthKitTask" {
                             selectedCard = .numericProgress
                         } else {

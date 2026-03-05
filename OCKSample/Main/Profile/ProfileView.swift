@@ -133,6 +133,7 @@ struct AddHealthKitTaskView: View {
     @State private var title = ""
     @State private var instructions = ""
     @State private var linkURL = ""
+    @State private var checkListItem=""
     @State private var scheduleStart = Date()
     @State private var selectedCard: CareKitCard = .numericProgress
     @State private var selectedAsset = "cross.case.fill"
@@ -162,6 +163,9 @@ struct AddHealthKitTaskView: View {
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .keyboardType(.URL)
+                    }
+                    if selectedTaskType == "OCKTask" && selectedCard == .checklist {
+                       TextField("Checklist Item", text: $checkListItem)
                     }
                     DatePicker(
                         "Schedule",
@@ -220,9 +224,7 @@ struct AddHealthKitTaskView: View {
                 }
             }
         }
-        isPresented = false
     }
-
 
     private func normalizedHTTPURL(_ value: String) -> String? {
         guard let parsedURL = URL(string: value),
@@ -232,7 +234,6 @@ struct AddHealthKitTaskView: View {
         }
         return value
     }
-
 
     private func saveTask() {
         let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -244,12 +245,26 @@ struct AddHealthKitTaskView: View {
 
         errorMessage = nil
         if selectedTaskType == "OCKTask" {
+            var cleanLinkURL: String?
+            if selectedCard == .link {
+                guard let validatedLinkURL = normalizedHTTPURL(
+                    linkURL.trimmingCharacters(in: .whitespacesAndNewlines)
+                ) else {
+                    errorMessage = "Please enter a valid http(s) URL for Link card."
+                    return
+                }
+                cleanLinkURL = validatedLinkURL
+            }
             viewModel.saveRegularTask(
                 title: cleanTitle,
                 instructions: cleanInstructions,
                 scheduleStart: scheduleStart,
                 cardType: selectedCard,
-                assetName: selectedAsset
+                payload: .init(
+                    assetName: selectedAsset,
+                    linkURL: cleanLinkURL
+                ),
+                // assetName: selectedAsset
             )
         } else {
             viewModel.saveTask(
@@ -263,9 +278,6 @@ struct AddHealthKitTaskView: View {
         isPresented = false
     }
 }
-
-
-
 
 struct DeleteTasksView: View {
     @Binding var isPresented: Bool

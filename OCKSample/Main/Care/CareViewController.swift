@@ -576,15 +576,15 @@ private func normalizedHTTPURLString(_ value: String?) -> String? {
     if selectedCard == .labeledValue {
         let card = EventQueryView<LabeledValueTaskView>(
             query: query,
-            store: store
+            // controller: controller
         )
         .formattedHostingController()
         return [card]
     }
 
     let card = EventQueryView<NumericProgressTaskView>(
-        query: query
-        store: store
+        query: query,
+        // store: store
     )
     .formattedHostingController()
     return [card]

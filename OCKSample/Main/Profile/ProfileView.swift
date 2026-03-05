@@ -137,6 +137,7 @@ struct AddHealthKitTaskView: View {
     @State private var scheduleStart = Date()
     @State private var selectedCard: CareKitCard = .numericProgress
     @State private var selectedAsset = "cross.case.fill"
+    @State private var numericGoalText = "1000"
     @State private var errorMessage: String?
     // Choose task type first, then update the allowed card options.
     @State private var selectedTaskType = "OCKHealthKitTask"
@@ -167,6 +168,10 @@ struct AddHealthKitTaskView: View {
                     if selectedTaskType == "OCKTask" && selectedCard == .checklist {
                        TextField("Checklist Item", text: $checkListItem)
                     }
+                    if selectedTaskType == "OCKHealthKitTask" && selectedCard == .numericProgress {
+                        TextField("Goal", text: $numericGoalText)
+                            .keyboardType(.decimalPad)
+                    }
                     DatePicker(
                         "Schedule",
                         selection: $scheduleStart,
@@ -182,8 +187,8 @@ struct AddHealthKitTaskView: View {
                             Text(CareKitCard.link.rawValue).tag(CareKitCard.link)
                             Text(CareKitCard.simple.rawValue).tag(CareKitCard.simple)
                         } else {
-                            Text(CareKitCard.numericProgress.rawValue).tag(CareKitCard.numericProgress)
-                            Text(CareKitCard.labeledValue.rawValue).tag(CareKitCard.labeledValue)
+                            Text("Recover Exercise").tag(CareKitCard.numericProgress)
+                            Text("heartRate").tag(CareKitCard.labeledValue)
                         }
                     }
                     Picker("Asset", selection: $selectedAsset) {
@@ -246,6 +251,7 @@ struct AddHealthKitTaskView: View {
         errorMessage = nil
         if selectedTaskType == "OCKTask" {
             var cleanLinkURL: String?
+            var cleanChecklistItem: String?
             if selectedCard == .link {
                 guard let validatedLinkURL = normalizedHTTPURL(
                     linkURL.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -255,6 +261,14 @@ struct AddHealthKitTaskView: View {
                 }
                 cleanLinkURL = validatedLinkURL
             }
+            if selectedCard == .checklist {
+                let checklistItem = checkListItem.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !checklistItem.isEmpty else {
+                    errorMessage = "Please enter a checklist item for Checklist card."
+                    return
+                }
+                cleanChecklistItem = checklistItem
+            }
             viewModel.saveRegularTask(
                 title: cleanTitle,
                 instructions: cleanInstructions,
@@ -262,17 +276,29 @@ struct AddHealthKitTaskView: View {
                 cardType: selectedCard,
                 payload: .init(
                     assetName: selectedAsset,
-                    linkURL: cleanLinkURL
-                ),
-                // assetName: selectedAsset
+                    linkURL: cleanLinkURL,
+                    checklistItem: cleanChecklistItem
+                )
             )
         } else {
+            var numericGoalValue: Double?
+            if selectedCard == .numericProgress {
+                guard let parsedGoal = Double(numericGoalText.trimmingCharacters(in: .whitespacesAndNewlines)),
+                      parsedGoal > 0 else {
+                    errorMessage = "Please enter a valid goal greater than 0."
+                    return
+                }
+                numericGoalValue = parsedGoal
+            }
             viewModel.saveTask(
                 title: cleanTitle,
                 instructions: cleanInstructions,
                 scheduleStart: scheduleStart,
                 cardType: selectedCard,
-                assetName: selectedAsset
+                payload: .init(
+                    assetName: selectedAsset,
+                    numericGoalValue: numericGoalValue
+                )
             )
         }
         isPresented = false

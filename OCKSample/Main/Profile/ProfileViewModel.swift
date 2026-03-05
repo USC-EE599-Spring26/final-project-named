@@ -16,6 +16,12 @@ import os.log
 struct RegularTaskPayload {
     let assetName: String
     let linkURL: String?
+    let checklistItem: String?
+}
+
+struct HealthKitTaskPayload {
+    let assetName: String
+    let numericGoalValue: Double?
 }
 
 @MainActor
@@ -98,7 +104,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
         instructions: String,
         scheduleStart: Date,
         cardType: CareKitCard,
-        assetName: String
+        payload: HealthKitTaskPayload
     ) {
         // Validate form input.
         let taskTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -123,7 +129,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
             instructions: taskInstructions,
             scheduleStart: scheduleStart,
             cardType: cardType,
-            assetName: assetName
+            payload: payload
         )
 
         // Save task.
@@ -192,10 +198,32 @@ class AddHealthKitTaskViewModel: ObservableObject {
         instructions: String,
         scheduleStart: Date,
         cardType: CareKitCard,
-        assetName: String
+        payload: HealthKitTaskPayload
     ) -> OCKHealthKitTask {
-        let unit = HKUnit.count()
-        let target = OCKOutcomeValue(1000.0, units: unit.unitString)
+        let linkage: OCKHealthKitLinkage
+        let targetValues: [OCKOutcomeValue]
+
+        switch cardType {
+        case .labeledValue:
+            let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+            linkage = OCKHealthKitLinkage(
+                quantityIdentifier: .heartRate,
+                quantityType: .discrete,
+                unit: heartRateUnit
+            )
+            targetValues = []
+
+        default:
+            let stepUnit = HKUnit.count()
+            let goalValue = payload.numericGoalValue ?? 1000.0
+            linkage = OCKHealthKitLinkage(
+                quantityIdentifier: .stepCount,
+                quantityType: .cumulative,
+                unit: stepUnit
+            )
+            targetValues = [OCKOutcomeValue(goalValue, units: stepUnit.unitString)]
+        }
+
         let schedule = OCKSchedule(
             composing: [
                 OCKScheduleElement(
@@ -203,7 +231,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
                     end: nil,
                     interval: DateComponents(day: 1),
                     text: "Daily",
-                    targetValues: [target],
+                    targetValues: targetValues,
                     duration: .allDay
                 )
             ]
@@ -214,14 +242,10 @@ class AddHealthKitTaskViewModel: ObservableObject {
             title: title,
             carePlanUUID: nil,
             schedule: schedule,
-            healthKitLinkage: OCKHealthKitLinkage(
-                quantityIdentifier: .stepCount,
-                quantityType: .cumulative,
-                unit: unit
-            )
+            healthKitLinkage: linkage
         )
         task.instructions = instructions
-        task.asset = assetName
+        task.asset = payload.assetName
         task.card = cardType
         task.impactsAdherence = true
         return task
@@ -234,13 +258,20 @@ class AddHealthKitTaskViewModel: ObservableObject {
         cardType: CareKitCard,
         payload: RegularTaskPayload
     ) -> OCKTask {
+        let scheduleText: String
+        if cardType == .checklist {
+            scheduleText = payload.checklistItem ?? "Daily"
+        } else {
+            scheduleText = "Daily"
+        }
+
         let schedule = OCKSchedule(
             composing: [
                 OCKScheduleElement(
                     start: scheduleStart,
                     end: nil,
                     interval: DateComponents(day: 1),
-                    text: "Daily",
+                    text: scheduleText,
                     targetValues: [],
                     duration: .allDay
                 )

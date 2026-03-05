@@ -466,14 +466,9 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 @MainActor private func featuredTaskViewController(
     for task: OCKTask?
 ) -> UIViewController {
-    let featuredView = OCKFeaturedContentView(imageOverlayStyle: .light)
-    featuredView.directionalLayoutMargins = NSDirectionalEdgeInsets(
-        top: 20,
-        leading: 20,
-        bottom: 36,
-        trailing: 20
-    )
-    featuredView.label.text = task?.title ?? "Voice Recovery Milestone"
+    let featuredView = TipView()
+    featuredView.headerView.titleLabel.text = task?.title ?? "Voice Recovery Milestone"
+    featuredView.headerView.detailLabel.text = task?.instructions ?? "Complete this recovery milestone today."
     featuredView.imageView.image = UIImage(
         systemName: task?.asset ?? "mic.fill",
         withConfiguration: UIImage.SymbolConfiguration(
@@ -482,6 +477,8 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         )
     )
     featuredView.imageView.contentMode = .center
+    featuredView.imageView.tintColor = UIColor(red: 0.70, green: 0.23, blue: 0.23, alpha: 1.0)
+    featuredView.imageView.backgroundColor = UIColor(red: 0.99, green: 0.97, blue: 0.93, alpha: 1.0)
 
     let viewController = UIViewController()
     viewController.view = featuredView

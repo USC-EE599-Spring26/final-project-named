@@ -148,6 +148,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
         scheduleStart: Date,
         cardType: CareKitCard,
         payload: RegularTaskPayload
+        assetName: String
     ) {
         // Validate form input.
         let taskTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -168,7 +169,9 @@ class AddHealthKitTaskViewModel: ObservableObject {
             instructions: taskInstructions,
             scheduleStart: scheduleStart,
             cardType: cardType,
-            payload: payload
+            payload: payload,
+            assetName: assetName
+
         )
 
         // Save task.
@@ -232,7 +235,8 @@ class AddHealthKitTaskViewModel: ObservableObject {
         instructions: String,
         scheduleStart: Date,
         cardType: CareKitCard,
-        payload: RegularTaskPayload
+        payload: RegularTaskPayload,
+        assetName: String
     ) -> OCKTask {
         let schedule = OCKSchedule(
             composing: [
@@ -255,6 +259,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
         )
         task.instructions = instructions
         task.asset = payload.assetName
+        //task.asset = assetName
         task.card = cardType
         task.linkURL = payload.linkURL
         task.impactsAdherence = true

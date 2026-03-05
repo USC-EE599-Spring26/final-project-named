@@ -220,7 +220,19 @@ struct AddHealthKitTaskView: View {
                 }
             }
         }
+        isPresented = false
     }
+
+
+    private func normalizedHTTPURL(_ value: String) -> String? {
+        guard let parsedURL = URL(string: value),
+              let scheme = parsedURL.scheme?.lowercased(),
+              scheme == "http" || scheme == "https" else {
+            return nil
+        }
+        return value
+    }
+
 
     private func saveTask() {
         let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -232,26 +244,12 @@ struct AddHealthKitTaskView: View {
 
         errorMessage = nil
         if selectedTaskType == "OCKTask" {
-            var cleanLinkURL: String?
-            if selectedCard == .link {
-                guard let validatedLinkURL = normalizedHTTPURL(
-                    linkURL.trimmingCharacters(in: .whitespacesAndNewlines)
-                ) else {
-                    errorMessage = "Please enter a valid http(s) URL for Link card."
-                    return
-                }
-                cleanLinkURL = validatedLinkURL
-            }
-
             viewModel.saveRegularTask(
                 title: cleanTitle,
                 instructions: cleanInstructions,
                 scheduleStart: scheduleStart,
                 cardType: selectedCard,
-                payload: .init(
-                    assetName: selectedAsset,
-                    linkURL: cleanLinkURL
-                )
+                assetName: selectedAsset
             )
         } else {
             viewModel.saveTask(
@@ -264,16 +262,10 @@ struct AddHealthKitTaskView: View {
         }
         isPresented = false
     }
-
-    private func normalizedHTTPURL(_ value: String) -> String? {
-        guard let parsedURL = URL(string: value),
-              let scheme = parsedURL.scheme?.lowercased(),
-              scheme == "http" || scheme == "https" else {
-            return nil
-        }
-        return value
-    }
 }
+
+
+
 
 struct DeleteTasksView: View {
     @Binding var isPresented: Bool

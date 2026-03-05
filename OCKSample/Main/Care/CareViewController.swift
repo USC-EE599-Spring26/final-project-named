@@ -344,7 +344,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     }
 }
 
-private func customTaskViewControllers(
+@MainActor private func customTaskViewControllers(
     for task: any OCKAnyTask,
     query: OCKEventQuery,
     store: OCKAnyStoreProtocol
@@ -358,55 +358,112 @@ private func customTaskViewControllers(
     }
 
     if selectedCard == .button {
+        #if os(iOS)
         let card = OCKButtonLogTaskViewController(
             query: query,
             store: store
         )
         return [card]
+        #else
+        let card = EventQueryView<SimpleTaskView>(
+            query: query
+        )
+        .formattedHostingController()
+        return [card]
+        #endif
     }
 
     if selectedCard == .checklist {
+        #if os(iOS)
         let card = OCKChecklistTaskViewController(
             query: query,
             store: store
         )
         return [card]
+        #else
+        let card = EventQueryView<SimpleTaskView>(
+            query: query
+        )
+        .formattedHostingController()
+        return [card]
+        #endif
     }
 
     if selectedCard == .grid {
+        #if os(iOS)
         let card = OCKGridTaskViewController(
             query: query,
             store: store
         )
         return [card]
+        #else
+        let card = EventQueryView<SimpleTaskView>(
+            query: query
+        )
+        .formattedHostingController()
+        return [card]
+        #endif
     }
 
     if selectedCard == .instruction {
+        #if os(iOS)
         let card = OCKInstructionsTaskViewController(
             query: query,
             store: store
         )
         return [card]
+        #else
+        let card = EventQueryView<InstructionsTaskView>(
+            query: query
+        )
+        .formattedHostingController()
+        return [card]
+        #endif
     }
 
     if selectedCard == .featured {
+        #if os(iOS)
         let card = featuredTaskViewController(for: savedTask)
         return [card]
+        #else
+        let card = EventQueryView<SimpleTaskView>(
+            query: query
+        )
+        .formattedHostingController()
+        return [card]
+        #endif
     }
 
     if selectedCard == .link {
+        #if os(iOS)
         let card = linkTaskViewController(for: savedTask)
         return [card]
+        #else
+        let card = EventQueryView<SimpleTaskView>(
+            query: query
+        )
+        .formattedHostingController()
+        return [card]
+        #endif
     }
 
+    #if os(iOS)
     let card = OCKSimpleTaskViewController(
         query: query,
         store: store
     )
     return [card]
+    #else
+    let card = EventQueryView<SimpleTaskView>(
+        query: query
+    )
+    .formattedHostingController()
+    return [card]
+    #endif
 }
 
-private func featuredTaskViewController(
+#if os(iOS)
+@MainActor private func featuredTaskViewController(
     for task: OCKTask?
 ) -> UIViewController {
     let featuredView = OCKFeaturedContentView(imageOverlayStyle: .light)
@@ -431,7 +488,7 @@ private func featuredTaskViewController(
     return viewController
 }
 
-private func linkTaskViewController(
+@MainActor private func linkTaskViewController(
     for task: OCKTask?
 ) -> UIViewController {
     let resourceURLString = resolvedLinkURLString(for: task)
@@ -503,6 +560,7 @@ private func normalizedHTTPURLString(_ value: String?) -> String? {
     tipView.customStyle = CustomStylerKey.defaultValue
     listViewController.appendView(tipView, animated: false)
 }
+#endif
 
 @MainActor private func customHealthKitTaskViewControllers(
     for task: any OCKAnyTask,
@@ -516,21 +574,23 @@ private func normalizedHTTPURLString(_ value: String?) -> String? {
     }
 
     if selectedCard == .labeledValue {
-        let card = OCKSimpleTaskViewController(
+        let card = EventQueryView<LabeledValueTaskView>(
             query: query,
             store: store
         )
+        .formattedHostingController()
         return [card]
     }
 
-    let card = OCKSimpleTaskViewController(
-        query: query,
+    let card = EventQueryView<NumericProgressTaskView>(
+        query: query
         store: store
     )
+    .formattedHostingController()
     return [card]
 }
 
-private extension View {
+@MainActor private extension View {
     /// Convert SwiftUI view to UIKit view.
     func formattedHostingController() -> UIHostingController<Self> {
         let viewController = UIHostingController(rootView: self)

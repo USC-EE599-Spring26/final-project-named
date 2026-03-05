@@ -344,7 +344,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     }
 }
 
-private func customTaskViewControllers(
+@MainActor private func customTaskViewControllers(
     for task: any OCKAnyTask,
     query: OCKEventQuery,
     store: OCKAnyStoreProtocol
@@ -406,7 +406,7 @@ private func customTaskViewControllers(
     return [card]
 }
 
-private func featuredTaskViewController(
+@MainActor private func featuredTaskViewController(
     for task: OCKTask?
 ) -> UIViewController {
     let featuredView = OCKFeaturedContentView(imageOverlayStyle: .light)
@@ -431,7 +431,7 @@ private func featuredTaskViewController(
     return viewController
 }
 
-private func linkTaskViewController(
+@MainActor private func linkTaskViewController(
     for task: OCKTask?
 ) -> UIViewController {
     let resourceURLString = resolvedLinkURLString(for: task)
@@ -483,7 +483,7 @@ private func normalizedHTTPURLString(_ value: String?) -> String? {
     return value
 }
 
-private func appendRecoveryTipIfNeeded(
+@MainActor private func appendRecoveryTipIfNeeded(
     for date: Date,
     isCurrentDay: Bool,
     to listViewController: OCKListViewController
@@ -504,7 +504,7 @@ private func appendRecoveryTipIfNeeded(
     listViewController.appendView(tipView, animated: false)
 }
 
-private func customHealthKitTaskViewControllers(
+@MainActor private func customHealthKitTaskViewControllers(
     for task: any OCKAnyTask,
     query: OCKEventQuery,
     store: OCKAnyStoreProtocol

@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 "START_SURVEY" = "Start Survey";
 
 // MARK: Login
-"APP_NAME" = "CareKit Sample App";
+"APP_NAME" = "ThyroRecover";
 "LOGIN_PICKER" = "Login Picker";
 "LOGIN" = "Login";
 "LOGIN_ANONYMOUSLY" = "Login Anonymously";
@@ -77,10 +77,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 "OPEN_APP_IPHONE" = "Please open the app on your iPhone";
 
 // MARK: Care View
-"NAUSEA_DOXYLAMINE_INTAKE" = "Nausea & Doxylamine Intake";
+"NAUSEA_DOXYLAMINE_INTAKE" = "Hydration & Symptom Recovery";
 "THIS_WEEK" = "This Week";
-"NAUSEA" = "Nausea";
-"DOXYLAMINE" = "Doxylamine";
+"NAUSEA" = "Symptoms";
+"DOXYLAMINE" = "Hydration";
 
 // MARK: Profile
 "BIRTHDAY" = "Birthday";
@@ -88,16 +88,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 "LOG_OUT" = "Log Out";
 
 // MARK: TASKS
-"TAKE_DOXYLAMINE" = "Take Doxylamine";
-"DOXYLAMINE_INSTRUCTIONS" = "Take 25mg of doxylamine when you experience nausea";
+"TAKE_DOXYLAMINE" = "Hydration Reminder";
+"DOXYLAMINE_INSTRUCTIONS" = "Sip water regularly and keep your throat moist during voice recovery.";
 "ANYTIME_DURING_DAY" = "Anytime throughout the day";
-"TRACK_NAUSEA" = "Track your nausea";
-"NAUSEA_INSTRUCTIONS" = "Tap the button below anytime you experience nausea";
-"KEGEL_EXERCISES" = "Kegel Exercises";
-"KEGEL_INSTRUCTIONS" = "Perform kegel exercises";
-"STRETCH" = "Stretch";
-"STEPS" = "Steps";
-"OVULATION_TEST_RESULT" = "Ovulation Test Result";
+"TRACK_NAUSEA" = "Log Voice or Swallowing Symptoms";
+"NAUSEA_INSTRUCTIONS" = "Tap the button below when you notice hoarseness, vocal fatigue, or swallowing discomfort.";
+"KEGEL_EXERCISES" = "Swallowing Comfort Check";
+"KEGEL_INSTRUCTIONS" = "Record whether swallowing feels painful, tight, or difficult today.";
+"STRETCH" = "Voice Rest Guidance";
+"STEPS" = "Daily Walking Goal";
+"OVULATION_TEST_RESULT" = "Voice Recovery Check";
+"LINK" = "Why do you need Thyroid Removal";
 
 // MARK: Charts
 "CHOOSE_DATE_INTERVAL" = "Chose date interval";

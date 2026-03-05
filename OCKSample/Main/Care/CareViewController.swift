@@ -215,26 +215,26 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 
         switch task.id {
         case TaskID.steps:
-            let card = OCKSimpleTaskViewController(
-                query: query,
-                store: self.store
+            let card = EventQueryView<NumericProgressTaskView>(
+                query: query
             )
+            .formattedHostingController()
 
             return [card]
 
         case TaskID.ovulationTestResult:
-            let card = OCKSimpleTaskViewController(
-                query: query,
-                store: self.store
+            let card = EventQueryView<LabeledValueTaskView>(
+                query: query
             )
+            .formattedHostingController()
 
             return [card]
 
         case TaskID.stretch:
-            let card = OCKInstructionsTaskViewController(
-                query: query,
-                store: self.store
+            let card = EventQueryView<InstructionsTaskView>(
+                query: query
             )
+            .formattedHostingController()
 
             return [card]
 
@@ -243,10 +243,10 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
              Since the kegel task is only scheduled every other day, there will be cases
              where it is not contained in the tasks array returned from the query.
              */
-            let card = OCKSimpleTaskViewController(
-                query: query,
-                store: self.store
+            let card = EventQueryView<SimpleTaskView>(
+                query: query
             )
+            .formattedHostingController()
 
             return [card]
 

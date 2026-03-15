@@ -100,6 +100,67 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 "OVULATION_TEST_RESULT" = "Voice Recovery Check";
 "LINK" = "Why do you need Thyroid Removal";
 
+//MARK: SURVEY
+
+//daily survey
+"SYMPTOM_TRACKING" = "Post-surgery Symptom Tracking";
+"SYMPTOM_TRACKING_NECK_PAIN" = "Are you experience any neck pain or discomfort today?";
+"SYMPTOM_TRACKING_VOICE" = "Do you have a hoarse voice or difficuty speaking today";
+"SYMPTOM_TRACKING_FATIGUE_LEVEL" = "How would you rate your fatigue level today";
+"SYMPTOM_TRACKING_SWALLOWING_DIFFICULTY" = "Are you experiencing any difficulty swallowing or a feeling of a lump in your throat today?";
+"SYMPTOM_TRACKING_TEMP" = "If you take your temperature today, please enter it here";
+"SYMPTOM_TRACKING_MEDICHINE" =" Which pain Medication(s) did you take today?";
+"SYMPTOM_TRACKING_LEVEL" = " 0 is normal, 10 is very severe";
+"ANSWER_YES" = "Yes";
+"ANSWER_NO" = "No";
+
+//weekly servey
+"WEEKLY_EVALUATION" = "Post-surgery Symptom Evaluation";
+"WEEKLY_EVALUATION_DAILY_ACTIVITY" = "How would you rate your ability to perform daily activities (such as household chores, work, or studying) this week?";
+"WEEKLY_EVALUATION_SLEEP_QUALITY" = "How would you rate your sleep quality this week?";
+"WEEKLY_EVALUATION_APPETITE" = "How would you describe your appetite this week?";
+"WEEKLY_EVALUATION_WEIGHT" = "What is your current weight this week?";
+"WEEKLY_EVALUATION_PSYCHOLOGICAL_DISTRESS_FACTORS" = "Which of the following factors have caused you psychological distress?";
+"ANSWER_RECURRENCE" = "Concern about recurrence";
+"ANSWER_VOICE_CHANGE" = "Voice changes";
+"ANSWER_SLEEP" = "Sleep disturbances";
+"ANSWER_PAIN" = "Pain";
+
+"WEEKLY_EVALUATION_PSYCHOLOGICAL_DISTRESS" = "On a scale of 0–10, how would you rate your psychological distress over the past week? ";
+"WEEKLY_EVALUATION_PSYCHOLOGICAL_DISTRESS_LEVEL" = "(0 = No distress, 10 = Extreme distress)";
+"WEEKLY_EVALUATION_FAMILY_COMMUNICATION" = "How would you rate your communication with family or friends this week?";
+"WEEKLY_EVALUATION_FAMILY_COMMUNICATION_LEVEL" = "(0 = No communication, 5 = Excellent Communication)";
+"WEEKLY_EVALUATION_MEDICAL_COMMUNICATION" = "Have you communicated with a doctor or nurse this week? (No / Phone or online consultation / follow-up visit)";
+"ANSWER_ONLINE_CONSULATION" = "Online Consultation";
+"ANSWER_FOLLOW_UP_VISIT" = "Follow-up Visit";
+"ANSWER_PHONE" = "Phone";
+
+"WEEKLY_EVALUATION_COMPLICATION_SYMPTOMS" = "Are you experiencing any symptoms of complications?";
+"ANSWER_COMPLICATION_FEVER" = "Fever (>38.5°C / 101.3°F)";
+"ANSWER_COMPLICATION_BLEEDING" = "Bleeding";
+"ANSWER_COMPLICATION_BREATHING_DIFFICULTY" = "Difficulty breathing";
+"ANSWER_COMPLICATION_SEVERE_PAIN" = "Severe pain";
+
+"WEEKLY_EVALUATION_COMPLICATION_DATE" = "Date when complication symptoms first appeared";
+
+"ANSWER_NONE" = "None of the Above";
+"WEEKLY_EVALUATION_LEVEL" = " 0 is normal, 10 is very severe";
+
+// MARK: ResearchKit SwiftUI
+"BUTTON_CANCEL" = "Cancel";
+"BUTTON_NEXT" = "Next";
+"BUTTON_DONE" = "Done";
+"BUTTON_CLEAR" = "Clear";
+"IMAGE_SELECT_ALL" = "Select all that apply";
+"IMAGE_TAP_SELECT" = "Tap to select";
+"NAVIGATION_TITLE" = "%D of %D";
+"PICKER_TAP" = "Tap Here";
+"QUESTION_HEIGHT" = "Select Height";
+"QUESTION_PROGRESS" = "Question %D of %D";
+"QUESTION_WEIGHT" = "Select Weight";
+"SLIDER_CONFIG_FOR" = "Slider for";
+
+
 // MARK: Charts
 "CHOOSE_DATE_INTERVAL" = "Chose date interval";
 "TOTAL" = "Total";

@@ -9,7 +9,7 @@
 import Foundation
 import CareKitStore
 
-extension OCKHealthKitTask {
+extension OCKHealthKitTask: CareTask {
 
     var card: CareKitCard {
         get {

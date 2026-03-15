@@ -49,4 +49,5 @@ enum Constants {
     static let card = "card"
     static let linkURL = "linkURL"
     static let defaultRecoveryResourceURL = "https://www.keckmedicine.org/treatments/total-thyroidectomy/"
+    static let priority = "priority"
 }

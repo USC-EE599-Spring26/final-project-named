@@ -151,8 +151,6 @@
 		70F921B127CAC16E00368CEC /* SessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F921AB27CABE3000368CEC /* SessionDelegate.swift */; };
 		70F921B227CAC16E00368CEC /* RemoteSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F921AD27CABE7700368CEC /* RemoteSessionDelegate.swift */; };
 		70F921B327CAC16E00368CEC /* LocalSyncSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F921AF27CABED600368CEC /* LocalSyncSessionDelegate.swift */; };
-		791663472F66990100F49F3E /* ResearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E99E2F63C324007F9CB5 /* ResearchKit.framework */; platformFilter = ios; };
-		791663482F66990100F49F3E /* ResearchKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E99E2F63C324007F9CB5 /* ResearchKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7916634A2F66990600F49F3E /* ResearchKitActiveTask.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A42F63C324007F9CB5 /* ResearchKitActiveTask.framework */; platformFilter = ios; };
 		7916634B2F66990600F49F3E /* ResearchKitActiveTask.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A42F63C324007F9CB5 /* ResearchKitActiveTask.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7916634C2F66990D00F49F3E /* ResearchKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A22F63C324007F9CB5 /* ResearchKitUI.framework */; platformFilter = ios; };
@@ -168,6 +166,8 @@
 		794903802F685A7F009B32C3 /* CardEnabledEnvironmentKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7949037D2F685A7F009B32C3 /* CardEnabledEnvironmentKey.swift */; };
 		794903822F685B03009B32C3 /* MyCustomCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794903812F685AFA009B32C3 /* MyCustomCardView.swift */; };
 		794903832F685B03009B32C3 /* MyCustomCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794903812F685AFA009B32C3 /* MyCustomCardView.swift */; };
+		794903842F68697D009B32C3 /* ResearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E99E2F63C324007F9CB5 /* ResearchKit.framework */; platformFilter = ios; };
+		794903852F68697D009B32C3 /* ResearchKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E99E2F63C324007F9CB5 /* ResearchKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9103AA5227B8C913002C921E /* FontColorKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F03AA727860E7700E5AFB4 /* FontColorKey.swift */; };
 		91693818271B5E1600A634ED /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7036E63F25717F85006E9A3C /* Constants.swift */; };
 		9169381B271B64E100A634ED /* Styler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9169381A271B64E100A634ED /* Styler.swift */; };
@@ -274,7 +274,7 @@
 			files = (
 				7916634F2F66991300F49F3E /* ResearchKitSwiftUI.framework in Embed Frameworks */,
 				7916634D2F66990D00F49F3E /* ResearchKitUI.framework in Embed Frameworks */,
-				791663482F66990100F49F3E /* ResearchKit.framework in Embed Frameworks */,
+				794903852F68697D009B32C3 /* ResearchKit.framework in Embed Frameworks */,
 				7916634B2F66990600F49F3E /* ResearchKitActiveTask.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -439,9 +439,9 @@
 			files = (
 				918FDEAF271B3F8F0045A0EF /* ParseCareKit in Frameworks */,
 				7916634C2F66990D00F49F3E /* ResearchKitUI.framework in Frameworks */,
+				794903842F68697D009B32C3 /* ResearchKit.framework in Frameworks */,
 				7916634E2F66991300F49F3E /* ResearchKitSwiftUI.framework in Frameworks */,
 				708542F9276687F90029E888 /* HealthKit.framework in Frameworks */,
-				791663472F66990100F49F3E /* ResearchKit.framework in Frameworks */,
 				7916634A2F66990600F49F3E /* ResearchKitActiveTask.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

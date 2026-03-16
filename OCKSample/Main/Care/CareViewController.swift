@@ -230,21 +230,35 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                     switch standardTask.card {
 
                     case .button:
+                        #if os(iOS)
                         // This is a UIKit based card.
                         let card = OCKButtonLogTaskViewController(
                             query: query,
                             store: self.store
                         )
-
+                        #else
+                        let card = EventQueryView<SimpleTaskView>(
+                            query: query
+                        )
+                        .padding(.vertical, swiftUIPadding)
+                        .formattedHostingController()
+                        #endif
                         return [card]
 
                     case .checklist:
+                        #if os(iOS)
                         // This is a UIKit based card.
                         let card = OCKChecklistTaskViewController(
                             query: query,
                             store: self.store
                         )
-
+                        #else
+                        let card = EventQueryView<SimpleTaskView>(
+                            query: query
+                        )
+                        .padding(.vertical, swiftUIPadding)
+                        .formattedHostingController()
+                        #endif
                         return [card]
 
                     case .featured:

@@ -291,6 +291,17 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 
                                     return [card]
 
+                    case .custom:
+                        let shouldEnableInteraction = isSameDay(as: date)
+                        let card = EventQueryView<MyCustomCardView>(
+                            query: query
+                        )
+                        .cardEnabled(shouldEnableInteraction)
+                        .padding(.vertical, swiftUIPadding)
+                        .formattedHostingController()
+
+                        return [card]
+
                     default:
                         return nil
                     }

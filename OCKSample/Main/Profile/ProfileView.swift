@@ -181,6 +181,7 @@ struct AddHealthKitTaskView: View {
                         if selectedTaskType == "OCKTask" {
                             Text(CareKitCard.button.rawValue).tag(CareKitCard.button)
                             Text(CareKitCard.checklist.rawValue).tag(CareKitCard.checklist)
+                            Text(CareKitCard.custom.rawValue).tag(CareKitCard.custom)
                             Text(CareKitCard.featured.rawValue).tag(CareKitCard.featured)
                             Text(CareKitCard.grid.rawValue).tag(CareKitCard.grid)
                             Text(CareKitCard.instruction.rawValue).tag(CareKitCard.instruction)

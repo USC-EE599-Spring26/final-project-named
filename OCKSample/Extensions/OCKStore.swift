@@ -325,13 +325,13 @@ extension OCKStore {
 
     func createSymptomTrackingWeeklySurveyTask(carePlanUUID: UUID?) -> OCKTask {
             let weeklyEvaluationTaskId = TaskID.WeeklyEvaluation
-           // let thisMorning = Calendar.current.startOfDay(for: Date())
+            // let thisMorning = Calendar.current.startOfDay(for: Date())
             // let aFewDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: thisMorning)!
             // let beforeBreakfast = Calendar.current.date(byAdding: .hour, value: 8, to: aFewDaysAgo)!
             let weeklyEvaluationElement = OCKScheduleElement(
                 start: Date(),
                 end: nil,
-                interval: DateComponents(weekOfYear: 1)
+                interval: DateComponents(day: 1)
             )
             let weeklyEvaluationSchedule = OCKSchedule(
                 composing: [weeklyEvaluationElement]

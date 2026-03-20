@@ -16,6 +16,8 @@ enum TaskID {
     static let steps = "steps"
     static let ovulationTestResult = "ovulationTestResult"
     static let keckResource = "custom-task-keck-resource"
+    static let symptomTracking = "symptomTracking"
+    static let WeeklyEvaluation = "weeklyEvaluation"
 
     static var ordered: [String] {
         orderedObjective + orderedSubjective

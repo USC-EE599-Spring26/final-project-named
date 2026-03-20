@@ -45,7 +45,8 @@ extension OCKHealthKitPassthroughStore {
             )
         )
         steps.asset = "figure.walk"
-
+        steps.card = .numericProgress
+        steps.priority = 0
         let ovulationTestResultSchedule = OCKSchedule.dailyAtTime(
             hour: 8,
             minutes: 0,
@@ -65,6 +66,8 @@ extension OCKHealthKitPassthroughStore {
             )
         )
         ovulationTestResult.asset = "waveform.path.ecg"
+        ovulationTestResult.card = .labeledValue
+        ovulationTestResult.priority = 1
         let tasks = [ steps, ovulationTestResult ]
 
         _ = try await addTasksIfNotPresent(tasks)

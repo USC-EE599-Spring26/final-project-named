@@ -304,7 +304,9 @@ class DeleteTasksViewModel: ObservableObject {
             return
         }
 
-        var query = OCKTaskQuery()
+        // Keep the delete sheet aligned with the Care page by only showing
+        // tasks that are currently effective today.
+        var query = OCKTaskQuery(for: Date())
         query.sortDescriptors = [.title(ascending: true)]
 
         do {
@@ -323,9 +325,7 @@ class DeleteTasksViewModel: ObservableObject {
 
         do {
             _ = try await appDelegate.storeCoordinator.deleteAnyTask(task)
-            tasks.removeAll { currentTask in
-                currentTask.uuid == task.uuid
-            }
+            await loadTasks()
             NotificationCenter.default.post(
                 name: .init(rawValue: Constants.shouldRefreshView),
                 object: nil

@@ -262,12 +262,31 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                         return [card]
 
                     case .featured:
-                        // Can be implememented based off of midterm.
-                        return nil
+                        #if os(iOS)
+                        let card = featuredTaskViewController(for: standardTask)
+                        #else
+                        let card = EventQueryView<SimpleTaskView>(
+                            query: query
+                        )
+                        .padding(.vertical, swiftUIPadding)
+                        .formattedHostingController()
+                        #endif
+                        return [card]
 
                     case .grid:
-                        // Can be implememented based off of midterm.
-                        return nil
+                        #if os(iOS)
+                        let card = OCKGridTaskViewController(
+                            query: query,
+                            store: self.store
+                        )
+                        #else
+                        let card = EventQueryView<SimpleTaskView>(
+                            query: query
+                        )
+                        .padding(.vertical, swiftUIPadding)
+                        .formattedHostingController()
+                        #endif
+                        return [card]
 
                     case .instruction:
                         let card = EventQueryView<InstructionsTaskView>(
@@ -279,8 +298,16 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                         return [card]
 
                     case .link:
-                        // Can be implememented based off of midterm.
-                        return nil
+                        #if os(iOS)
+                        let card = linkTaskViewController(for: standardTask)
+                        #else
+                        let card = EventQueryView<SimpleTaskView>(
+                            query: query
+                        )
+                        .padding(.vertical, swiftUIPadding)
+                        .formattedHostingController()
+                        #endif
+                        return [card]
 
                     case .simple:
 

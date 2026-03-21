@@ -135,6 +135,7 @@ struct AddHealthKitTaskView: View {
     @State private var linkURL = ""
     @State private var checkListItem=""
     @State private var scheduleStart = Date()
+    @State private var repeatEveryDays = 1
     @State private var selectedCard: CareKitCard = .numericProgress
     @State private var selectedAsset = "cross.case.fill"
     @State private var numericGoalText = "1000"
@@ -173,10 +174,13 @@ struct AddHealthKitTaskView: View {
                             .keyboardType(.decimalPad)
                     }
                     DatePicker(
-                        "Schedule",
+                        "Start Date",
                         selection: $scheduleStart,
-                        displayedComponents: [.date, .hourAndMinute]
+                        displayedComponents: [.date]
                     )
+                    Stepper(value: $repeatEveryDays, in: 1...30) {
+                        Text(repeatDescription)
+                    }
                     Picker("Card Type", selection: $selectedCard) {
                         if selectedTaskType == "OCKTask" {
                             Text(CareKitCard.button.rawValue).tag(CareKitCard.button)
@@ -244,6 +248,10 @@ struct AddHealthKitTaskView: View {
     private func saveTask() {
         let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanInstructions = instructions.trimmingCharacters(in: .whitespacesAndNewlines)
+        let schedule = TaskScheduleConfiguration(
+            startDate: scheduleStart,
+            repeatEveryDays: repeatEveryDays
+        )
         guard !cleanTitle.isEmpty, !cleanInstructions.isEmpty else {
             errorMessage = "Please fill in Title and Instructions."
             return
@@ -273,7 +281,7 @@ struct AddHealthKitTaskView: View {
             viewModel.saveRegularTask(
                 title: cleanTitle,
                 instructions: cleanInstructions,
-                scheduleStart: scheduleStart,
+                schedule: schedule,
                 cardType: selectedCard,
                 payload: .init(
                     assetName: selectedAsset,
@@ -294,7 +302,7 @@ struct AddHealthKitTaskView: View {
             viewModel.saveTask(
                 title: cleanTitle,
                 instructions: cleanInstructions,
-                scheduleStart: scheduleStart,
+                schedule: schedule,
                 cardType: selectedCard,
                 payload: .init(
                     assetName: selectedAsset,
@@ -303,6 +311,10 @@ struct AddHealthKitTaskView: View {
             )
         }
         isPresented = false
+    }
+
+    private var repeatDescription: String {
+        repeatEveryDays == 1 ? "Repeat every day" : "Repeat every \(repeatEveryDays) days"
     }
 }
 

@@ -193,7 +193,7 @@ struct AddHealthKitTaskView: View {
                             Text(CareKitCard.simple.rawValue).tag(CareKitCard.simple)
                         } else {
                             Text("Recover Exercise").tag(CareKitCard.numericProgress)
-                            Text("heartRate").tag(CareKitCard.labeledValue)
+                            Text("restingHeartRate").tag(CareKitCard.labeledValue)
                         }
                     }
                     Picker("Asset", selection: $selectedAsset) {

@@ -14,7 +14,7 @@ enum TaskID {
     static let stretch = "stretch"
     static let kegels = "kegels"
     static let steps = "steps"
-    static let ovulationTestResult = "ovulationTestResult"
+    static let ovulationTestResult = "restingHeartRate"
     static let keckResource = "custom-task-keck-resource"
     static let symptomTracking = "symptomTracking"
     static let WeeklyEvaluation = "weeklyEvaluation"

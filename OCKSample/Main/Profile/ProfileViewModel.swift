@@ -220,7 +220,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
         case .labeledValue:
             let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
             linkage = OCKHealthKitLinkage(
-                quantityIdentifier: .heartRate,
+                quantityIdentifier: .restingHeartRate,
                 quantityType: .discrete,
                 unit: heartRateUnit
             )

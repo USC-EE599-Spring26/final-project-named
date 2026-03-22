@@ -351,8 +351,13 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                     switch healthTask.card {
 
                     case .labeledValue:
-                        // Can be implememented based off of midterm.
-                        return nil
+                        let card = EventQueryView<LabeledValueTaskView>(
+                            query: query
+                        )
+                        .padding(.vertical, swiftUIPadding)
+                        .formattedHostingController()
+
+                        return [card]
 
                     case .numericProgress:
                         let card = EventQueryView<NumericProgressTaskView>(

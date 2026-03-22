@@ -122,6 +122,26 @@ extension OCKStore {
         stretch.asset = "mic.fill"
         stretch.priority = 4
 
+        let walkingElement = OCKScheduleElement(
+            start: beforeBreakfast,
+            end: nil,
+            interval: DateComponents(day: 1)
+        )
+        let walkingSchedule = OCKSchedule(
+            composing: [walkingElement]
+        )
+        var walking = OCKTask(
+            id: TaskID.walking,
+            title: String(localized: "WALKING_CHECK"),
+            carePlanUUID: nil,
+            schedule: walkingSchedule
+        )
+        walking.impactsAdherence = true
+        walking.instructions = String(localized: "WALKING_INSTRUCTIONS")
+        walking.asset = "figure.walk"
+        walking.card = .instruction
+        walking.priority = 3
+
         var keckResource = OCKTask(
             id: TaskID.keckResource,
             title: "Open Keck Medicine",
@@ -146,6 +166,7 @@ extension OCKStore {
             [
                 nausea,
                 doxylamine,
+                walking,
                 stretch,
                 keckResource,
                 symptomTracking,

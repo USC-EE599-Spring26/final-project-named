@@ -96,6 +96,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 "KEGEL_EXERCISES" = "Swallowing Comfort Check";
 "KEGEL_INSTRUCTIONS" = "Record whether swallowing feels painful, tight, or difficult today.";
 "STRETCH" = "Voice Rest Guidance";
+"WALKING_CHECK" = "Walking Check";
+"WALKING_INSTRUCTIONS" = "Complete your planned recovery walk today.";
 "STEPS" = "Daily Walking Goal";
 "OVULATION_TEST_RESULT" = "Resting Heart Rate";
 "LINK" = "Why do you need Thyroid Removal";

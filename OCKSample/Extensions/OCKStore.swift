@@ -103,25 +103,6 @@ extension OCKStore {
         nausea.card = .button
         nausea.priority = 5
 
-        let kegelElement = OCKScheduleElement(
-            start: beforeBreakfast,
-            end: nil,
-            interval: DateComponents(day: 2)
-        )
-        let kegelSchedule = OCKSchedule(
-            composing: [kegelElement]
-        )
-        var kegels = OCKTask(
-            id: TaskID.kegels,
-            title: String(localized: "KEGEL_EXERCISES"),
-            carePlanUUID: nil,
-            schedule: kegelSchedule
-        )
-        kegels.impactsAdherence = true
-        kegels.instructions = String(localized: "KEGEL_INSTRUCTIONS")
-        kegels.asset = "fork.knife"
-        kegels.card = .instruction
-        kegels.priority = 3
         let stretchElement = OCKScheduleElement(
             start: beforeBreakfast,
             end: nil,
@@ -153,13 +134,18 @@ extension OCKStore {
         keckResource.card = .link
         keckResource.linkURL = Constants.defaultRecoveryResourceURL
 
+        var removedTaskQuery = OCKTaskQuery(for: Date())
+        removedTaskQuery.ids = [TaskID.kegels]
+        if let removedTask = try await fetchTasks(query: removedTaskQuery).first {
+            _ = try await deleteTask(removedTask)
+        }
+
         let symptomTracking = createSymptomTrackingSurveyTask(carePlanUUID: nil)
         let symptomTrackingWeekly = createSymptomTrackingWeeklySurveyTask(carePlanUUID: nil)
         _ = try await addTasksIfNotPresent(
             [
                 nausea,
                 doxylamine,
-                kegels,
                 stretch,
                 keckResource,
                 symptomTracking,
@@ -259,11 +245,12 @@ extension OCKStore {
 
             let questionTwo = SurveyQuestion(
                 id: "\(symptomTrackingTaskId)-voice",
-                type: .multipleChoice,
+                type: .slider,
                 required: true,
                 title: String(localized: "SYMPTOM_TRACKING_VOICE"),
-                textChoices: choices,
-                choiceSelectionLimit: .single
+                detail: String(localized: "SYMPTOM_TRACKING_LEVEL"),
+                integerRange: 0...10,
+                sliderStepValue: 1
             )
 
             let questionThree = SurveyQuestion(

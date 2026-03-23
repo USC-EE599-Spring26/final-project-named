@@ -40,7 +40,7 @@ extension OCKStore {
             )
 
             switch event.task.id {
-            case TaskID.doxylamine, TaskID.kegels, TaskID.stretch, TaskID.walking:
+            case TaskID.doxylamine, TaskID.kegels, TaskID.stretch, TaskID.walking, TaskID.neckMobility:
                 let randomBool: Bool = .random()
                 guard randomBool else { return nil }
                 let outcomeValue = createOutcomeValue(

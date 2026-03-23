@@ -142,6 +142,30 @@ extension OCKStore {
         walking.card = .instruction
         walking.priority = 3
 
+        let neckMobilitySchedule = OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: beforeBreakfast,
+                    end: nil,
+                    interval: DateComponents(day: 1),
+                    text: String(localized: "ANYTIME_DURING_DAY"),
+                    targetValues: [],
+                    duration: .allDay
+                )
+            ]
+        )
+        var neckMobility = OCKTask(
+            id: TaskID.neckMobility,
+            title: "Neck Mobility Check",
+            carePlanUUID: nil,
+            schedule: neckMobilitySchedule
+        )
+        neckMobility.impactsAdherence = true
+        neckMobility.instructions = "Tap Begin to follow a gentle guided neck mobility check."
+        neckMobility.asset = "heart.fill"
+        neckMobility.card = .custom
+        neckMobility.priority = 4
+
         var keckResource = OCKTask(
             id: TaskID.keckResource,
             title: "Open Keck Medicine",
@@ -167,6 +191,7 @@ extension OCKStore {
                 nausea,
                 doxylamine,
                 walking,
+                neckMobility,
                 stretch,
                 keckResource,
                 symptomTracking,

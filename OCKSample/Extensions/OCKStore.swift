@@ -49,6 +49,7 @@ extension OCKStore {
     ) async throws {
 
         let thisMorning = Calendar.current.startOfDay(for: startDate)
+        let onboardingEndDate = thisMorning.endOfDay
         let aFewDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: thisMorning)!
         let beforeBreakfast = Calendar.current.date(byAdding: .hour, value: 8, to: aFewDaysAgo)!
         let afterLunch = Calendar.current.date(byAdding: .hour, value: 14, to: aFewDaysAgo)!
@@ -142,6 +143,30 @@ extension OCKStore {
         walking.card = .instruction
         walking.priority = 3
 
+        let onboardingSchedule = OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: thisMorning,
+                    end: onboardingEndDate,
+                    interval: DateComponents(day: 1),
+                    text: "Task Due!",
+                    targetValues: [],
+                    duration: .allDay
+                )
+            ]
+        )
+        var onboard = OCKTask(
+            id: TaskID.onboard,
+            title: "Onboard",
+            carePlanUUID: nil,
+            schedule: onboardingSchedule
+        )
+        onboard.impactsAdherence = true
+        onboard.instructions = "You'll need to agree to some terms and conditions before we get started!"
+        onboard.asset = "hand.wave.fill"
+        onboard.card = .custom
+        onboard.priority = -1
+
         let neckMobilitySchedule = OCKSchedule(
             composing: [
                 OCKScheduleElement(
@@ -188,6 +213,7 @@ extension OCKStore {
         let symptomTrackingWeekly = createSymptomTrackingWeeklySurveyTask(carePlanUUID: nil)
         _ = try await addTasksIfNotPresent(
             [
+                onboard,
                 nausea,
                 doxylamine,
                 walking,

@@ -47,7 +47,8 @@ extension OCKHealthKitPassthroughStore {
         steps.asset = "figure.walk"
         steps.card = .numericProgress
         steps.priority = 0
-        let ovulationTestResultSchedule = OCKSchedule.dailyAtTime(
+        let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+        let restingHeartRateSchedule = OCKSchedule.dailyAtTime(
             hour: 8,
             minutes: 0,
             start: startDate,
@@ -56,19 +57,29 @@ extension OCKHealthKitPassthroughStore {
             duration: .allDay,
             targetValues: []
         )
-        var ovulationTestResult = OCKHealthKitTask(
+        var restingHeartRate = OCKHealthKitTask(
             id: TaskID.ovulationTestResult,
             title: String(localized: "OVULATION_TEST_RESULT"),
             carePlanUUID: nil,
-            schedule: ovulationTestResultSchedule,
+            schedule: restingHeartRateSchedule,
             healthKitLinkage: OCKHealthKitLinkage(
-                categoryIdentifier: .ovulationTestResult
+                quantityIdentifier: .restingHeartRate,
+                quantityType: .discrete,
+                unit: heartRateUnit
             )
         )
-        ovulationTestResult.asset = "waveform.path.ecg"
-        ovulationTestResult.card = .labeledValue
-        ovulationTestResult.priority = 1
-        let tasks = [ steps, ovulationTestResult ]
+        restingHeartRate.asset = "heart.fill"
+        restingHeartRate.card = .labeledValue
+        restingHeartRate.priority = 1
+
+        var removedTaskQuery = OCKTaskQuery(for: Date())
+        removedTaskQuery.ids = [TaskID.ovulationTestResult, "ovulationTestResult"]
+        let removedTasks = try await fetchTasks(query: removedTaskQuery)
+        for removedTask in removedTasks {
+            _ = try await deleteTask(removedTask)
+        }
+
+        let tasks = [ steps, restingHeartRate ]
 
         _ = try await addTasksIfNotPresent(tasks)
 

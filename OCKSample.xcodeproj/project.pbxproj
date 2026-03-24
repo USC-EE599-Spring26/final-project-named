@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1C15B08D2F70833500E8E3F6 /* DailyRecoverySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C15B0852F70832300E8E3F6 /* DailyRecoverySummary.swift */; };
+		1C15B08E2F70833500E8E3F6 /* DailyRecoverySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C15B0852F70832300E8E3F6 /* DailyRecoverySummary.swift */; };
+		1C15B08F2F70833500E8E3F6 /* DailyRecoverySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C15B0852F70832300E8E3F6 /* DailyRecoverySummary.swift */; };
+		1C15B0912F70837B00E8E3F6 /* RecoverySummaryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C15B0902F70837800E8E3F6 /* RecoverySummaryBuilder.swift */; };
+		1C15B0922F70837B00E8E3F6 /* RecoverySummaryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C15B0902F70837800E8E3F6 /* RecoverySummaryBuilder.swift */; };
+		1C15B0932F70837B00E8E3F6 /* RecoverySummaryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C15B0902F70837800E8E3F6 /* RecoverySummaryBuilder.swift */; };
+		1C17E13C2F70CB60005A7F34 /* NeckMobilityTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C17E1342F70CB5D005A7F34 /* NeckMobilityTaskView.swift */; };
+		1C17E13D2F70CB60005A7F34 /* NeckMobilityTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C17E1342F70CB5D005A7F34 /* NeckMobilityTaskView.swift */; };
+		1C17E13F2F70E56E005A7F34 /* OnboardTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C17E13E2F70E56C005A7F34 /* OnboardTaskView.swift */; };
+		1C17E1402F70E56E005A7F34 /* OnboardTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C17E13E2F70E56C005A7F34 /* OnboardTaskView.swift */; };
 		1C34E27A2F501CC900A29A18 /* DimensionStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C34E2792F501CBC00A29A18 /* DimensionStyle.swift */; };
 		1C34E27B2F501CC900A29A18 /* DimensionStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C34E2792F501CBC00A29A18 /* DimensionStyle.swift */; };
 		1C34E27C2F501CC900A29A18 /* DimensionStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C34E2792F501CBC00A29A18 /* DimensionStyle.swift */; };
@@ -318,6 +328,10 @@
 /* Begin PBXFileReference section */
 		03580E3E23CFA2E400A57818 /* OCKSample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OCKSample.entitlements; sourceTree = "<group>"; };
 		0520468223C3C1F2004F0F36 /* OCKSample.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = OCKSample.xctestplan; sourceTree = "<group>"; };
+		1C15B0852F70832300E8E3F6 /* DailyRecoverySummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyRecoverySummary.swift; sourceTree = "<group>"; };
+		1C15B0902F70837800E8E3F6 /* RecoverySummaryBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverySummaryBuilder.swift; sourceTree = "<group>"; };
+		1C17E1342F70CB5D005A7F34 /* NeckMobilityTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeckMobilityTaskView.swift; sourceTree = "<group>"; };
+		1C17E13E2F70E56C005A7F34 /* OnboardTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardTaskView.swift; sourceTree = "<group>"; };
 		1C34E2792F501CBC00A29A18 /* DimensionStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DimensionStyle.swift; sourceTree = "<group>"; };
 		1C34E27D2F501CF600A29A18 /* AnimationStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationStyler.swift; sourceTree = "<group>"; };
 		1C34E2812F501D1800A29A18 /* AppearanceStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceStyler.swift; sourceTree = "<group>"; };
@@ -661,6 +675,8 @@
 		70E3422C2DB058A7005124F9 /* Cards */ = {
 			isa = PBXGroup;
 			children = (
+				1C17E13E2F70E56C005A7F34 /* OnboardTaskView.swift */,
+				1C17E1342F70CB5D005A7F34 /* NeckMobilityTaskView.swift */,
 				794903812F685AFA009B32C3 /* MyCustomCardView.swift */,
 				E7C37848228F887800E982D8 /* TipView.swift */,
 				70E3422D2DB0626A005124F9 /* Modifiers */,
@@ -733,6 +749,8 @@
 		918FDEB3271B402F0045A0EF /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				1C15B0902F70837800E8E3F6 /* RecoverySummaryBuilder.swift */,
+				1C15B0852F70832300E8E3F6 /* DailyRecoverySummary.swift */,
 				1CA9EDFF2F5221C600C82A4F /* CareKitCard.swift */,
 				7099D1FE29E98D900037CD8E /* AppError.swift */,
 				7099D20A29E98E400037CD8E /* InstallationChannel.swift */,
@@ -1184,9 +1202,11 @@
 				707D29472DCBE68500980253 /* User.swift in Sources */,
 				707D29482DCBE68500980253 /* FontColorKey.swift in Sources */,
 				707D29492DCBE68500980253 /* MainView.swift in Sources */,
+				1C15B0932F70837B00E8E3F6 /* RecoverySummaryBuilder.swift in Sources */,
 				707D294A2DCBE68500980253 /* CustomStylerKey.swift in Sources */,
 				707D294B2DCBE68500980253 /* TipView.swift in Sources */,
 				707D29712DCBE6A000980253 /* OCKLocalization.swift in Sources */,
+				1C15B08F2F70833500E8E3F6 /* DailyRecoverySummary.swift in Sources */,
 				707D294C2DCBE68500980253 /* StoreCoordinatorKey.swift in Sources */,
 				1CA9EDFD2F52217F00C82A4F /* OCKTask+Card.swift in Sources */,
 				1CA9EE062F52276E00C82A4F /* CareKitTaskView.swift in Sources */,
@@ -1211,6 +1231,7 @@
 				707D295D2DCBE68500980253 /* LoginViewModel.swift in Sources */,
 				70B8E0A62F0EC1CA00440FCA /* Mutex.swift in Sources */,
 				707D295E2DCBE68500980253 /* Utility.swift in Sources */,
+				1C17E13D2F70CB60005A7F34 /* NeckMobilityTaskView.swift in Sources */,
 				1CA9EE012F5221CE00C82A4F /* CareKitCard.swift in Sources */,
 				707D295F2DCBE68500980253 /* OCKSampleApp.swift in Sources */,
 				1C34E27E2F501CF800A29A18 /* AnimationStyler.swift in Sources */,
@@ -1233,6 +1254,7 @@
 				707D296C2DCBE68500980253 /* RemoteSessionDelegate.swift in Sources */,
 				707D296D2DCBE68500980253 /* OCKPatient+Parse.swift in Sources */,
 				707D296E2DCBE68500980253 /* ColorStyler.swift in Sources */,
+				1C17E1402F70E56E005A7F34 /* OnboardTaskView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1251,6 +1273,7 @@
 				70221F3928D8C10800971195 /* StoreCoordinatorKey.swift in Sources */,
 				7099D20029E98D900037CD8E /* AppError.swift in Sources */,
 				70A98D63278A268B009B58F2 /* ColorStyler.swift in Sources */,
+				1C15B0922F70837B00E8E3F6 /* RecoverySummaryBuilder.swift in Sources */,
 				794903802F685A7F009B32C3 /* CardEnabledEnvironmentKey.swift in Sources */,
 				918FDEB8271B49060045A0EF /* Logger.swift in Sources */,
 				91AD923B24A4C42D00925D4D /* CareView.swift in Sources */,
@@ -1268,6 +1291,7 @@
 				70F921B227CAC16E00368CEC /* RemoteSessionDelegate.swift in Sources */,
 				70E342302DB062F8005124F9 /* NoHighlightStyle.swift in Sources */,
 				1CA9EDF82F52214E00C82A4F /* OCKHealthKitTask+Card.swift in Sources */,
+				1C15B08E2F70833500E8E3F6 /* DailyRecoverySummary.swift in Sources */,
 				7094DCF32DC340E40039CA64 /* SplashScreenView.swift in Sources */,
 				70221F2F28D7CDE400971195 /* AppDelegate+ParseRemoteDelegate.swift in Sources */,
 				7083A857279CA40F00B3832E /* PCKUtility.swift in Sources */,
@@ -1311,6 +1335,7 @@
 				7036E4CE256E9A0C006E9A3C /* ContactView.swift in Sources */,
 				70F03A972786098F00E5AFB4 /* OCKStore.swift in Sources */,
 				1C34E2822F501D1A00A29A18 /* AppearanceStyler.swift in Sources */,
+				1C15B0912F70837B00E8E3F6 /* RecoverySummaryBuilder.swift in Sources */,
 				70DFD80B2567074500B9DB12 /* LoginView.swift in Sources */,
 				707D28CF2DCA8AAB00980253 /* OCKStore+SampleData.swift in Sources */,
 				7055725B2DC33AB1008E5B0A /* SplashScreenView.swift in Sources */,
@@ -1320,6 +1345,7 @@
 				70221F3428D8ABBE00971195 /* AppDelegate+UIApplicationDelegate.swift in Sources */,
 				7949037E2F685A7F009B32C3 /* CardEnabledEnvironmentKey.swift in Sources */,
 				1CA9EDFE2F52217F00C82A4F /* OCKTask+Card.swift in Sources */,
+				1C15B08D2F70833500E8E3F6 /* DailyRecoverySummary.swift in Sources */,
 				9169381D271B650700A634ED /* ColorStyler.swift in Sources */,
 				E72B2C0A226939E3009A9438 /* AppDelegate.swift in Sources */,
 				7036E4C4256E0A48006E9A3C /* CareView.swift in Sources */,
@@ -1346,6 +1372,7 @@
 				1CA9EE052F52276E00C82A4F /* CareKitTaskView.swift in Sources */,
 				7083A856279CA40A00B3832E /* PCKUtility.swift in Sources */,
 				70B8E0A52F0EC1CA00440FCA /* Mutex.swift in Sources */,
+				1C17E13F2F70E56E005A7F34 /* OnboardTaskView.swift in Sources */,
 				1CA9EDFA2F52214E00C82A4F /* OCKHealthKitTask+Card.swift in Sources */,
 				70F921AE27CABE7700368CEC /* RemoteSessionDelegate.swift in Sources */,
 				794903832F685B03009B32C3 /* MyCustomCardView.swift in Sources */,
@@ -1353,6 +1380,7 @@
 				7036E4BF256DA089006E9A3C /* LoginViewModel.swift in Sources */,
 				7036E517256F2413006E9A3C /* ProfileViewModel.swift in Sources */,
 				7099D20B29E98E400037CD8E /* InstallationChannel.swift in Sources */,
+				1C17E13C2F70CB60005A7F34 /* NeckMobilityTaskView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

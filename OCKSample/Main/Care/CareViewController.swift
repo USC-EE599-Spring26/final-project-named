@@ -334,14 +334,34 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 
                     case .custom:
                         let shouldEnableInteraction = isSameDay(as: date)
-                        let card = EventQueryView<MyCustomCardView>(
-                            query: query
-                        )
-                        .cardEnabled(shouldEnableInteraction)
-                        .padding(.vertical, swiftUIPadding)
-                        .formattedHostingController()
+                        if standardTask.id == TaskID.onboard {
+                            let card = EventQueryView<OnboardTaskView>(
+                                query: query
+                            )
+                            .cardEnabled(shouldEnableInteraction)
+                            .padding(.vertical, swiftUIPadding)
+                            .formattedHostingController()
 
-                        return [card]
+                            return [card]
+                        } else if standardTask.id == TaskID.neckMobility {
+                            let card = EventQueryView<NeckMobilityTaskView>(
+                                query: query
+                            )
+                            .cardEnabled(shouldEnableInteraction)
+                            .padding(.vertical, swiftUIPadding)
+                            .formattedHostingController()
+
+                            return [card]
+                        } else {
+                            let card = EventQueryView<MyCustomCardView>(
+                                query: query
+                            )
+                            .cardEnabled(shouldEnableInteraction)
+                            .padding(.vertical, swiftUIPadding)
+                            .formattedHostingController()
+
+                            return [card]
+                        }
 
                     default:
                         return nil

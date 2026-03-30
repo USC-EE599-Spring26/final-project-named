@@ -33,6 +33,7 @@ import CareKitEssentials
 import CareKitStore
 import CareKitUI
 import os.log
+import ParseSwift
 import ResearchKitSwiftUI
 import SwiftUI
 import UIKit
@@ -209,11 +210,63 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             let orderedTasks = orderedPriorityTasks.compactMap { orderedPriorityTask in
                 tasks.first(where: { $0.id == orderedPriorityTask.id })
             }
-            return orderedTasks
+            return await filterTasksForAnonymousOnboarding(
+                orderedTasks,
+                on: date
+            )
             // return tasks
         } catch {
             Logger.feed.error("Could not fetch tasks: \(error, privacy: .public)")
             return []
+        }
+    }
+
+    private func filterTasksForAnonymousOnboarding(
+        _ tasks: [any OCKAnyTask],
+        on date: Date
+    ) async -> [any OCKAnyTask] {
+        guard await isAnonymousUser() else {
+            return tasks
+        }
+
+        let onboardingIsComplete = await isOnboardingComplete()
+        guard !onboardingIsComplete else {
+            return tasks
+        }
+
+        if let onboardTask = tasks.first(where: { $0.id == TaskID.onboard }) {
+            return [onboardTask]
+        }
+
+        return []
+    }
+
+    private func isAnonymousUser() async -> Bool {
+        guard let user = try? await User.current() else {
+            return false
+        }
+
+        return user.authData?.keys.contains("anonymous") == true
+    }
+
+    private func isOnboardingComplete() async -> Bool {
+        guard let user = try? await User.current() else {
+            return false
+        }
+
+        let onboardingDate = user.createdAt ?? Date()
+        var eventQuery = OCKEventQuery(for: onboardingDate)
+        eventQuery.taskIDs = [TaskID.onboard]
+
+        do {
+            let events = try await store.fetchAnyEvents(query: eventQuery)
+            guard let onboardEvent = events.first else {
+                return false
+            }
+            return onboardEvent.isComplete
+        } catch {
+            Logger.feed.error("Could not fetch onboard event: \(error, privacy: .public)")
+            return false
         }
     }
     // swiftlint:disable:next cyclomatic_complexity

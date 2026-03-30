@@ -46,13 +46,16 @@ struct OnboardTaskView: CareKitEssentialView {
                     .padding(.vertical)
 
                 Button(action: {
+                    guard !event.isComplete else {
+                        return
+                    }
                     isPresentingTask = true
                 }) {
-                    RectangularCompletionView(isComplete: false) {
+                    RectangularCompletionView(isComplete: event.isComplete) {
                         HStack {
                             Spacer()
-                            Text("Begin")
-                                .foregroundColor(.white)
+                            Text(event.isComplete ? "Completed" : "Begin")
+                                .foregroundColor(event.isComplete ? .accentColor : .white)
                                 .frame(maxWidth: .infinity)
                             Spacer()
                         }
@@ -102,19 +105,22 @@ private struct OnboardSheetView: CareKitEssentialView {
     private func handleCompleted() {
         Task {
             do {
-                guard let appDelegate = AppDelegateKey.defaultValue else {
+                guard !event.isComplete else {
                     dismissSheet()
                     return
                 }
 
-                _ = try await appDelegate.storeCoordinator.deleteAnyTask(event.task)
+                _ = try await saveOutcomeValues(
+                    [OCKOutcomeValue(true)],
+                    event: event
+                )
                 NotificationCenter.default.post(
                     name: .init(rawValue: Constants.shouldRefreshView),
                     object: nil
                 )
                 dismissSheet()
             } catch {
-                Logger.feed.error("Could not delete onboard task: \(error)")
+                Logger.feed.error("Could not save onboard outcome: \(error)")
                 dismissSheet()
             }
         }

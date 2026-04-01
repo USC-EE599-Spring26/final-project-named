@@ -49,7 +49,6 @@ extension OCKStore {
     ) async throws {
 
         let thisMorning = Calendar.current.startOfDay(for: startDate)
-        let onboardingEndDate = thisMorning.endOfDay
         let aFewDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: thisMorning)!
         let beforeBreakfast = Calendar.current.date(byAdding: .hour, value: 8, to: aFewDaysAgo)!
         let afterLunch = Calendar.current.date(byAdding: .hour, value: 14, to: aFewDaysAgo)!
@@ -146,7 +145,7 @@ extension OCKStore {
             composing: [
                 OCKScheduleElement(
                     start: thisMorning,
-                    end: onboardingEndDate,
+                    end: nil,
                     interval: DateComponents(day: 1),
                     text: "Task Due!",
                     targetValues: [],

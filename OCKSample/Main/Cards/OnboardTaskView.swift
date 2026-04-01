@@ -165,56 +165,7 @@ private struct OnboardTaskController: UIViewControllerRepresentable {
             "Thank you for joining. " +
             "Tap Next to review the onboarding information before you start."
 
-        let beforeYouJoinStep = ORKInstructionStep(identifier: "onboard.beforeYouJoin")
-        beforeYouJoinStep.iconImage = UIImage(systemName: "checkmark.seal.fill")
-        beforeYouJoinStep.title = "Before You Join"
-        beforeYouJoinStep.bodyItems = [
-            ORKBodyItem(
-                text: "You may be asked to share health data related to recovery.",
-                detailText: nil,
-                image: UIImage(systemName: "heart.fill"),
-                learnMoreItem: nil,
-                bodyItemStyle: .image,
-                useCardStyle: false,
-                alignImageToTop: true
-            ),
-            ORKBodyItem(
-                text: "You will complete short tasks and surveys during the study.",
-                detailText: nil,
-                image: UIImage(systemName: "checkmark.circle.fill"),
-                learnMoreItem: nil,
-                bodyItemStyle: .image,
-                useCardStyle: false,
-                alignImageToTop: true
-            ),
-            ORKBodyItem(
-                text: "You can withdraw from the study at any time.",
-                detailText: nil,
-                image: UIImage(systemName: "hand.raised.fill"),
-                learnMoreItem: nil,
-                bodyItemStyle: .image,
-                useCardStyle: false,
-                alignImageToTop: true
-            )
-        ]
-
-        let informedConsentStep = ORKInstructionStep(identifier: "onboard.informedConsent")
-        informedConsentStep.iconImage = UIImage(systemName: "doc.text.fill")
-        informedConsentStep.title = "Informed Consent"
-        informedConsentStep.detailText = """
-        Study Expectations
-
-        - You will be asked to complete surveys and recovery tasks.
-        - The study may send reminders to help you stay on track.
-        - Your information will be kept private and secure.
-        - You may withdraw from the study at any time.
-
-        Eligibility Requirements
-
-        - Must be 18 years or older.
-        - Must be able to read and understand English.
-        - Must be the only user of this device.
-        """
+        let consentReviewStep = makeConsentReviewStep()
 
         let requestPermissionsStep = ORKRequestPermissionsStep(
             identifier: "onboard.permissions",
@@ -233,12 +184,89 @@ private struct OnboardTaskController: UIViewControllerRepresentable {
             identifier: TaskID.onboard,
             steps: [
                 welcomeStep,
-                beforeYouJoinStep,
-                informedConsentStep,
+                consentReviewStep,
                 requestPermissionsStep,
                 completionStep
             ]
         )
+    }
+
+    private func makeConsentReviewStep() -> ORKConsentReviewStep {
+        let consentDocument = ORKConsentDocument()
+        consentDocument.title = "Informed Consent"
+        consentDocument.signaturePageTitle = "Informed Consent"
+        consentDocument.signaturePageContent =
+            "By signing below, I acknowledge that I have read this consent carefully, " +
+            "that I understand all of its terms, and that I enter into this study voluntarily. " +
+            "I understand that my information will only be used and disclosed for the purposes " +
+            "described in the consent and I can withdraw from the study at any time."
+        consentDocument.htmlReviewContent = """
+        <html>
+        <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 12px 4px;
+            color: #111111;
+            line-height: 1.45;
+        }
+        h1 { font-size: 26px; margin: 0 0 20px 0; }
+        h2 { font-size: 18px; margin: 22px 0 12px 0; }
+        ul { margin: 0 0 18px 0; padding-left: 22px; }
+        li { margin: 0 0 10px 0; }
+        p { margin: 0 0 18px 0; }
+        </style>
+        </head>
+        <body>
+        <h1>Informed Consent</h1>
+        <h2>Study Expectations</h2>
+        <ul>
+        <li>You will be asked to complete various study tasks such as surveys.</li>
+        <li>The study will send you notifications to remind you to complete these study tasks.</li>
+        <li>You will be asked to share various health data types to support the study goals.</li>
+        <li>The study is expected to last 4 years.</li>
+        <li>The study may reach out to you for future research opportunities.</li>
+        <li>Your information will be kept private and secure.</li>
+        <li>You can withdraw from the study at any time.</li>
+        </ul>
+        <h2>Eligibility Requirements</h2>
+        <ul>
+        <li>Must be 18 years or older.</li>
+        <li>Must be able to read and understand English.</li>
+        <li>Must be the only user of the device on which you are participating in the study.</li>
+        <li>Must be able to sign your own consent form.</li>
+        </ul>
+        <p>
+        By signing below, I acknowledge that I have read this consent carefully, that I understand
+        all of its terms, and that I enter into this study voluntarily. I understand that my
+        information will only be used and disclosed for the purposes described in the consent and I
+        can withdraw from the study at any time.
+        </p>
+        <p>Please sign using your finger below.</p>
+        </body>
+        </html>
+        """
+
+        let participantSignature = ORKConsentSignature(
+            forPersonWithTitle: "Participant",
+            dateFormatString: nil,
+            identifier: "onboard.participantSignature"
+        )
+        participantSignature.requiresName = false
+        participantSignature.requiresSignatureImage = true
+        consentDocument.addSignature(participantSignature)
+
+        let consentReviewStep = ORKConsentReviewStep(
+            identifier: "onboard.consentReview",
+            signature: participantSignature,
+            in: consentDocument
+        )
+        consentReviewStep.text = "Please review and sign the informed consent below."
+        consentReviewStep.reasonForConsent =
+            "I have read the consent and agree to participate in this study."
+        consentReviewStep.requiresScrollToBottom = true
+        return consentReviewStep
     }
 
     private func makePermissionTypes() -> [ORKPermissionType] {
@@ -257,6 +285,8 @@ private struct OnboardTaskController: UIViewControllerRepresentable {
         )
         permissionTypes.append(healthKitPermissionType)
 #endif
+
+        permissionTypes.append(ORKPermissionType.deviceMotionPermissionType())
 
         return permissionTypes
     }
@@ -299,10 +329,6 @@ private struct OnboardTaskController: UIViewControllerRepresentable {
                 }
 
                 if stepIdentifier == "onboard.welcome" {
-                    stepViewController.continueButtonTitle = "Next"
-                } else if stepIdentifier == "onboard.beforeYouJoin" {
-                    stepViewController.continueButtonTitle = "Get Started"
-                } else if stepIdentifier == "onboard.informedConsent" {
                     stepViewController.continueButtonTitle = "Next"
                 } else if stepIdentifier == "onboard.completion" {
                     stepViewController.continueButtonTitle = "Done"

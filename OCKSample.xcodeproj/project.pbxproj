@@ -168,6 +168,12 @@
 		794903E52F686C46009B32C3 /* ResearchKitSwiftUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		794903E72F686E0E009B32C3 /* ResearchKitSwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; platformFilters = (ios, xros, ); };
 		794903E82F686E0E009B32C3 /* ResearchKitSwiftUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		794F107A2F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10792F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift */; };
+		794F107B2F7CE7E800EDB0F1 /* OnboardTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10782F7CE7E800EDB0F1 /* OnboardTaskView.swift */; };
+		794F107C2F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10792F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift */; };
+		794F107D2F7CE7E800EDB0F1 /* OnboardTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10782F7CE7E800EDB0F1 /* OnboardTaskView.swift */; };
+		794F107E2F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10792F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift */; };
+		794F107F2F7CE7E800EDB0F1 /* OnboardTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10782F7CE7E800EDB0F1 /* OnboardTaskView.swift */; };
 		9103AA5227B8C913002C921E /* FontColorKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F03AA727860E7700E5AFB4 /* FontColorKey.swift */; };
 		91693818271B5E1600A634ED /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7036E63F25717F85006E9A3C /* Constants.swift */; };
 		9169381B271B64E100A634ED /* Styler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9169381A271B64E100A634ED /* Styler.swift */; };
@@ -378,6 +384,8 @@
 		70F921AF27CABED600368CEC /* LocalSyncSessionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSyncSessionDelegate.swift; sourceTree = "<group>"; };
 		7949037D2F685A7F009B32C3 /* CardEnabledEnvironmentKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardEnabledEnvironmentKey.swift; sourceTree = "<group>"; };
 		794903812F685AFA009B32C3 /* MyCustomCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyCustomCardView.swift; sourceTree = "<group>"; };
+		794F10782F7CE7E800EDB0F1 /* OnboardTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardTaskView.swift; sourceTree = "<group>"; };
+		794F10792F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeOfMotionTaskView.swift; sourceTree = "<group>"; };
 		7984E8CF2F63C104007F9CB5 /* ResearchKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ResearchKit.xcodeproj; path = ResearchKit/ResearchKit.xcodeproj; sourceTree = SOURCE_ROOT; };
 		7984E9072F63C18D007F9CB5 /* ResearchKitSwiftUI.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ResearchKitSwiftUI.xcodeproj; path = ResearchKit/ResearchKitSwiftUI/ResearchKitSwiftUI.xcodeproj; sourceTree = SOURCE_ROOT; };
 		7984E9702F63C26D007F9CB5 /* ResearchKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -661,6 +669,8 @@
 		70E3422C2DB058A7005124F9 /* Cards */ = {
 			isa = PBXGroup;
 			children = (
+				794F10782F7CE7E800EDB0F1 /* OnboardTaskView.swift */,
+				794F10792F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift */,
 				794903812F685AFA009B32C3 /* MyCustomCardView.swift */,
 				E7C37848228F887800E982D8 /* TipView.swift */,
 				70E3422D2DB0626A005124F9 /* Modifiers */,
@@ -1183,6 +1193,8 @@
 				707D29462DCBE68500980253 /* MainTabView.swift in Sources */,
 				707D29472DCBE68500980253 /* User.swift in Sources */,
 				707D29482DCBE68500980253 /* FontColorKey.swift in Sources */,
+				794F107C2F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift in Sources */,
+				794F107D2F7CE7E800EDB0F1 /* OnboardTaskView.swift in Sources */,
 				707D29492DCBE68500980253 /* MainView.swift in Sources */,
 				707D294A2DCBE68500980253 /* CustomStylerKey.swift in Sources */,
 				707D294B2DCBE68500980253 /* TipView.swift in Sources */,
@@ -1293,6 +1305,8 @@
 				7099D20C29E98E400037CD8E /* InstallationChannel.swift in Sources */,
 				70308886258273D400FFABB6 /* LoginViewModel.swift in Sources */,
 				70F921B127CAC16E00368CEC /* SessionDelegate.swift in Sources */,
+				794F107E2F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift in Sources */,
+				794F107F2F7CE7E800EDB0F1 /* OnboardTaskView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1306,6 +1320,8 @@
 				70F921AC27CABE3000368CEC /* SessionDelegate.swift in Sources */,
 				70F0EFEA28C2EE6C0005B5A2 /* AppDelegateKey.swift in Sources */,
 				7055723F2DC1E63A008E5B0A /* InsightsView.swift in Sources */,
+				794F107A2F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift in Sources */,
+				794F107B2F7CE7E800EDB0F1 /* OnboardTaskView.swift in Sources */,
 				7036E64025717F85006E9A3C /* Constants.swift in Sources */,
 				7099D20529E98DFF0037CD8E /* TaskID.swift in Sources */,
 				7036E4CE256E9A0C006E9A3C /* ContactView.swift in Sources */,

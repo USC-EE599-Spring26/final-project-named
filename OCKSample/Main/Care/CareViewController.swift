@@ -157,15 +157,25 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         let date = modifyDateIfNeeded(date)
         let isCurrentDay = isSameDay(as: date)
 
-        #if os(iOS)
-        appendRecoveryTipIfNeeded(
-            for: date,
-            isCurrentDay: isCurrentDay,
-            to: listViewController
-        )
-        #endif
+        Task {
+            let onboardingPending = await isOnboardingPending(on: date)
 
-        fetchAndDisplayTasks(on: listViewController, for: date)
+            #if os(iOS)
+            if !onboardingPending {
+                appendRecoveryTipIfNeeded(
+                    for: date,
+                    isCurrentDay: isCurrentDay,
+                    to: listViewController
+                )
+            }
+            #endif
+
+            await fetchAndDisplayTasks(
+                on: listViewController,
+                for: date,
+                onboardingPending: onboardingPending
+            )
+        }
     }
 
     private func isSameDay(as date: Date) -> Bool { Calendar.current.isDate(date, inSameDayAs: Date()) }
@@ -182,19 +192,46 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 
     private func fetchAndDisplayTasks(
         on listViewController: OCKListViewController,
-        for date: Date
-    ) {
-        Task {
-            let tasks = await self.fetchTasks(on: date)
-            appendTasks(tasks, to: listViewController, date: date)
+        for date: Date,
+        onboardingPending: Bool
+    ) async {
+        let tasks = await self.fetchTasks(
+            on: date,
+            onboardingPending: onboardingPending
+        )
+        appendTasks(tasks, to: listViewController, date: date)
+    }
+
+    private func isOnboardingPending(on date: Date) async -> Bool {
+        var query = OCKTaskQuery(for: date)
+        query.ids = [TaskID.onboard]
+        query.excludesTasksWithNoEvents = true
+
+        do {
+            let tasks = try await store.fetchAnyTasks(query: query)
+            return !tasks.isEmpty
+        } catch {
+            Logger.feed.error("Could not determine onboarding state: \(error, privacy: .public)")
+            return false
         }
     }
 
-    private func fetchTasks(on date: Date) async -> [any OCKAnyTask] {
+    private func fetchTasks(
+        on date: Date,
+        onboardingPending: Bool
+    ) async -> [any OCKAnyTask] {
         var query = OCKTaskQuery(for: date)
         query.excludesTasksWithNoEvents = true
         do {
             let tasks = try await store.fetchAnyTasks(query: query)
+
+            if onboardingPending {
+                guard isSameDay(as: date) else {
+                    return []
+                }
+                return tasks.filter { $0.id == TaskID.onboard }
+            }
+
             /*let orderedTasks = TaskID.ordered.compactMap { orderedTaskID in
                 tasks.first(where: { $0.id == orderedTaskID })
             }

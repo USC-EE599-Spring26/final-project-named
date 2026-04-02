@@ -47,32 +47,41 @@ extension OCKHealthKitPassthroughStore {
         steps.asset = "figure.walk"
         steps.card = .numericProgress
         steps.priority = 0
-        let ovulationTestResultSchedule = OCKSchedule.dailyAtTime(
-            hour: 8,
-            minutes: 0,
-            start: startDate,
-            end: nil,
-            text: nil,
-            duration: .allDay,
-            targetValues: []
-        )
-        var restingHeartRate = OCKHealthKitTask(
-            id: TaskID.ovulationTestResult,
-            title: String(localized: "OVULATION_TEST_RESULT"),
-            carePlanUUID: nil,
-            schedule: restingHeartRateSchedule,
-            healthKitLinkage: OCKHealthKitLinkage(
-                quantityIdentifier: .restingHeartRate,
-                quantityType: .discrete,
-                unit: heartRateUnit
-            )
-        )
-        ovulationTestResult.asset = "waveform.path.ecg"
-        ovulationTestResult.card = .labeledValue
-        ovulationTestResult.priority = 1
-        let tasks = [ steps, ovulationTestResult ]
+        let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+                let restingHeartRateSchedule = OCKSchedule.dailyAtTime(
+                    hour: 8,
+                    minutes: 0,
+                    start: startDate,
+                    end: nil,
+                    text: nil,
+                    duration: .allDay,
+                    targetValues: []
+                )
+                var restingHeartRate = OCKHealthKitTask(
+                    id: TaskID.ovulationTestResult,
+                    title: String(localized: "OVULATION_TEST_RESULT"),
+                    carePlanUUID: nil,
+                    schedule: restingHeartRateSchedule,
+                    healthKitLinkage: OCKHealthKitLinkage(
+                        quantityIdentifier: .restingHeartRate,
+                        quantityType: .discrete,
+                        unit: heartRateUnit
+                    )
+                )
+                restingHeartRate.asset = "heart.fill"
+                restingHeartRate.card = .labeledValue
+                restingHeartRate.priority = 1
 
-        _ = try await addTasksIfNotPresent(tasks)
+        var removedTaskQuery = OCKTaskQuery(for: Date())
+                removedTaskQuery.ids = [TaskID.ovulationTestResult, "ovulationTestResult"]
+                let removedTasks = try await fetchTasks(query: removedTaskQuery)
+                for removedTask in removedTasks {
+                    _ = try await deleteTask(removedTask)
+                }
+
+                let tasks = [ steps, restingHeartRate ]
+
+                _ = try await addTasksIfNotPresent(tasks)
 
     }
 }

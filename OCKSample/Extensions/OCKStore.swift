@@ -184,7 +184,7 @@ extension OCKStore {
         onboard.asset = "hand.wave.fill"
         onboard.card = .custom
         onboard.priority = -1
-        
+
         let neckMobilitySchedule = OCKSchedule(
             composing: [
                 OCKScheduleElement(

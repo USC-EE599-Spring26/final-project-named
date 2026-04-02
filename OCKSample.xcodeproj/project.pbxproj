@@ -12,8 +12,6 @@
 		1C15B08F2F70833500E8E3F6 /* DailyRecoverySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C15B0852F70832300E8E3F6 /* DailyRecoverySummary.swift */; };
 		1C15B0912F70837B00E8E3F6 /* RecoverySummaryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C15B0902F70837800E8E3F6 /* RecoverySummaryBuilder.swift */; };
 		1C15B0932F70837B00E8E3F6 /* RecoverySummaryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C15B0902F70837800E8E3F6 /* RecoverySummaryBuilder.swift */; };
-		1C17E13D2F70CB60005A7F34 /* NeckMobilityTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C17E1342F70CB5D005A7F34 /* NeckMobilityTaskView.swift */; };
-		1C17E1402F70E56E005A7F34 /* OnboardTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C17E13E2F70E56C005A7F34 /* OnboardTaskView.swift */; };
 		1C34E27A2F501CC900A29A18 /* DimensionStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C34E2792F501CBC00A29A18 /* DimensionStyle.swift */; };
 		1C34E27B2F501CC900A29A18 /* DimensionStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C34E2792F501CBC00A29A18 /* DimensionStyle.swift */; };
 		1C34E27C2F501CC900A29A18 /* DimensionStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C34E2792F501CBC00A29A18 /* DimensionStyle.swift */; };
@@ -1261,7 +1259,6 @@
 				707D295D2DCBE68500980253 /* LoginViewModel.swift in Sources */,
 				70B8E0A62F0EC1CA00440FCA /* Mutex.swift in Sources */,
 				707D295E2DCBE68500980253 /* Utility.swift in Sources */,
-				1C17E13D2F70CB60005A7F34 /* NeckMobilityTaskView.swift in Sources */,
 				1CA9EE012F5221CE00C82A4F /* CareKitCard.swift in Sources */,
 				707D295F2DCBE68500980253 /* OCKSampleApp.swift in Sources */,
 				1C34E27E2F501CF800A29A18 /* AnimationStyler.swift in Sources */,
@@ -1285,7 +1282,6 @@
 				707D296C2DCBE68500980253 /* RemoteSessionDelegate.swift in Sources */,
 				707D296D2DCBE68500980253 /* OCKPatient+Parse.swift in Sources */,
 				707D296E2DCBE68500980253 /* ColorStyler.swift in Sources */,
-				1C17E1402F70E56E005A7F34 /* OnboardTaskView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

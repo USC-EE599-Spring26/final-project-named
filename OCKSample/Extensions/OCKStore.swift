@@ -49,7 +49,6 @@ extension OCKStore {
     ) async throws {
 
         let thisMorning = Calendar.current.startOfDay(for: startDate)
-        let onboardingEndDate = thisMorning.endOfDay
         let aFewDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: thisMorning)!
         let beforeBreakfast = Calendar.current.date(byAdding: .hour, value: 8, to: aFewDaysAgo)!
         let afterLunch = Calendar.current.date(byAdding: .hour, value: 14, to: aFewDaysAgo)!
@@ -185,6 +184,30 @@ extension OCKStore {
         onboard.asset = "hand.wave.fill"
         onboard.card = .custom
         onboard.priority = -1
+        
+        let neckMobilitySchedule = OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: beforeBreakfast,
+                    end: nil,
+                    interval: DateComponents(day: 1),
+                    text: String(localized: "ANYTIME_DURING_DAY"),
+                    targetValues: [],
+                    duration: .allDay
+                )
+            ]
+        )
+        var neckMobility = OCKTask(
+            id: TaskID.neckMobility,
+            title: "Neck Mobility Check",
+            carePlanUUID: nil,
+            schedule: neckMobilitySchedule
+        )
+        neckMobility.impactsAdherence = true
+        neckMobility.instructions = "Tap Begin to follow a gentle guided neck mobility check."
+        neckMobility.asset = "heart.fill"
+        neckMobility.card = .custom
+        neckMobility.priority = 4
 
         let rangeOfMotionSchedule = OCKSchedule(
             composing: [

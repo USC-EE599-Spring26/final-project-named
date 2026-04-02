@@ -33,7 +33,6 @@ import CareKitEssentials
 import CareKitStore
 import CareKitUI
 import os.log
-import ParseSwift
 import ResearchKitSwiftUI
 import SwiftUI
 import UIKit
@@ -158,15 +157,25 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         let date = modifyDateIfNeeded(date)
         let isCurrentDay = isSameDay(as: date)
 
-        #if os(iOS)
-        appendRecoveryTipIfNeeded(
-            for: date,
-            isCurrentDay: isCurrentDay,
-            to: listViewController
-        )
-        #endif
+        Task {
+            let onboardingPending = await isOnboardingPending(on: date)
 
-        fetchAndDisplayTasks(on: listViewController, for: date)
+            #if os(iOS)
+            if !onboardingPending {
+                appendRecoveryTipIfNeeded(
+                    for: date,
+                    isCurrentDay: isCurrentDay,
+                    to: listViewController
+                )
+            }
+            #endif
+
+            await fetchAndDisplayTasks(
+                on: listViewController,
+                for: date,
+                onboardingPending: onboardingPending
+            )
+        }
     }
 
     private func isSameDay(as date: Date) -> Bool { Calendar.current.isDate(date, inSameDayAs: Date()) }
@@ -183,19 +192,46 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 
     private func fetchAndDisplayTasks(
         on listViewController: OCKListViewController,
-        for date: Date
-    ) {
-        Task {
-            let tasks = await self.fetchTasks(on: date)
-            appendTasks(tasks, to: listViewController, date: date)
+        for date: Date,
+        onboardingPending: Bool
+    ) async {
+        let tasks = await self.fetchTasks(
+            on: date,
+            onboardingPending: onboardingPending
+        )
+        appendTasks(tasks, to: listViewController, date: date)
+    }
+
+    private func isOnboardingPending(on date: Date) async -> Bool {
+        var query = OCKTaskQuery(for: date)
+        query.ids = [TaskID.onboard]
+        query.excludesTasksWithNoEvents = true
+
+        do {
+            let tasks = try await store.fetchAnyTasks(query: query)
+            return !tasks.isEmpty
+        } catch {
+            Logger.feed.error("Could not determine onboarding state: \(error, privacy: .public)")
+            return false
         }
     }
 
-    private func fetchTasks(on date: Date) async -> [any OCKAnyTask] {
+    private func fetchTasks(
+        on date: Date,
+        onboardingPending: Bool
+    ) async -> [any OCKAnyTask] {
         var query = OCKTaskQuery(for: date)
         query.excludesTasksWithNoEvents = true
         do {
             let tasks = try await store.fetchAnyTasks(query: query)
+
+            if onboardingPending {
+                guard isSameDay(as: date) else {
+                    return []
+                }
+                return tasks.filter { $0.id == TaskID.onboard }
+            }
+
             /*let orderedTasks = TaskID.ordered.compactMap { orderedTaskID in
                 tasks.first(where: { $0.id == orderedTaskID })
             }
@@ -210,63 +246,11 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             let orderedTasks = orderedPriorityTasks.compactMap { orderedPriorityTask in
                 tasks.first(where: { $0.id == orderedPriorityTask.id })
             }
-            return await filterTasksForAnonymousOnboarding(
-                orderedTasks,
-                on: date
-            )
+            return orderedTasks
             // return tasks
         } catch {
             Logger.feed.error("Could not fetch tasks: \(error, privacy: .public)")
             return []
-        }
-    }
-
-    private func filterTasksForAnonymousOnboarding(
-        _ tasks: [any OCKAnyTask],
-        on date: Date
-    ) async -> [any OCKAnyTask] {
-        guard await isAnonymousUser() else {
-            return tasks
-        }
-
-        let onboardingIsComplete = await isOnboardingComplete()
-        guard !onboardingIsComplete else {
-            return tasks
-        }
-
-        if let onboardTask = tasks.first(where: { $0.id == TaskID.onboard }) {
-            return [onboardTask]
-        }
-
-        return []
-    }
-
-    private func isAnonymousUser() async -> Bool {
-        guard let user = try? await User.current() else {
-            return false
-        }
-
-        return user.authData?.keys.contains("anonymous") == true
-    }
-
-    private func isOnboardingComplete() async -> Bool {
-        guard let user = try? await User.current() else {
-            return false
-        }
-
-        let onboardingDate = user.createdAt ?? Date()
-        var eventQuery = OCKEventQuery(for: onboardingDate)
-        eventQuery.taskIDs = [TaskID.onboard]
-
-        do {
-            let events = try await store.fetchAnyEvents(query: eventQuery)
-            guard let onboardEvent = events.first else {
-                return false
-            }
-            return onboardEvent.isComplete
-        } catch {
-            Logger.feed.error("Could not fetch onboard event: \(error, privacy: .public)")
-            return false
         }
     }
     // swiftlint:disable:next cyclomatic_complexity
@@ -315,31 +299,12 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                         return [card]
 
                     case .featured:
-                        #if os(iOS)
-                        let card = featuredTaskViewController(for: standardTask)
-                        #else
-                        let card = EventQueryView<SimpleTaskView>(
-                            query: query
-                        )
-                        .padding(.vertical, swiftUIPadding)
-                        .formattedHostingController()
-                        #endif
-                        return [card]
+                        // Can be implememented based off of midterm.
+                        return nil
 
                     case .grid:
-                        #if os(iOS)
-                        let card = OCKGridTaskViewController(
-                            query: query,
-                            store: self.store
-                        )
-                        #else
-                        let card = EventQueryView<SimpleTaskView>(
-                            query: query
-                        )
-                        .padding(.vertical, swiftUIPadding)
-                        .formattedHostingController()
-                        #endif
-                        return [card]
+                        // Can be implememented based off of midterm.
+                        return nil
 
                     case .instruction:
                         let card = EventQueryView<InstructionsTaskView>(
@@ -351,16 +316,8 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                         return [card]
 
                     case .link:
-                        #if os(iOS)
-                        let card = linkTaskViewController(for: standardTask)
-                        #else
-                        let card = EventQueryView<SimpleTaskView>(
-                            query: query
-                        )
-                        .padding(.vertical, swiftUIPadding)
-                        .formattedHostingController()
-                        #endif
-                        return [card]
+                        // Can be implememented based off of midterm.
+                        return nil
 
                     case .simple:
 
@@ -396,8 +353,8 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                             .formattedHostingController()
 
                             return [card]
-                        } else if standardTask.id == TaskID.neckMobility {
-                            let card = EventQueryView<NeckMobilityTaskView>(
+                        } else if standardTask.id == TaskID.rangeOfMotion {
+                            let card = EventQueryView<RangeOfMotionTaskView>(
                                 query: query
                             )
                             .cardEnabled(shouldEnableInteraction)
@@ -424,13 +381,8 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                     switch healthTask.card {
 
                     case .labeledValue:
-                        let card = EventQueryView<LabeledValueTaskView>(
-                            query: query
-                        )
-                        .padding(.vertical, swiftUIPadding)
-                        .formattedHostingController()
-
-                        return [card]
+                        // Can be implememented based off of midterm.
+                        return nil
 
                     case .numericProgress:
                         let card = EventQueryView<NumericProgressTaskView>(

@@ -49,7 +49,6 @@ extension OCKStore {
     ) async throws {
 
         let thisMorning = Calendar.current.startOfDay(for: startDate)
-        let onboardingEndDate = thisMorning.endOfDay
         let aFewDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: thisMorning)!
         let beforeBreakfast = Calendar.current.date(byAdding: .hour, value: 8, to: aFewDaysAgo)!
         let afterLunch = Calendar.current.date(byAdding: .hour, value: 14, to: aFewDaysAgo)!
@@ -104,6 +103,25 @@ extension OCKStore {
         nausea.card = .button
         nausea.priority = 5
 
+        let kegelElement = OCKScheduleElement(
+            start: beforeBreakfast,
+            end: nil,
+            interval: DateComponents(day: 2)
+        )
+        let kegelSchedule = OCKSchedule(
+            composing: [kegelElement]
+        )
+        var kegels = OCKTask(
+            id: TaskID.kegels,
+            title: String(localized: "KEGEL_EXERCISES"),
+            carePlanUUID: nil,
+            schedule: kegelSchedule
+        )
+        kegels.impactsAdherence = true
+        kegels.instructions = String(localized: "KEGEL_INSTRUCTIONS")
+        kegels.asset = "fork.knife"
+        kegels.card = .instruction
+        kegels.priority = 3
         let stretchElement = OCKScheduleElement(
             start: beforeBreakfast,
             end: nil,
@@ -147,7 +165,7 @@ extension OCKStore {
             composing: [
                 OCKScheduleElement(
                     start: thisMorning,
-                    end: onboardingEndDate,
+                    end: nil,
                     interval: DateComponents(day: 1),
                     text: "Task Due!",
                     targetValues: [],
@@ -162,7 +180,7 @@ extension OCKStore {
             schedule: onboardingSchedule
         )
         onboard.impactsAdherence = true
-        onboard.instructions = "You'll need to agree to some terms and conditions before we get started!"
+        onboard.instructions = "Review the study information and permissions before you get started."
         onboard.asset = "hand.wave.fill"
         onboard.card = .custom
         onboard.priority = -1
@@ -191,6 +209,30 @@ extension OCKStore {
         neckMobility.card = .custom
         neckMobility.priority = 4
 
+        let rangeOfMotionSchedule = OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: beforeBreakfast,
+                    end: nil,
+                    interval: DateComponents(day: 1),
+                    text: String(localized: "ANYTIME_DURING_DAY"),
+                    targetValues: [],
+                    duration: .allDay
+                )
+            ]
+        )
+        var rangeOfMotion = OCKTask(
+            id: TaskID.rangeOfMotion,
+            title: "Range of Motion",
+            carePlanUUID: nil,
+            schedule: rangeOfMotionSchedule
+        )
+        rangeOfMotion.impactsAdherence = true
+        rangeOfMotion.instructions = "Tap Begin to complete a guided neck range of motion check."
+        rangeOfMotion.asset = "arrow.left.and.right.circle"
+        rangeOfMotion.card = .custom
+        rangeOfMotion.priority = 4
+
         var keckResource = OCKTask(
             id: TaskID.keckResource,
             title: "Open Keck Medicine",
@@ -203,12 +245,6 @@ extension OCKStore {
         keckResource.card = .link
         keckResource.linkURL = Constants.defaultRecoveryResourceURL
 
-        var removedTaskQuery = OCKTaskQuery(for: Date())
-        removedTaskQuery.ids = [TaskID.kegels]
-        if let removedTask = try await fetchTasks(query: removedTaskQuery).first {
-            _ = try await deleteTask(removedTask)
-        }
-
         let symptomTracking = createSymptomTrackingSurveyTask(carePlanUUID: nil)
         let symptomTrackingWeekly = createSymptomTrackingWeeklySurveyTask(carePlanUUID: nil)
         _ = try await addTasksIfNotPresent(
@@ -219,6 +255,7 @@ extension OCKStore {
                 walking,
                 neckMobility,
                 stretch,
+                rangeOfMotion,
                 keckResource,
                 symptomTracking,
                 symptomTrackingWeekly
@@ -317,12 +354,11 @@ extension OCKStore {
 
             let questionTwo = SurveyQuestion(
                 id: "\(symptomTrackingTaskId)-voice",
-                type: .slider,
+                type: .multipleChoice,
                 required: true,
                 title: String(localized: "SYMPTOM_TRACKING_VOICE"),
-                detail: String(localized: "SYMPTOM_TRACKING_LEVEL"),
-                integerRange: 0...10,
-                sliderStepValue: 1
+                textChoices: choices,
+                choiceSelectionLimit: .single
             )
 
             let questionThree = SurveyQuestion(

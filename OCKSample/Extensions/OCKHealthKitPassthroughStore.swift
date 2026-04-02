@@ -56,13 +56,15 @@ extension OCKHealthKitPassthroughStore {
             duration: .allDay,
             targetValues: []
         )
-        var ovulationTestResult = OCKHealthKitTask(
+        var restingHeartRate = OCKHealthKitTask(
             id: TaskID.ovulationTestResult,
             title: String(localized: "OVULATION_TEST_RESULT"),
             carePlanUUID: nil,
-            schedule: ovulationTestResultSchedule,
+            schedule: restingHeartRateSchedule,
             healthKitLinkage: OCKHealthKitLinkage(
-                categoryIdentifier: .ovulationTestResult
+                quantityIdentifier: .restingHeartRate,
+                quantityType: .discrete,
+                unit: heartRateUnit
             )
         )
         ovulationTestResult.asset = "waveform.path.ecg"

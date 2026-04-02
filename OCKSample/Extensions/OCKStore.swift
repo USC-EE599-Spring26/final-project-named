@@ -49,6 +49,7 @@ extension OCKStore {
     ) async throws {
 
         let thisMorning = Calendar.current.startOfDay(for: startDate)
+        let onboardingEndDate = thisMorning.endOfDay
         let aFewDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: thisMorning)!
         let beforeBreakfast = Calendar.current.date(byAdding: .hour, value: 8, to: aFewDaysAgo)!
         let afterLunch = Calendar.current.date(byAdding: .hour, value: 14, to: aFewDaysAgo)!
@@ -141,6 +142,26 @@ extension OCKStore {
         stretch.asset = "mic.fill"
         stretch.priority = 4
 
+        let walkingElement = OCKScheduleElement(
+            start: beforeBreakfast,
+            end: nil,
+            interval: DateComponents(day: 1)
+        )
+        let walkingSchedule = OCKSchedule(
+            composing: [walkingElement]
+        )
+        var walking = OCKTask(
+            id: TaskID.walking,
+            title: String(localized: "WALKING_CHECK"),
+            carePlanUUID: nil,
+            schedule: walkingSchedule
+        )
+        walking.impactsAdherence = true
+        walking.instructions = String(localized: "WALKING_INSTRUCTIONS")
+        walking.asset = "figure.walk"
+        walking.card = .instruction
+        walking.priority = 3
+
         let onboardingSchedule = OCKSchedule(
             composing: [
                 OCKScheduleElement(
@@ -208,7 +229,8 @@ extension OCKStore {
                 onboard,
                 nausea,
                 doxylamine,
-                kegels,
+                walking,
+                neckMobility,
                 stretch,
                 rangeOfMotion,
                 keckResource,
@@ -375,13 +397,13 @@ extension OCKStore {
 
     func createSymptomTrackingWeeklySurveyTask(carePlanUUID: UUID?) -> OCKTask {
             let weeklyEvaluationTaskId = TaskID.WeeklyEvaluation
-           // let thisMorning = Calendar.current.startOfDay(for: Date())
+            // let thisMorning = Calendar.current.startOfDay(for: Date())
             // let aFewDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: thisMorning)!
             // let beforeBreakfast = Calendar.current.date(byAdding: .hour, value: 8, to: aFewDaysAgo)!
             let weeklyEvaluationElement = OCKScheduleElement(
                 start: Date(),
                 end: nil,
-                interval: DateComponents(weekOfYear: 1)
+                interval: DateComponents(day: 1)
             )
             let weeklyEvaluationSchedule = OCKSchedule(
                 composing: [weeklyEvaluationElement]

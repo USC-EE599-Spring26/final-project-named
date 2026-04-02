@@ -24,6 +24,19 @@ struct HealthKitTaskPayload {
     let numericGoalValue: Double?
 }
 
+struct TaskScheduleConfiguration {
+    let startDate: Date
+    let repeatEveryDays: Int
+
+    var normalizedStartDate: Date {
+        Calendar.current.startOfDay(for: startDate)
+    }
+
+    var recurrenceDescription: String {
+        repeatEveryDays == 1 ? "Daily" : "Every \(repeatEveryDays) days"
+    }
+}
+
 @MainActor
 class ProfileViewModel: ObservableObject {
 
@@ -102,7 +115,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
     func saveTask(
         title: String,
         instructions: String,
-        scheduleStart: Date,
+        schedule: TaskScheduleConfiguration,
         cardType: CareKitCard,
         payload: HealthKitTaskPayload
     ) {
@@ -127,7 +140,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
         let task = makeHealthKitTask(
             title: taskTitle,
             instructions: taskInstructions,
-            scheduleStart: scheduleStart,
+            schedule: schedule,
             cardType: cardType,
             payload: payload
         )
@@ -151,7 +164,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
     func saveRegularTask(
         title: String,
         instructions: String,
-        scheduleStart: Date,
+        schedule: TaskScheduleConfiguration,
         cardType: CareKitCard,
         payload: RegularTaskPayload
     ) {
@@ -172,7 +185,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
         let task = makeRegularTask(
             title: taskTitle,
             instructions: taskInstructions,
-            scheduleStart: scheduleStart,
+            schedule: schedule,
             cardType: cardType,
             payload: payload
         )
@@ -196,7 +209,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
     private func makeHealthKitTask(
         title: String,
         instructions: String,
-        scheduleStart: Date,
+        schedule: TaskScheduleConfiguration,
         cardType: CareKitCard,
         payload: HealthKitTaskPayload
     ) -> OCKHealthKitTask {
@@ -207,7 +220,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
         case .labeledValue:
             let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
             linkage = OCKHealthKitLinkage(
-                quantityIdentifier: .heartRate,
+                quantityIdentifier: .restingHeartRate,
                 quantityType: .discrete,
                 unit: heartRateUnit
             )
@@ -224,13 +237,13 @@ class AddHealthKitTaskViewModel: ObservableObject {
             targetValues = [OCKOutcomeValue(goalValue, units: stepUnit.unitString)]
         }
 
-        let schedule = OCKSchedule(
+        let taskSchedule = OCKSchedule(
             composing: [
                 OCKScheduleElement(
-                    start: scheduleStart,
+                    start: schedule.normalizedStartDate,
                     end: nil,
-                    interval: DateComponents(day: 1),
-                    text: "Daily",
+                    interval: DateComponents(day: schedule.repeatEveryDays),
+                    text: schedule.recurrenceDescription,
                     targetValues: targetValues,
                     duration: .allDay
                 )
@@ -241,7 +254,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
             id: "custom-healthkit-\(UUID().uuidString)",
             title: title,
             carePlanUUID: nil,
-            schedule: schedule,
+            schedule: taskSchedule,
             healthKitLinkage: linkage
         )
         task.instructions = instructions
@@ -254,7 +267,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
     private func makeRegularTask(
         title: String,
         instructions: String,
-        scheduleStart: Date,
+        schedule: TaskScheduleConfiguration,
         cardType: CareKitCard,
         payload: RegularTaskPayload
     ) -> OCKTask {
@@ -262,15 +275,15 @@ class AddHealthKitTaskViewModel: ObservableObject {
         if cardType == .checklist {
             scheduleText = payload.checklistItem ?? "Daily"
         } else {
-            scheduleText = "Daily"
+            scheduleText = schedule.recurrenceDescription
         }
 
-        let schedule = OCKSchedule(
+        let taskSchedule = OCKSchedule(
             composing: [
                 OCKScheduleElement(
-                    start: scheduleStart,
+                    start: schedule.normalizedStartDate,
                     end: nil,
-                    interval: DateComponents(day: 1),
+                    interval: DateComponents(day: schedule.repeatEveryDays),
                     text: scheduleText,
                     targetValues: [],
                     duration: .allDay
@@ -282,7 +295,7 @@ class AddHealthKitTaskViewModel: ObservableObject {
             id: "custom-task-\(UUID().uuidString)",
             title: title,
             carePlanUUID: nil,
-            schedule: schedule
+            schedule: taskSchedule
         )
         task.instructions = instructions
         task.asset = payload.assetName
@@ -304,7 +317,9 @@ class DeleteTasksViewModel: ObservableObject {
             return
         }
 
-        var query = OCKTaskQuery()
+        // Keep the delete sheet aligned with the Care page by only showing
+        // tasks that are currently effective today.
+        var query = OCKTaskQuery(for: Date())
         query.sortDescriptors = [.title(ascending: true)]
 
         do {
@@ -323,9 +338,7 @@ class DeleteTasksViewModel: ObservableObject {
 
         do {
             _ = try await appDelegate.storeCoordinator.deleteAnyTask(task)
-            tasks.removeAll { currentTask in
-                currentTask.uuid == task.uuid
-            }
+            await loadTasks()
             NotificationCenter.default.post(
                 name: .init(rawValue: Constants.shouldRefreshView),
                 object: nil

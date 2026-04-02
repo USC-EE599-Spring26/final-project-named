@@ -118,7 +118,7 @@ private struct OnboardSheetView: View {
                 )
                 dismissSheet()
             } catch {
-                Logger.feed.error("Could not delete onboard task: \(error)")
+                Logger.feed.error("Could not save onboard outcome: \(error)")
                 dismissSheet()
             }
         }
@@ -178,7 +178,9 @@ private struct OnboardTaskController: UIViewControllerRepresentable {
         let completionStep = ORKCompletionStep(identifier: "onboard.completion")
         completionStep.iconImage = UIImage(systemName: "checkmark.circle.fill")
         completionStep.title = "Enrollment Complete"
-        completionStep.text = "Thank you for enrolling. You are ready to begin the recovery program."
+        completionStep.text =
+            "Thank you for enrolling in this study. " +
+            "Your participation will contribute to meaningful research!"
 
         return ORKOrderedTask(
             identifier: TaskID.onboard,

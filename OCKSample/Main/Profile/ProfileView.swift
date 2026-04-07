@@ -11,6 +11,12 @@ import CareKitStore
 import CareKit
 import os.log
 import SwiftUI
+#if canImport(PhotosUI)
+import PhotosUI
+#endif
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct ProfileView: View {
     private static var query = OCKPatientQuery(for: Date())
@@ -19,16 +25,27 @@ struct ProfileView: View {
     @ObservedObject var loginViewModel: LoginViewModel
     @State var isPresentingAddTask = false
     @State var isPresentingDeleteTasks = false
+    @State private var isPresentingMyContact = false
+#if canImport(PhotosUI)
+    @State private var selectedPhotoItem: PhotosPickerItem?
+#endif
 
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Profile")
-                        .font(.system(size: 34, weight: .bold))
-                        .padding(.top, 8)
+                    avatarSection
 
                     VStack(spacing: 14) {
+                        profileField(title: "Login") {
+                            Text(viewModel.loginName.isEmpty ? "Anonymous" : viewModel.loginName)
+                                .foregroundStyle(.primary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(16)
+                        }
+
                         TextField("First Name",
                                   text: $viewModel.firstName)
                             .padding()
@@ -44,6 +61,49 @@ struct ProfileView: View {
                         DatePicker("Birthday",
                                    selection: $viewModel.birthday,
                                    displayedComponents: [DatePickerComponents.date])
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+                    }
+                    .padding(18)
+                    .background(Color(red: 0.97, green: 0.95, blue: 0.90))
+                    .cornerRadius(24)
+
+                    VStack(alignment: .leading, spacing: 14) {
+                        Text("Contact")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+
+                        TextField("Phone", text: $viewModel.phoneNumber)
+                            .keyboardType(.phonePad)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+
+                        TextField("Email", text: $viewModel.email)
+                            .keyboardType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+
+                        TextField("Street", text: $viewModel.street)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+
+                        TextField("City", text: $viewModel.city)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+
+                        TextField("State", text: $viewModel.state)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+
+                        TextField("Postal Code", text: $viewModel.postalCode)
                             .padding()
                             .background(Color.white)
                             .cornerRadius(16)
@@ -101,11 +161,16 @@ struct ProfileView: View {
             }
             .background(Color(red: 0.99, green: 0.97, blue: 0.93))
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("My Contact") {
+                        isPresentingMyContact = true
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         isPresentingAddTask = true
                     } label: {
-                        Image(systemName: "plus")
+                        Text("Add Task")
                     }
                     .accessibilityLabel("Add Task")
                 }
@@ -113,9 +178,15 @@ struct ProfileView: View {
             .sheet(isPresented: $isPresentingAddTask) {
                 AddHealthKitTaskView(isPresented: $isPresentingAddTask)
             }
+            .sheet(isPresented: $isPresentingMyContact) {
+                MyContactView(viewModel: viewModel)
+            }
             .onAppear {
                 if let patient = patients.first?.result {
                     viewModel.updatePatient(patient)
+                }
+                Task {
+                    await viewModel.loadCurrentUser()
                 }
             }
             .onChange(of: patients.count) { _, _ in
@@ -123,7 +194,327 @@ struct ProfileView: View {
                     viewModel.updatePatient(patient)
                 }
             }
+#if canImport(PhotosUI)
+            .onChange(of: selectedPhotoItem) { _, newItem in
+                guard let newItem else {
+                    return
+                }
+                Task {
+                    if let data = try? await newItem.loadTransferable(type: Data.self) {
+                        viewModel.updateAvatar(data: data)
+                    }
+                }
+            }
+#endif
         }
+    }
+}
+
+private extension ProfileView {
+    @ViewBuilder
+    var avatarSection: some View {
+        VStack(spacing: 16) {
+#if canImport(PhotosUI)
+            PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                avatarContent
+            }
+            .buttonStyle(.plain)
+#else
+            avatarContent
+#endif
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 8)
+    }
+
+    @ViewBuilder
+    var avatarContent: some View {
+        ZStack {
+            Circle()
+                .fill(Color.white)
+                .frame(width: 104, height: 104)
+
+            Circle()
+                .stroke(Color(red: 0.64, green: 0.20, blue: 0.22), lineWidth: 4)
+                .frame(width: 104, height: 104)
+
+#if canImport(UIKit)
+            if let avatarImage = viewModel.avatarImage {
+                Image(uiImage: avatarImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 92, height: 92)
+                    .clipShape(Circle())
+            } else if let avatarURL = viewModel.avatarURL {
+                AsyncImage(url: avatarURL) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    default:
+                        Image(systemName: "person.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(18)
+                            .foregroundStyle(.black)
+                    }
+                }
+                .frame(width: 92, height: 92)
+                .clipShape(Circle())
+            } else {
+                Image(systemName: "person.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(18)
+                    .frame(width: 92, height: 92)
+                    .foregroundStyle(.black)
+            }
+#else
+            if let avatarURL = viewModel.avatarURL {
+                AsyncImage(url: avatarURL) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    default:
+                        Image(systemName: "person.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(18)
+                            .foregroundStyle(.black)
+                    }
+                }
+                .frame(width: 92, height: 92)
+                .clipShape(Circle())
+            } else {
+                Image(systemName: "person.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(18)
+                    .frame(width: 92, height: 92)
+                    .foregroundStyle(.black)
+            }
+#endif
+        }
+    }
+
+    @ViewBuilder
+    func profileField<Content: View>(
+        title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(.secondary)
+            content()
+        }
+    }
+}
+
+private struct MyContactView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @ObservedObject var viewModel: ProfileViewModel
+
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    HStack(spacing: 16) {
+                        profileAvatar
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(viewModel.displayName)
+                                .font(.system(size: 28, weight: .bold))
+                            if !viewModel.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                Text(viewModel.email)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text(viewModel.loginName.isEmpty ? "Anonymous" : viewModel.loginName)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+
+                    if hasCommunicationActions {
+                        HStack(spacing: 16) {
+                            if !cleanPhone.isEmpty {
+                                actionButton(
+                                    title: "Call",
+                                    systemName: "phone",
+                                    action: { openURL(URL(string: "tel://\(cleanPhone.filter { !$0.isWhitespace })")!) }
+                                )
+                                actionButton(
+                                    title: "Message",
+                                    systemName: "message",
+                                    action: { openURL(URL(string: "sms://\(cleanPhone.filter { !$0.isWhitespace })")!) }
+                                )
+                            }
+
+                            if !cleanEmail.isEmpty {
+                                actionButton(
+                                    title: "E-mail",
+                                    systemName: "envelope",
+                                    action: { openURL(URL(string: "mailto:\(cleanEmail)")!) }
+                                )
+                            }
+                        }
+                    }
+
+                    if !cleanPhone.isEmpty {
+                        myContactSection(title: "Phone", value: cleanPhone)
+                    }
+
+                    if !cleanEmail.isEmpty {
+                        myContactSection(title: "Email", value: cleanEmail)
+                    }
+
+                    if !cleanAddress.isEmpty {
+                        myContactSection(title: "Address", value: cleanAddress)
+                    }
+                }
+                .padding(20)
+            }
+            .background(Color(red: 0.99, green: 0.97, blue: 0.93))
+            .navigationTitle("My Contact")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Close") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+
+    private var cleanPhone: String {
+        viewModel.phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var cleanEmail: String {
+        viewModel.email.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var cleanAddress: String {
+        [
+            viewModel.street,
+            viewModel.city,
+            viewModel.state,
+            viewModel.postalCode
+        ]
+        .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+        .filter { !$0.isEmpty }
+        .joined(separator: ", ")
+    }
+
+    private var hasCommunicationActions: Bool {
+        !cleanPhone.isEmpty || !cleanEmail.isEmpty
+    }
+
+    @ViewBuilder
+    private var profileAvatar: some View {
+#if canImport(UIKit)
+        if let avatarImage = viewModel.avatarImage {
+            Image(uiImage: avatarImage)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 72, height: 72)
+                .clipShape(Circle())
+        } else if let avatarURL = viewModel.avatarURL {
+            AsyncImage(url: avatarURL) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                default:
+                    Image(systemName: "person.crop.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(Color(.systemGray4))
+                }
+            }
+            .frame(width: 72, height: 72)
+            .clipShape(Circle())
+        } else {
+            Image(systemName: "person.crop.circle.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 72, height: 72)
+                .foregroundStyle(Color(.systemGray4))
+        }
+#else
+        if let avatarURL = viewModel.avatarURL {
+            AsyncImage(url: avatarURL) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                default:
+                    Image(systemName: "person.crop.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(Color(.systemGray4))
+                }
+            }
+            .frame(width: 72, height: 72)
+            .clipShape(Circle())
+        } else {
+            Image(systemName: "person.crop.circle.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 72, height: 72)
+                .foregroundStyle(Color(.systemGray4))
+        }
+#endif
+    }
+
+    @ViewBuilder
+    private func actionButton(
+        title: String,
+        systemName: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: systemName)
+                    .font(.system(size: 20, weight: .semibold))
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+            }
+            .foregroundStyle(Color(red: 0.64, green: 0.20, blue: 0.22))
+            .frame(maxWidth: .infinity, minHeight: 72)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private func myContactSection(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.headline)
+            Text(value)
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 }
 

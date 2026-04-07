@@ -10,8 +10,12 @@ import CareKit
 import CareKitStore
 import CareKitEssentials
 import HealthKit
+import ParseSwift
 import SwiftUI
 import os.log
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct RegularTaskPayload {
     let assetName: String
@@ -45,6 +49,33 @@ class ProfileViewModel: ObservableObject {
     var firstName = ""
     var lastName = ""
     var birthday = Date()
+    var loginName = ""
+    var email = ""
+    var phoneNumber = ""
+    var street = ""
+    var city = ""
+    var state = ""
+    var postalCode = ""
+#if canImport(UIKit)
+    var avatarImage: UIImage?
+#endif
+    var avatarURL: URL?
+    private var pendingAvatarData: Data?
+    private var currentUser: User?
+
+    var displayName: String {
+        let trimmedFirst = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedLast = lastName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let combinedName = [trimmedFirst, trimmedLast]
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+
+        if !combinedName.isEmpty {
+            return combinedName
+        }
+
+        return loginName.isEmpty ? "Anonymous" : loginName
+    }
 
     var patient: OCKPatient? {
         willSet {
@@ -69,6 +100,39 @@ class ProfileViewModel: ObservableObject {
         objectWillChange.send()
         self.patient = patient
     }
+
+    func loadCurrentUser() async {
+        do {
+            let user = try await User.current()
+            objectWillChange.send()
+            currentUser = user
+            loginName = user.username ?? "Anonymous"
+            email = user.email ?? ""
+            phoneNumber = user.phoneNumber ?? ""
+            street = user.street ?? ""
+            city = user.city ?? ""
+            state = user.state ?? ""
+            postalCode = user.postalCode ?? ""
+            avatarURL = user.profileImage?.url
+#if canImport(UIKit)
+            avatarImage = nil
+#endif
+            pendingAvatarData = nil
+        } catch {
+            Logger.profile.error("Could not load current user: \(error)")
+        }
+    }
+
+#if canImport(UIKit)
+    func updateAvatar(data: Data) {
+        guard let image = UIImage(data: data) else {
+            return
+        }
+        objectWillChange.send()
+        avatarImage = image
+        pendingAvatarData = data
+    }
+#endif
 
     // MARK: User intentional behavior
 
@@ -106,6 +170,82 @@ class ProfileViewModel: ObservableObject {
                 Logger.profile.error("Patient was updated in store but could not be cast to OCKPatient.")
             }
         }
+
+        try await saveCurrentUserProfile()
+    }
+
+    private func saveCurrentUserProfile() async throws {
+        var user = try await User.current()
+        var userHasBeenUpdated = false
+
+        if user.email != normalizedOptionalValue(email) {
+            userHasBeenUpdated = true
+            user.email = normalizedOptionalValue(email)
+        }
+
+        if user.phoneNumber != normalizedOptionalValue(phoneNumber) {
+            userHasBeenUpdated = true
+            user.phoneNumber = normalizedOptionalValue(phoneNumber)
+        }
+
+        if user.street != normalizedOptionalValue(street) {
+            userHasBeenUpdated = true
+            user.street = normalizedOptionalValue(street)
+        }
+
+        if user.city != normalizedOptionalValue(city) {
+            userHasBeenUpdated = true
+            user.city = normalizedOptionalValue(city)
+        }
+
+        if user.state != normalizedOptionalValue(state) {
+            userHasBeenUpdated = true
+            user.state = normalizedOptionalValue(state)
+        }
+
+        if user.postalCode != normalizedOptionalValue(postalCode) {
+            userHasBeenUpdated = true
+            user.postalCode = normalizedOptionalValue(postalCode)
+        }
+
+        if let pendingAvatarData {
+            let avatarFile = ParseFile(
+                name: "profile-avatar-\(UUID().uuidString).jpg",
+                data: pendingAvatarData,
+                mimeType: "image/jpeg"
+            )
+            let savedFile = try await avatarFile.save()
+            user.profileImage = savedFile
+            userHasBeenUpdated = true
+        }
+
+        guard userHasBeenUpdated else {
+            currentUser = user
+            return
+        }
+
+        let savedUser = try await user.save()
+        objectWillChange.send()
+        currentUser = savedUser
+        loginName = savedUser.username ?? "Anonymous"
+        email = savedUser.email ?? ""
+        phoneNumber = savedUser.phoneNumber ?? ""
+        street = savedUser.street ?? ""
+        city = savedUser.city ?? ""
+        state = savedUser.state ?? ""
+        postalCode = savedUser.postalCode ?? ""
+        avatarURL = savedUser.profileImage?.url
+        pendingAvatarData = nil
+#if canImport(UIKit)
+        if savedUser.profileImage != nil {
+            avatarImage = nil
+        }
+#endif
+    }
+
+    private func normalizedOptionalValue(_ value: String) -> String? {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
     }
 }
 

@@ -163,11 +163,53 @@ private final class SimpleContactCardViewController: UIViewController {
     }
 
     override func loadView() {
-        let contactView = OCKSimpleContactView()
-        contactView.headerView.titleLabel.text = contact.displayNameText
-        contactView.headerView.detailLabel.text = contact.subtitleText
-        contactView.customStyle = CustomStylerKey.defaultValue
-        view = contactView
+        let cardView = UIView()
+        cardView.backgroundColor = .systemBackground
+        cardView.layer.cornerRadius = 14
+        cardView.layer.masksToBounds = true
+
+        let iconView = UIImageView(image: UIImage(systemName: "person.crop.circle.fill"))
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        iconView.tintColor = .systemGray3
+        iconView.contentMode = .scaleAspectFit
+
+        let titleLabel = UILabel()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.font = .preferredFont(forTextStyle: .headline)
+        titleLabel.textColor = .label
+        titleLabel.text = contact.displayNameText
+
+        let subtitleLabel = UILabel()
+        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        subtitleLabel.font = .preferredFont(forTextStyle: .subheadline)
+        subtitleLabel.textColor = .secondaryLabel
+        subtitleLabel.text = contact.subtitleText
+        subtitleLabel.numberOfLines = 0
+
+        let labelStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
+        labelStack.translatesAutoresizingMaskIntoConstraints = false
+        labelStack.axis = .vertical
+        labelStack.spacing = 4
+
+        let contentStack = UIStackView(arrangedSubviews: [iconView, labelStack])
+        contentStack.translatesAutoresizingMaskIntoConstraints = false
+        contentStack.axis = .horizontal
+        contentStack.alignment = .center
+        contentStack.spacing = 12
+
+        cardView.addSubview(contentStack)
+
+        NSLayoutConstraint.activate([
+            iconView.widthAnchor.constraint(equalToConstant: 40),
+            iconView.heightAnchor.constraint(equalToConstant: 40),
+
+            contentStack.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 16),
+            contentStack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 16),
+            contentStack.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -16),
+            contentStack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -16)
+        ])
+
+        view = cardView
     }
 }
 

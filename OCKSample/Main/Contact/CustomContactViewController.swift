@@ -112,10 +112,7 @@ final class CustomContactViewController: OCKListViewController, @unchecked Senda
     @MainActor
     private func displayContacts(_ contacts: [OCKContact]) {
         for contact in contacts {
-            var query = OCKContactQuery(for: Date())
-            query.ids = [contact.id]
-            query.limit = 1
-            let contactViewController = OCKSimpleContactViewController(query: query, store: store)
+            let contactViewController = SimpleContactCardViewController(contact: contact)
             appendViewController(contactViewController, animated: false)
         }
     }
@@ -149,6 +146,58 @@ final class CustomContactViewController: OCKListViewController, @unchecked Senda
         }
 
         return convertedContact
+    }
+}
+
+private final class SimpleContactCardViewController: UIViewController {
+    private let contact: OCKContact
+
+    init(contact: OCKContact) {
+        self.contact = contact
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func loadView() {
+        let contactView = OCKSimpleContactView()
+        contactView.headerView.titleLabel.text = contact.displayNameText
+        contactView.headerView.detailLabel.text = contact.subtitleText
+        contactView.customStyle = CustomStylerKey.defaultValue
+        view = contactView
+    }
+}
+
+private extension OCKContact {
+    var displayNameText: String {
+        let components = [name.givenName, name.familyName]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+
+        if !components.isEmpty {
+            return components.joined(separator: " ")
+        }
+
+        if let title, !title.isEmpty {
+            return title
+        }
+
+        return id
+    }
+
+    var subtitleText: String? {
+        if let title, !title.isEmpty {
+            return title
+        }
+
+        if let role, !role.isEmpty {
+            return role
+        }
+
+        return nil
     }
 }
 

@@ -13,8 +13,8 @@ import CareKitUI
 import Contacts
 import ContactsUI
 import ParseSwift
-import UIKit
 import os.log
+import UIKit
 
 final class CustomContactViewController: OCKListViewController, @unchecked Sendable {
     private var allContacts = [OCKContact]()
@@ -25,16 +25,13 @@ final class CustomContactViewController: OCKListViewController, @unchecked Senda
     }
 
     private let store: OCKAnyStoreProtocol
-    private let viewSynchronizer: OCKSimpleContactViewSynchronizer
 
     init(
         store: OCKAnyStoreProtocol,
-        contacts: [CareStoreFetchedResult<OCKAnyContact>]? = nil,
-        viewSynchronizer: OCKSimpleContactViewSynchronizer
+        contacts: [CareStoreFetchedResult<OCKAnyContact>]? = nil
     ) {
         self.store = store
         self.contacts = contacts
-        self.viewSynchronizer = viewSynchronizer
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -118,11 +115,7 @@ final class CustomContactViewController: OCKListViewController, @unchecked Senda
             var query = OCKContactQuery(for: Date())
             query.ids = [contact.id]
             query.limit = 1
-            let contactViewController = OCKSimpleContactViewController(
-                query: query,
-                store: store,
-                viewSynchronizer: viewSynchronizer
-            )
+            let contactViewController = OCKSimpleContactViewController(query: query, store: store)
             appendViewController(contactViewController, animated: false)
         }
     }

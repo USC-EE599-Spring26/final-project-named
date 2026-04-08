@@ -10,10 +10,10 @@ import CareKit
 import CareKitEssentials
 import CareKitStore
 import CareKitUI
+import os.log
 import SwiftUI
 #if canImport(UIKit) && canImport(ContactsUI)
 import UIKit
-import os.log
 
 struct ContactView: UIViewControllerRepresentable {
     @Environment(\.careStore) var careStore
@@ -39,8 +39,7 @@ struct ContactView: UIViewControllerRepresentable {
     func createViewController() -> UIViewController {
         CustomContactViewController(
             store: careStore,
-            contacts: contacts.latest,
-            viewSynchronizer: OCKSimpleContactViewSynchronizer()
+            contacts: contacts.latest
         )
     }
 

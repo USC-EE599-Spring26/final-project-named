@@ -45,6 +45,7 @@ extension OCKStore {
 
     // Adds tasks and contacts into the store
     func populateDefaultCarePlansTasksContacts(
+        carePlanUUID: UUID? = nil,
         startDate: Date = Date()
     ) async throws {
 
@@ -71,7 +72,7 @@ extension OCKStore {
         var doxylamine = OCKTask(
             id: TaskID.doxylamine,
             title: String(localized: "TAKE_DOXYLAMINE"),
-            carePlanUUID: nil,
+            carePlanUUID: carePlanUUID,
             schedule: schedule
         )
         doxylamine.instructions = String(localized: "DOXYLAMINE_INSTRUCTIONS")
@@ -94,7 +95,7 @@ extension OCKStore {
         var nausea = OCKTask(
             id: TaskID.nausea,
             title: String(localized: "TRACK_NAUSEA"),
-            carePlanUUID: nil,
+            carePlanUUID: carePlanUUID,
             schedule: nauseaSchedule
         )
         nausea.impactsAdherence = false
@@ -114,7 +115,7 @@ extension OCKStore {
         var kegels = OCKTask(
             id: TaskID.kegels,
             title: String(localized: "KEGEL_EXERCISES"),
-            carePlanUUID: nil,
+            carePlanUUID: carePlanUUID,
             schedule: kegelSchedule
         )
         kegels.impactsAdherence = true
@@ -133,7 +134,7 @@ extension OCKStore {
         var stretch = OCKTask(
             id: TaskID.stretch,
             title: String(localized: "STRETCH"),
-            carePlanUUID: nil,
+            carePlanUUID: carePlanUUID,
             schedule: stretchSchedule
         )
         stretch.impactsAdherence = true
@@ -152,7 +153,7 @@ extension OCKStore {
         var walking = OCKTask(
             id: TaskID.walking,
             title: String(localized: "WALKING_CHECK"),
-            carePlanUUID: nil,
+            carePlanUUID: carePlanUUID,
             schedule: walkingSchedule
         )
         walking.impactsAdherence = true
@@ -176,7 +177,7 @@ extension OCKStore {
         var onboard = OCKTask(
             id: TaskID.onboard,
             title: "Onboard",
-            carePlanUUID: nil,
+            carePlanUUID: carePlanUUID,
             schedule: onboardingSchedule
         )
         onboard.impactsAdherence = true
@@ -200,7 +201,7 @@ extension OCKStore {
         var neckMobility = OCKTask(
             id: TaskID.neckMobility,
             title: "Neck Mobility Check",
-            carePlanUUID: nil,
+            carePlanUUID: carePlanUUID,
             schedule: neckMobilitySchedule
         )
         neckMobility.impactsAdherence = true
@@ -224,7 +225,7 @@ extension OCKStore {
         var rangeOfMotion = OCKTask(
             id: TaskID.rangeOfMotion,
             title: "Range of Motion",
-            carePlanUUID: nil,
+            carePlanUUID: carePlanUUID,
             schedule: rangeOfMotionSchedule
         )
         rangeOfMotion.impactsAdherence = true
@@ -236,7 +237,7 @@ extension OCKStore {
         var keckResource = OCKTask(
             id: TaskID.keckResource,
             title: "Open Keck Medicine",
-            carePlanUUID: nil,
+            carePlanUUID: carePlanUUID,
             schedule: stretchSchedule
         )
         keckResource.impactsAdherence = false
@@ -245,8 +246,8 @@ extension OCKStore {
         keckResource.card = .link
         keckResource.linkURL = Constants.defaultRecoveryResourceURL
 
-        let symptomTracking = createSymptomTrackingSurveyTask(carePlanUUID: nil)
-        let symptomTrackingWeekly = createSymptomTrackingWeeklySurveyTask(carePlanUUID: nil)
+        let symptomTracking = createSymptomTrackingSurveyTask(carePlanUUID: carePlanUUID)
+        let symptomTrackingWeekly = createSymptomTrackingWeeklySurveyTask(carePlanUUID: carePlanUUID)
         _ = try await addTasksIfNotPresent(
             [
                 onboard,
@@ -684,4 +685,23 @@ extension OCKStore {
         return startDate...endDate
     }
 
+}
+
+extension OCKStore {
+
+    func fetchCurrentCarePlanUUID() async throws -> UUID {
+        if let remoteUUID = try? await Utility.getRemoteClockUUID() {
+            let carePlan = try await fetchCarePlan(withID: remoteUUID.uuidString)
+            return carePlan.uuid
+        }
+
+        var query = OCKCarePlanQuery(for: Date())
+        query.limit = 1
+        query.sortDescriptors = [.effectiveDate(ascending: false)]
+
+        guard let carePlan = try await fetchCarePlans(query: query).first else {
+            throw AppError.couldntBeUnwrapped
+        }
+        return carePlan.uuid
+    }
 }

@@ -12,6 +12,17 @@ import CareKit
 import CareKitStore
 import os.log
 
+#if os(visionOS)
+struct MyContactView: View {
+    var body: some View {
+        NavigationStack {
+            Text("My Contact is unavailable on visionOS.")
+                .foregroundStyle(.secondary)
+                .navigationTitle("My Contact")
+        }
+    }
+}
+#else
 struct MyContactView: UIViewControllerRepresentable {
     @Environment(\.careStore) var careStore
 
@@ -43,3 +54,4 @@ struct MyContactView_Previews: PreviewProvider {
             .accentColor(Color.accentColor)
     }
 }
+#endif

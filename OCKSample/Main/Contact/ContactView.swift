@@ -13,6 +13,17 @@ import os.log
 import SwiftUI
 import UIKit
 
+#if os(visionOS)
+struct ContactView: View {
+    var body: some View {
+        NavigationStack {
+            Text("Contacts are unavailable on visionOS.")
+                .foregroundStyle(.secondary)
+                .navigationTitle("Contacts")
+        }
+    }
+}
+#else
 struct ContactView: UIViewControllerRepresentable {
     @Environment(\.careStore) var careStore
     @CareStoreFetchRequest(query: query()) private var contacts
@@ -62,6 +73,7 @@ struct ContactView_Previews: PreviewProvider {
     static var previews: some View {
         ContactView()
             .environment(\.careStore, Utility.createPreviewStore())
-			.careKitStyle(Styler())
+            .careKitStyle(Styler())
     }
 }
+#endif

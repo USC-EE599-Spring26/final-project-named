@@ -11,24 +11,42 @@ import CareKitStore
 import CareKit
 import os.log
 import SwiftUI
+#if canImport(PhotosUI)
+import PhotosUI
+#endif
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct ProfileView: View {
     private static var query = OCKPatientQuery(for: Date())
     @CareStoreFetchRequest(query: query) private var patients
+    @CareStoreFetchRequest(query: ProfileViewModel.queryContacts()) private var contacts
     @StateObject private var viewModel = ProfileViewModel()
     @ObservedObject var loginViewModel: LoginViewModel
     @State var isPresentingAddTask = false
     @State var isPresentingDeleteTasks = false
+    @State private var isPresentingMyContact = false
+#if canImport(PhotosUI)
+    @State private var selectedPhotoItem: PhotosPickerItem?
+#endif
 
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Profile")
-                        .font(.system(size: 34, weight: .bold))
-                        .padding(.top, 8)
+                    avatarSection
 
                     VStack(spacing: 14) {
+                        profileField(title: "Login") {
+                            Text(viewModel.loginName.isEmpty ? "Anonymous" : viewModel.loginName)
+                                .foregroundStyle(.primary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(16)
+                        }
+
                         TextField("First Name",
                                   text: $viewModel.firstName)
                             .padding()
@@ -44,6 +62,49 @@ struct ProfileView: View {
                         DatePicker("Birthday",
                                    selection: $viewModel.birthday,
                                    displayedComponents: [DatePickerComponents.date])
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+                    }
+                    .padding(18)
+                    .background(Color(red: 0.97, green: 0.95, blue: 0.90))
+                    .cornerRadius(24)
+
+                    VStack(alignment: .leading, spacing: 14) {
+                        Text("Contact")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+
+                        TextField("Phone", text: $viewModel.phoneNumber)
+                            .keyboardType(.phonePad)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+
+                        TextField("Email", text: $viewModel.email)
+                            .keyboardType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+
+                        TextField("Street", text: $viewModel.street)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+
+                        TextField("City", text: $viewModel.city)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+
+                        TextField("State", text: $viewModel.state)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+
+                        TextField("Postal Code", text: $viewModel.postalCode)
                             .padding()
                             .background(Color.white)
                             .cornerRadius(16)
@@ -101,11 +162,19 @@ struct ProfileView: View {
             }
             .background(Color(red: 0.99, green: 0.97, blue: 0.93))
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("My Contact") {
+                        Task {
+                            await viewModel.prepareMyContactForPresentation()
+                            isPresentingMyContact = true
+                        }
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         isPresentingAddTask = true
                     } label: {
-                        Image(systemName: "plus")
+                        Text("Add Task")
                     }
                     .accessibilityLabel("Add Task")
                 }
@@ -113,9 +182,15 @@ struct ProfileView: View {
             .sheet(isPresented: $isPresentingAddTask) {
                 AddHealthKitTaskView(isPresented: $isPresentingAddTask)
             }
+            .sheet(isPresented: $isPresentingMyContact) {
+                MyContactView()
+            }
             .onAppear {
                 if let patient = patients.first?.result {
                     viewModel.updatePatient(patient)
+                }
+                Task {
+                    await viewModel.loadCurrentUser()
                 }
             }
             .onChange(of: patients.count) { _, _ in
@@ -123,7 +198,122 @@ struct ProfileView: View {
                     viewModel.updatePatient(patient)
                 }
             }
+            .onReceive(contacts.publisher) { publishedContact in
+                viewModel.updateContact(publishedContact.result)
+            }
+#if canImport(PhotosUI)
+            .onChange(of: selectedPhotoItem) { _, newItem in
+                guard let newItem else {
+                    return
+                }
+                Task {
+                    if let data = try? await newItem.loadTransferable(type: Data.self) {
+                        viewModel.updateAvatar(data: data)
+                    }
+                }
+            }
+#endif
         }
+    }
+}
+
+private extension ProfileView {
+    @ViewBuilder
+    var avatarSection: some View {
+        let avatarView = ProfileAvatarView(viewModel: viewModel)
+        VStack(spacing: 16) {
+#if canImport(PhotosUI)
+            PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                avatarView
+            }
+            .buttonStyle(.plain)
+#else
+            avatarView
+#endif
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 8)
+    }
+
+    @ViewBuilder
+    func profileField<Content: View>(
+        title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(.secondary)
+            content()
+        }
+    }
+}
+
+private struct ProfileAvatarView: View {
+    @ObservedObject var viewModel: ProfileViewModel
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(Color.white)
+                .frame(width: 104, height: 104)
+
+            Circle()
+                .stroke(Color(red: 0.64, green: 0.20, blue: 0.22), lineWidth: 4)
+                .frame(width: 104, height: 104)
+
+#if canImport(UIKit)
+            if let avatarImage = viewModel.avatarImage {
+                Image(uiImage: avatarImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 92, height: 92)
+                    .clipShape(Circle())
+            } else if let avatarURL = viewModel.avatarURL {
+                AsyncImage(url: avatarURL) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    default:
+                        placeholderImage
+                    }
+                }
+                .frame(width: 92, height: 92)
+                .clipShape(Circle())
+            } else {
+                placeholderImage
+                    .frame(width: 92, height: 92)
+            }
+#else
+            if let avatarURL = viewModel.avatarURL {
+                AsyncImage(url: avatarURL) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    default:
+                        placeholderImage
+                    }
+                }
+                .frame(width: 92, height: 92)
+                .clipShape(Circle())
+            } else {
+                placeholderImage
+                    .frame(width: 92, height: 92)
+            }
+#endif
+        }
+    }
+
+    private var placeholderImage: some View {
+        Image(systemName: "person.fill")
+            .resizable()
+            .scaledToFit()
+            .padding(18)
+            .foregroundStyle(.black)
     }
 }
 
@@ -133,14 +323,13 @@ struct AddHealthKitTaskView: View {
     @State private var title = ""
     @State private var instructions = ""
     @State private var linkURL = ""
-    @State private var checkListItem=""
+    @State private var checkListItem = ""
     @State private var scheduleStart = Date()
     @State private var repeatEveryDays = 1
     @State private var selectedCard: CareKitCard = .numericProgress
     @State private var selectedAsset = "cross.case.fill"
     @State private var numericGoalText = "1000"
     @State private var errorMessage: String?
-    // Choose task type first, then update the allowed card options.
     @State private var selectedTaskType = "OCKHealthKitTask"
 
     var body: some View {
@@ -150,7 +339,7 @@ struct AddHealthKitTaskView: View {
                     Picker("Task Type", selection: $selectedTaskType) {
                         Text("OCKTask").tag("OCKTask")
                         Text("OCKHealthKitTask").tag("OCKHealthKitTask")
-                    } // User can choose which task type to create.
+                    }
                     .onChange(of: selectedTaskType) { _, newValue in
                         if newValue == "OCKHealthKitTask" {
                             selectedCard = .numericProgress
@@ -167,7 +356,7 @@ struct AddHealthKitTaskView: View {
                             .keyboardType(.URL)
                     }
                     if selectedTaskType == "OCKTask" && selectedCard == .checklist {
-                       TextField("Checklist Item", text: $checkListItem)
+                        TextField("Checklist Item", text: $checkListItem)
                     }
                     if selectedTaskType == "OCKHealthKitTask" && selectedCard == .numericProgress {
                         TextField("Goal", text: $numericGoalText)

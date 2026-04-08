@@ -7,21 +7,28 @@
 //
 
 import CareKit
+import CareKitEssentials
 import CareKitStore
+import CareKitUI
 import os.log
 import SwiftUI
+#if canImport(UIKit) && canImport(ContactsUI)
 import UIKit
 
 struct ContactView: UIViewControllerRepresentable {
     @Environment(\.careStore) var careStore
+    @CareStoreFetchRequest(query: query()) private var contacts
 
     func makeUIViewController(context: Context) -> some UIViewController {
         let viewController = createViewController()
-        return UINavigationController(rootViewController: viewController)
+        let navigationController = UINavigationController(rootViewController: viewController)
+        return navigationController
     }
 
-    func updateUIViewController(_ uiViewController: UIViewControllerType,
-                                context: Context) {
+    func updateUIViewController(
+        _ uiViewController: UIViewControllerType,
+        context: Context
+    ) {
         guard let navigationController = uiViewController as? UINavigationController else {
             Logger.feed.error("ContactView should have been a UINavigationController")
             return
@@ -30,22 +37,29 @@ struct ContactView: UIViewControllerRepresentable {
     }
 
     func createViewController() -> UIViewController {
-        #if os(iOS)
-        return OCKContactsListViewController(
+        CustomContactViewController(
             store: careStore,
-            contactViewSynchronizer: OCKDetailedContactViewSynchronizer()
+            contacts: contacts.latest
         )
-        #else
-        return UIViewController()
-        #endif
+    }
+
+    static func query() -> OCKContactQuery {
+        OCKContactQuery(for: Date())
     }
 }
+#else
+struct ContactView: View {
+    var body: some View {
+        Text("Contacts are unavailable on this platform.")
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+#endif
 
 struct ContactView_Previews: PreviewProvider {
-
     static var previews: some View {
         ContactView()
             .environment(\.careStore, Utility.createPreviewStore())
-			.careKitStyle(Styler())
+            .careKitStyle(Styler())
     }
 }

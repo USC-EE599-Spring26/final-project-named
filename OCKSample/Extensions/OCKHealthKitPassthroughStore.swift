@@ -15,6 +15,7 @@ import os.log
 extension OCKHealthKitPassthroughStore {
 
     func populateDefaultHealthKitTasks(
+        carePlanUUID: UUID? = nil,
         startDate: Date = Date()
     ) async throws {
 
@@ -36,7 +37,7 @@ extension OCKHealthKitPassthroughStore {
         var steps = OCKHealthKitTask(
             id: TaskID.steps,
             title: String(localized: "STEPS"),
-            carePlanUUID: nil,
+            carePlanUUID: carePlanUUID,
             schedule: stepSchedule,
             healthKitLinkage: OCKHealthKitLinkage(
                 quantityIdentifier: .stepCount,
@@ -60,7 +61,7 @@ extension OCKHealthKitPassthroughStore {
                 var restingHeartRate = OCKHealthKitTask(
                     id: TaskID.ovulationTestResult,
                     title: String(localized: "OVULATION_TEST_RESULT"),
-                    carePlanUUID: nil,
+                    carePlanUUID: carePlanUUID,
                     schedule: restingHeartRateSchedule,
                     healthKitLinkage: OCKHealthKitLinkage(
                         quantityIdentifier: .restingHeartRate,

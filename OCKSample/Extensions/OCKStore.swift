@@ -398,9 +398,14 @@ extension OCKStore {
             )
 
             let questions = [questionOne, questionTwo, questionThree, questionFour, questionFive, questionSix]
+            let taskAsset = "brain.head.profile"
+            let taskTitle = String(localized: "QUALITY_OF_LIFE")
             let stepOne = SurveyStep(
                 id: "\(symptomTrackingTaskId)-step-1",
-                questions: questions
+                questions: questions,
+                asset: taskAsset,
+                title: taskTitle,
+                subtitle: String(localized: "ANSWER_HONESTLY")
             )
 
             var symptomTracking = OCKTask(

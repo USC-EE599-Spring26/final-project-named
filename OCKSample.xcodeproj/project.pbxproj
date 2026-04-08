@@ -188,6 +188,9 @@
 		794F11302F7E03CB00EDB0F1 /* OnboardTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10782F7CE7E800EDB0F1 /* OnboardTaskView.swift */; };
 		79FA5F6D2F8646C600B8A0D1 /* CustomContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FA5F652F8646B900B8A0D1 /* CustomContactViewController.swift */; };
 		79FA5F6E2F8646C600B8A0D1 /* CustomContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FA5F652F8646B900B8A0D1 /* CustomContactViewController.swift */; };
+		79FA602F2F8668B700B8A0D1 /* CarePlanID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FA60272F8668AA00B8A0D1 /* CarePlanID.swift */; };
+		79FA60302F8668B700B8A0D1 /* CarePlanID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FA60272F8668AA00B8A0D1 /* CarePlanID.swift */; };
+		79FA60312F8668B700B8A0D1 /* CarePlanID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FA60272F8668AA00B8A0D1 /* CarePlanID.swift */; };
 		9103AA5227B8C913002C921E /* FontColorKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F03AA727860E7700E5AFB4 /* FontColorKey.swift */; };
 		91693818271B5E1600A634ED /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7036E63F25717F85006E9A3C /* Constants.swift */; };
 		9169381B271B64E100A634ED /* Styler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9169381A271B64E100A634ED /* Styler.swift */; };
@@ -414,6 +417,7 @@
 		7984E97C2F63C2AF007F9CB5 /* ResearchKitSwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKitSwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7984E9802F63C2C0007F9CB5 /* ResearchKitSwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKitSwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		79FA5F652F8646B900B8A0D1 /* CustomContactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomContactViewController.swift; sourceTree = "<group>"; };
+		79FA60272F8668AA00B8A0D1 /* CarePlanID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarePlanID.swift; sourceTree = "<group>"; };
 		9169381A271B64E100A634ED /* Styler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Styler.swift; sourceTree = "<group>"; };
 		9169381C271B650700A634ED /* ColorStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorStyler.swift; sourceTree = "<group>"; };
 		9169381F271B80EA00A634ED /* CONTRIBUTING.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
@@ -780,6 +784,7 @@
 		918FDEB3271B402F0045A0EF /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				79FA60272F8668AA00B8A0D1 /* CarePlanID.swift */,
 				1C15B0902F70837800E8E3F6 /* RecoverySummaryBuilder.swift */,
 				1C15B0852F70832300E8E3F6 /* DailyRecoverySummary.swift */,
 				1CA9EDFF2F5221C600C82A4F /* CareKitCard.swift */,
@@ -1245,6 +1250,7 @@
 				1C15B08F2F70833500E8E3F6 /* DailyRecoverySummary.swift in Sources */,
 				707D294C2DCBE68500980253 /* StoreCoordinatorKey.swift in Sources */,
 				1CA9EDFD2F52217F00C82A4F /* OCKTask+Card.swift in Sources */,
+				79FA602F2F8668B700B8A0D1 /* CarePlanID.swift in Sources */,
 				1CA9EE062F52276E00C82A4F /* CareKitTaskView.swift in Sources */,
 				707D294D2DCBE68500980253 /* InsightsView.swift in Sources */,
 				707D294E2DCBE68500980253 /* OCKHealthKitPassthroughStore.swift in Sources */,
@@ -1330,6 +1336,7 @@
 				7094DCF32DC340E40039CA64 /* SplashScreenView.swift in Sources */,
 				70221F2F28D7CDE400971195 /* AppDelegate+ParseRemoteDelegate.swift in Sources */,
 				7083A857279CA40F00B3832E /* PCKUtility.swift in Sources */,
+				79FA60302F8668B700B8A0D1 /* CarePlanID.swift in Sources */,
 				1C34E27F2F501CF800A29A18 /* AnimationStyler.swift in Sources */,
 				705572402DC1EAEE008E5B0A /* InsightsView.swift in Sources */,
 				91AD923924A4C42D00925D4D /* OCKWatchSampleApp.swift in Sources */,
@@ -1400,6 +1407,7 @@
 				918FDEB7271B41FF0045A0EF /* Logger.swift in Sources */,
 				70221F2A28D7BE0600971195 /* AppDelegate+ParseRemoteDelegate.swift in Sources */,
 				79FA5F6E2F8646C600B8A0D1 /* CustomContactViewController.swift in Sources */,
+				79FA60312F8668B700B8A0D1 /* CarePlanID.swift in Sources */,
 				7036E4D3256EBE35006E9A3C /* MainView.swift in Sources */,
 				918FDEC5271B4EA70045A0EF /* StoreCoordinatorKey.swift in Sources */,
 				91693822271B897200A634ED /* Utility.swift in Sources */,

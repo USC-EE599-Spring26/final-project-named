@@ -16,6 +16,63 @@ import ParseCareKit
 import ResearchKitSwiftUI
 
 extension OCKStore {
+    @MainActor
+    class func getCarePlanUUIDs() async throws -> [CarePlanID: UUID] {
+        var results = [CarePlanID: UUID]()
+
+        guard let store = AppDelegateKey.defaultValue?.store else {
+            return results
+        }
+
+        var query = OCKCarePlanQuery(for: Date())
+        query.ids = [CarePlanID.health.rawValue]
+
+        let foundCarePlans = try await store.fetchCarePlans(query: query)
+        CarePlanID.allCases.forEach { carePlanID in
+            results[carePlanID] = foundCarePlans
+                .first(where: { $0.id == carePlanID.rawValue })?.uuid
+        }
+        return results
+    }
+
+    func addCarePlansIfNotPresent(
+        _ carePlans: [OCKAnyCarePlan],
+        patientUUID: UUID? = nil
+    ) async throws {
+        let carePlanIdsToAdd = carePlans.compactMap(\.id)
+
+        var query = OCKCarePlanQuery(for: Date())
+        query.ids = carePlanIdsToAdd
+        let foundCarePlans = try await fetchAnyCarePlans(query: query)
+
+        let carePlansNotInStore = carePlans.compactMap { potentialCarePlan -> OCKAnyCarePlan? in
+            guard foundCarePlans.first(where: { $0.id == potentialCarePlan.id }) == nil else {
+                return nil
+            }
+
+            guard var mutableCarePlan = potentialCarePlan as? OCKCarePlan else {
+                return potentialCarePlan
+            }
+            mutableCarePlan.patientUUID = patientUUID
+            return mutableCarePlan
+        }
+
+        guard !carePlansNotInStore.isEmpty else {
+            return
+        }
+
+        _ = try await addAnyCarePlans(carePlansNotInStore)
+        Logger.ockStore.info("Added care plans into OCKStore.")
+    }
+
+    func populateCarePlans(patientUUID: UUID? = nil) async throws {
+        let healthCarePlan = OCKCarePlan(
+            id: CarePlanID.health.rawValue,
+            title: "Health Care Plan",
+            patientUUID: patientUUID
+        )
+        try await addCarePlansIfNotPresent([healthCarePlan], patientUUID: patientUUID)
+    }
 
     func addContactsIfNotPresent(_ contacts: [OCKContact]) async throws -> [OCKContact] {
         let contactIdsToAdd = contacts.compactMap { $0.id }
@@ -45,8 +102,12 @@ extension OCKStore {
 
     // Adds tasks and contacts into the store
     func populateDefaultCarePlansTasksContacts(
-        startDate: Date = Date()
+        startDate: Date = Date(),
+        patientUUID: UUID? = nil
     ) async throws {
+        try await populateCarePlans(patientUUID: patientUUID)
+        let carePlanUUIDs = try await Self.getCarePlanUUIDs()
+        let healthCarePlanUUID = carePlanUUIDs[.health]
 
         let thisMorning = Calendar.current.startOfDay(for: startDate)
         let aFewDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: thisMorning)!
@@ -71,7 +132,7 @@ extension OCKStore {
         var doxylamine = OCKTask(
             id: TaskID.doxylamine,
             title: String(localized: "TAKE_DOXYLAMINE"),
-            carePlanUUID: nil,
+            carePlanUUID: healthCarePlanUUID,
             schedule: schedule
         )
         doxylamine.instructions = String(localized: "DOXYLAMINE_INSTRUCTIONS")
@@ -94,7 +155,7 @@ extension OCKStore {
         var nausea = OCKTask(
             id: TaskID.nausea,
             title: String(localized: "TRACK_NAUSEA"),
-            carePlanUUID: nil,
+            carePlanUUID: healthCarePlanUUID,
             schedule: nauseaSchedule
         )
         nausea.impactsAdherence = false
@@ -114,7 +175,7 @@ extension OCKStore {
         var kegels = OCKTask(
             id: TaskID.kegels,
             title: String(localized: "KEGEL_EXERCISES"),
-            carePlanUUID: nil,
+            carePlanUUID: healthCarePlanUUID,
             schedule: kegelSchedule
         )
         kegels.impactsAdherence = true
@@ -133,7 +194,7 @@ extension OCKStore {
         var stretch = OCKTask(
             id: TaskID.stretch,
             title: String(localized: "STRETCH"),
-            carePlanUUID: nil,
+            carePlanUUID: healthCarePlanUUID,
             schedule: stretchSchedule
         )
         stretch.impactsAdherence = true
@@ -152,7 +213,7 @@ extension OCKStore {
         var walking = OCKTask(
             id: TaskID.walking,
             title: String(localized: "WALKING_CHECK"),
-            carePlanUUID: nil,
+            carePlanUUID: healthCarePlanUUID,
             schedule: walkingSchedule
         )
         walking.impactsAdherence = true
@@ -176,7 +237,7 @@ extension OCKStore {
         var onboard = OCKTask(
             id: TaskID.onboard,
             title: "Onboard",
-            carePlanUUID: nil,
+            carePlanUUID: healthCarePlanUUID,
             schedule: onboardingSchedule
         )
         onboard.impactsAdherence = true
@@ -200,7 +261,7 @@ extension OCKStore {
         var neckMobility = OCKTask(
             id: TaskID.neckMobility,
             title: "Neck Mobility Check",
-            carePlanUUID: nil,
+            carePlanUUID: healthCarePlanUUID,
             schedule: neckMobilitySchedule
         )
         neckMobility.impactsAdherence = true
@@ -224,7 +285,7 @@ extension OCKStore {
         var rangeOfMotion = OCKTask(
             id: TaskID.rangeOfMotion,
             title: "Range of Motion",
-            carePlanUUID: nil,
+            carePlanUUID: healthCarePlanUUID,
             schedule: rangeOfMotionSchedule
         )
         rangeOfMotion.impactsAdherence = true
@@ -236,7 +297,7 @@ extension OCKStore {
         var keckResource = OCKTask(
             id: TaskID.keckResource,
             title: "Open Keck Medicine",
-            carePlanUUID: nil,
+            carePlanUUID: healthCarePlanUUID,
             schedule: stretchSchedule
         )
         keckResource.impactsAdherence = false
@@ -245,8 +306,8 @@ extension OCKStore {
         keckResource.card = .link
         keckResource.linkURL = Constants.defaultRecoveryResourceURL
 
-        let symptomTracking = createSymptomTrackingSurveyTask(carePlanUUID: nil)
-        let symptomTrackingWeekly = createSymptomTrackingWeeklySurveyTask(carePlanUUID: nil)
+        let symptomTracking = createSymptomTrackingSurveyTask(carePlanUUID: healthCarePlanUUID)
+        let symptomTrackingWeekly = createSymptomTrackingWeeklySurveyTask(carePlanUUID: healthCarePlanUUID)
         _ = try await addTasksIfNotPresent(
             [
                 onboard,

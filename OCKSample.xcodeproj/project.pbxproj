@@ -186,6 +186,8 @@
 		794F112E2F7E03CB00EDB0F1 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7036E63F25717F85006E9A3C /* Constants.swift */; };
 		794F112F2F7E03CB00EDB0F1 /* NeckMobilityTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F112A2F7E005C00EDB0F1 /* NeckMobilityTaskView.swift */; };
 		794F11302F7E03CB00EDB0F1 /* OnboardTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10782F7CE7E800EDB0F1 /* OnboardTaskView.swift */; };
+		79FA5F6D2F8646C600B8A0D1 /* CustomContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FA5F652F8646B900B8A0D1 /* CustomContactViewController.swift */; };
+		79FA5F6E2F8646C600B8A0D1 /* CustomContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FA5F652F8646B900B8A0D1 /* CustomContactViewController.swift */; };
 		9103AA5227B8C913002C921E /* FontColorKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F03AA727860E7700E5AFB4 /* FontColorKey.swift */; };
 		91693818271B5E1600A634ED /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7036E63F25717F85006E9A3C /* Constants.swift */; };
 		9169381B271B64E100A634ED /* Styler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9169381A271B64E100A634ED /* Styler.swift */; };
@@ -411,6 +413,7 @@
 		7984E9792F63C282007F9CB5 /* ResearchKitSwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKitSwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7984E97C2F63C2AF007F9CB5 /* ResearchKitSwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKitSwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7984E9802F63C2C0007F9CB5 /* ResearchKitSwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKitSwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		79FA5F652F8646B900B8A0D1 /* CustomContactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomContactViewController.swift; sourceTree = "<group>"; };
 		9169381A271B64E100A634ED /* Styler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Styler.swift; sourceTree = "<group>"; };
 		9169381C271B650700A634ED /* ColorStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorStyler.swift; sourceTree = "<group>"; };
 		9169381F271B80EA00A634ED /* CONTRIBUTING.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
@@ -455,6 +458,7 @@
 		707D29292DCBE5E500980253 /* OCKVisionSample */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (707D29432DCBE5E600980253 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = OCKVisionSample; sourceTree = "<group>"; };
 		707D293C2DCBE5E600980253 /* OCKVisionSampleTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = OCKVisionSampleTests; sourceTree = "<group>"; };
 		7984E85B2F6385EF007F9CB5 /* Protocol */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Protocol; sourceTree = "<group>"; };
+		79FA5FA52F864EBA00B8A0D1 /* MyContact */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = MyContact; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -592,6 +596,7 @@
 		7030887C258272E700FFABB6 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
+				79FA5FA52F864EBA00B8A0D1 /* MyContact */,
 				7036E4C8256E1A6F006E9A3C /* ProfileView.swift */,
 				7036E516256F2413006E9A3C /* ProfileViewModel.swift */,
 			);
@@ -601,6 +606,7 @@
 		7030887D258272F400FFABB6 /* Contact */ = {
 			isa = PBXGroup;
 			children = (
+				79FA5F652F8646B900B8A0D1 /* CustomContactViewController.swift */,
 				7036E4CD256E9A0C006E9A3C /* ContactView.swift */,
 			);
 			path = Contact;
@@ -939,6 +945,7 @@
 			fileSystemSynchronizedGroups = (
 				707D29292DCBE5E500980253 /* OCKVisionSample */,
 				7984E85B2F6385EF007F9CB5 /* Protocol */,
+				79FA5FA52F864EBA00B8A0D1 /* MyContact */,
 			);
 			name = OCKVisionSample;
 			packageProductDependencies = (
@@ -1013,6 +1020,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				7984E85B2F6385EF007F9CB5 /* Protocol */,
+				79FA5FA52F864EBA00B8A0D1 /* MyContact */,
 			);
 			name = OCKSample;
 			packageProductDependencies = (
@@ -1275,6 +1283,7 @@
 				794F112C2F7E005C00EDB0F1 /* NeckMobilityTaskView.swift in Sources */,
 				707D29662DCBE68500980253 /* UserType.swift in Sources */,
 				707D29672DCBE68500980253 /* ContactView.swift in Sources */,
+				79FA5F6D2F8646C600B8A0D1 /* CustomContactViewController.swift in Sources */,
 				707D29682DCBE68500980253 /* NoHighlightStyle.swift in Sources */,
 				707D29692DCBE68500980253 /* LocalSyncSessionDelegate.swift in Sources */,
 				707D296A2DCBE68500980253 /* Constants.swift in Sources */,
@@ -1390,6 +1399,7 @@
 				70F0EFE828C2EC050005B5A2 /* OCKSampleApp.swift in Sources */,
 				918FDEB7271B41FF0045A0EF /* Logger.swift in Sources */,
 				70221F2A28D7BE0600971195 /* AppDelegate+ParseRemoteDelegate.swift in Sources */,
+				79FA5F6E2F8646C600B8A0D1 /* CustomContactViewController.swift in Sources */,
 				7036E4D3256EBE35006E9A3C /* MainView.swift in Sources */,
 				918FDEC5271B4EA70045A0EF /* StoreCoordinatorKey.swift in Sources */,
 				91693822271B897200A634ED /* Utility.swift in Sources */,

@@ -44,8 +44,6 @@ struct TaskScheduleConfiguration {
 @MainActor
 class ProfileViewModel: ObservableObject {
 
-    // MARK: Public read/write properties
-
     var firstName = ""
     var lastName = ""
     var birthday = Date()
@@ -62,6 +60,7 @@ class ProfileViewModel: ObservableObject {
     var avatarURL: URL?
     private var pendingAvatarData: Data?
     private var currentUser: User?
+    private var contact: OCKContact?
 
     var displayName: String {
         let trimmedFirst = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -91,14 +90,23 @@ class ProfileViewModel: ObservableObject {
         }
     }
 
-    // MARK: Helpers (public)
-
     func updatePatient(_ patient: OCKAnyPatient) {
         guard let patient = patient as? OCKPatient else {
             return
         }
         objectWillChange.send()
         self.patient = patient
+    }
+
+    func updateContact(_ contact: OCKAnyContact) {
+        guard let currentPatient = patient,
+              let contact = contact as? OCKContact,
+              contact.id == currentPatient.id,
+              contact.uuid != self.contact?.uuid else {
+            return
+        }
+
+        self.contact = contact
     }
 
     func loadCurrentUser() async {
@@ -134,15 +142,12 @@ class ProfileViewModel: ObservableObject {
     }
 #endif
 
-    // MARK: User intentional behavior
-
     func saveProfile() async throws {
 
         guard var patientToUpdate = patient else {
             throw AppError.errorString("The profile is missing the Patient")
         }
 
-        // If there is a currentPatient that was fetched, check to see if any of the fields changed
         var patientHasBeenUpdated = false
 
         if patient?.name.givenName != firstName {
@@ -172,8 +177,21 @@ class ProfileViewModel: ObservableObject {
         }
 
         try await saveCurrentUserProfile()
+        try await saveContact()
     }
+}
 
+extension ProfileViewModel {
+    func prepareMyContactForPresentation() async {
+        do {
+            try await saveContact()
+        } catch {
+            Logger.profile.error("Could not prepare My Contact: \(error)")
+        }
+    }
+}
+
+private extension ProfileViewModel {
     private func saveCurrentUserProfile() async throws {
         var user = try await User.current()
         var userHasBeenUpdated = false
@@ -243,15 +261,93 @@ class ProfileViewModel: ObservableObject {
 #endif
     }
 
+    private func saveContact() async throws {
+        guard let store = AppDelegateKey.defaultValue?.store else {
+            throw AppError.couldntBeUnwrapped
+        }
+
+        let remoteUUID = try await Utility.getRemoteClockUUID().uuidString
+        var fallbackName = PersonNameComponents()
+        fallbackName.givenName = firstName
+        fallbackName.familyName = lastName
+        let patientName = patient?.name ?? fallbackName
+        let emailValue = normalizedOptionalValue(email)
+        let phoneValue = normalizedOptionalValue(phoneNumber)
+
+        let address = OCKPostalAddress(
+            street: normalizedOptionalValue(street) ?? "",
+            city: normalizedOptionalValue(city) ?? "",
+            state: normalizedOptionalValue(state) ?? "",
+            postalCode: normalizedOptionalValue(postalCode) ?? "",
+            country: ""
+        )
+
+        let emailAddresses = emailValue.map { [OCKLabeledValue(label: "email", value: $0)] }
+        let phoneNumbers = phoneValue.map { [OCKLabeledValue(label: "phone", value: $0)] }
+
+        if var contactToUpdate = contact {
+            var contactHasBeenUpdated = false
+
+            if contactToUpdate.name.givenName != patientName.givenName ||
+                contactToUpdate.name.familyName != patientName.familyName {
+                contactHasBeenUpdated = true
+                contactToUpdate.name = patientName
+            }
+
+            if contactToUpdate.address?.street != address.street ||
+                contactToUpdate.address?.city != address.city ||
+                contactToUpdate.address?.state != address.state ||
+                contactToUpdate.address?.postalCode != address.postalCode {
+                contactHasBeenUpdated = true
+                contactToUpdate.address = address
+            }
+
+            let currentEmail = contactToUpdate.emailAddresses?.first?.value
+            if currentEmail != emailValue {
+                contactHasBeenUpdated = true
+                contactToUpdate.emailAddresses = emailAddresses
+            }
+
+            let currentPhone = contactToUpdate.phoneNumbers?.first?.value
+            if currentPhone != phoneValue {
+                contactHasBeenUpdated = true
+                contactToUpdate.phoneNumbers = phoneNumbers
+                contactToUpdate.messagingNumbers = phoneNumbers
+            }
+
+            if contactHasBeenUpdated,
+               let updatedContact = try await store.updateAnyContact(contactToUpdate) as? OCKContact {
+                objectWillChange.send()
+                contact = updatedContact
+            }
+        } else {
+            var newContact = OCKContact(id: remoteUUID, name: patientName, carePlanUUID: nil)
+            newContact.address = address
+            newContact.emailAddresses = emailAddresses
+            newContact.phoneNumbers = phoneNumbers
+            newContact.messagingNumbers = phoneNumbers
+
+            let savedContact = try await store.addAnyContact(newContact) as? OCKContact
+            objectWillChange.send()
+            contact = savedContact
+        }
+    }
+
     private func normalizedOptionalValue(_ value: String) -> String? {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? nil : trimmed
+    }
+
+}
+
+extension ProfileViewModel {
+    static func queryContacts() -> OCKContactQuery {
+        OCKContactQuery(for: Date())
     }
 }
 
 @MainActor
 class AddHealthKitTaskViewModel: ObservableObject {
-    // OCKHealthKitTask
     func saveTask(
         title: String,
         instructions: String,
@@ -259,7 +355,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
         cardType: CareKitCard,
         payload: HealthKitTaskPayload
     ) {
-        // Validate form input.
         let taskTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let taskInstructions = instructions.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -267,7 +362,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
             return
         }
 
-        // Get the shared stores.
         guard let appDelegate = AppDelegateKey.defaultValue else {
             return
         }
@@ -276,7 +370,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
             return
         }
 
-        // Build a task from form data.
         let task = makeHealthKitTask(
             title: taskTitle,
             instructions: taskInstructions,
@@ -285,7 +378,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
             payload: payload
         )
 
-        // Save task.
         healthKitStore.addTasks([task]) { result in
             switch result {
             case .success:
@@ -308,7 +400,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
         cardType: CareKitCard,
         payload: RegularTaskPayload
     ) {
-        // Validate form input.
         let taskTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let taskInstructions = instructions.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -316,12 +407,10 @@ class AddHealthKitTaskViewModel: ObservableObject {
             return
         }
 
-        // Get the shared stores.
         guard let appDelegate = AppDelegateKey.defaultValue else {
             return
         }
 
-        // Build a task from form data.
         let task = makeRegularTask(
             title: taskTitle,
             instructions: taskInstructions,
@@ -330,7 +419,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
             payload: payload
         )
 
-        // Save task.
         appDelegate.store.addTasks([task]) { result in
             switch result {
             case .success:
@@ -344,7 +432,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
             }
         }
     }
-    // MARK: Helpers (private)
 
     private func makeHealthKitTask(
         title: String,
@@ -444,7 +531,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
         task.impactsAdherence = true
         return task
     }
-
 }
 
 @MainActor
@@ -457,8 +543,6 @@ class DeleteTasksViewModel: ObservableObject {
             return
         }
 
-        // Keep the delete sheet aligned with the Care page by only showing
-        // tasks that are currently effective today.
         var query = OCKTaskQuery(for: Date())
         query.sortDescriptors = [.title(ascending: true)]
 

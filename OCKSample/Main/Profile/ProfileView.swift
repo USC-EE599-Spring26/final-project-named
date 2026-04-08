@@ -13,11 +13,16 @@ import os.log
 import SwiftUI
 
 struct ProfileView: View {
-    private static var query = OCKPatientQuery(for: Date())
-    @CareStoreFetchRequest(query: query) private var patients
+    @CareStoreFetchRequest(query: ProfileViewModel.queryPatient()) private var patients
+    @CareStoreFetchRequest(query: ProfileViewModel.queryContacts()) private var contacts
     @StateObject private var viewModel = ProfileViewModel()
     @ObservedObject var loginViewModel: LoginViewModel
+
+    // MARK: Navigation
     @State var isPresentingAddTask = false
+    @State var isShowingSaveAlert = false
+    @State var isPresentingContact = false
+    @State var isPresentingImagePicker = false
     @State var isPresentingDeleteTasks = false
 
     var body: some View {
@@ -27,6 +32,8 @@ struct ProfileView: View {
                     Text("Profile")
                         .font(.system(size: 34, weight: .bold))
                         .padding(.top, 8)
+
+                    ProfileImageView(viewModel: viewModel)
 
                     VStack(spacing: 14) {
                         TextField("First Name",
@@ -52,13 +59,32 @@ struct ProfileView: View {
                     .background(Color(red: 0.97, green: 0.95, blue: 0.90))
                     .cornerRadius(24)
 
+                    // MARK: Contact Section (new from teacher)
+                    VStack(spacing: 14) {
+                        TextField("Street", text: $viewModel.street)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+                        TextField("City", text: $viewModel.city)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+                        TextField("State", text: $viewModel.state)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+                        TextField("Postal code", text: $viewModel.zipcode)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+                    }
+                    .padding(18)
+                    .background(Color(red: 0.97, green: 0.95, blue: 0.90))
+                    .cornerRadius(24)
+
                     Button(action: {
                         Task {
-                            do {
-                                try await viewModel.saveProfile()
-                            } catch {
-                                Logger.profile.error("Error saving profile: \(error)")
-                            }
+                            await viewModel.saveProfile()
                         }
                     }, label: {
                         Text("Save Profile")
@@ -101,6 +127,14 @@ struct ProfileView: View {
             }
             .background(Color(red: 0.99, green: 0.97, blue: 0.93))
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("My Contact") {
+                        viewModel.isPresentingContact = true
+                    }
+                    .sheet(isPresented: $viewModel.isPresentingContact) {
+                        MyContactView()
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         isPresentingAddTask = true
@@ -113,16 +147,22 @@ struct ProfileView: View {
             .sheet(isPresented: $isPresentingAddTask) {
                 AddHealthKitTaskView(isPresented: $isPresentingAddTask)
             }
-            .onAppear {
-                if let patient = patients.first?.result {
-                    viewModel.updatePatient(patient)
-                }
+            .sheet(isPresented: $viewModel.isPresentingImagePicker) {
+                ImagePicker(image: $viewModel.profileUIImage)
             }
-            .onChange(of: patients.count) { _, _ in
-                if let patient = patients.first?.result {
-                    viewModel.updatePatient(patient)
-                }
+            .alert(isPresented: $viewModel.isShowingSaveAlert) {
+                return Alert(title: Text("Update"),
+                             message: Text(viewModel.alertMessage),
+                             dismissButton: .default(Text("Ok"), action: {
+                                viewModel.isShowingSaveAlert = false
+                             }))
             }
+        }
+        .onReceive(patients.publisher) { publishedPatient in
+            viewModel.updatePatient(publishedPatient.result)
+        }
+        .onReceive(contacts.publisher) { publishedContact in
+            viewModel.updateContact(publishedContact.result)
         }
     }
 }
@@ -378,6 +418,7 @@ struct DeleteTasksView: View {
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
         ProfileView(loginViewModel: .init())
+            .accentColor(Color.accentColor)
             .environment(\.careStore, Utility.createPreviewStore())
     }
 }

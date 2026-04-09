@@ -350,27 +350,33 @@ class AddHealthKitTaskViewModel: ObservableObject {
             return
         }
 
-        // Build a task from form data.
-        let task = makeHealthKitTask(
-            title: taskTitle,
-            instructions: taskInstructions,
-            schedule: schedule,
-            cardType: cardType,
-            payload: payload
-        )
-
-        // Save task.
-        healthKitStore.addTasks([task]) { result in
-            switch result {
-            case .success:
-                healthKitStore.requestHealthKitPermissionsForAllTasksInStore()
-                NotificationCenter.default.post(
-                    name: .init(rawValue: Constants.shouldRefreshView),
-                    object: nil
+        Task { @MainActor in
+            do {
+                let carePlanUUID = try await appDelegate.store.fetchCurrentCarePlanUUID()
+                var task = makeHealthKitTask(
+                    title: taskTitle,
+                    instructions: taskInstructions,
+                    schedule: schedule,
+                    cardType: cardType,
+                    payload: payload
                 )
+                task.carePlanUUID = carePlanUUID
 
-            case .failure(let error):
-                Logger.profile.error("Could not save HealthKit task: \(error)")
+                healthKitStore.addTasks([task]) { result in
+                    switch result {
+                    case .success:
+                        healthKitStore.requestHealthKitPermissionsForAllTasksInStore()
+                        NotificationCenter.default.post(
+                            name: .init(rawValue: Constants.shouldRefreshView),
+                            object: nil
+                        )
+
+                    case .failure(let error):
+                        Logger.profile.error("Could not save HealthKit task: \(error)")
+                    }
+                }
+            } catch {
+                Logger.profile.error("Could not find care plan for HealthKit task: \(error)")
             }
         }
     }
@@ -395,26 +401,32 @@ class AddHealthKitTaskViewModel: ObservableObject {
             return
         }
 
-        // Build a task from form data.
-        let task = makeRegularTask(
-            title: taskTitle,
-            instructions: taskInstructions,
-            schedule: schedule,
-            cardType: cardType,
-            payload: payload
-        )
-
-        // Save task.
-        appDelegate.store.addTasks([task]) { result in
-            switch result {
-            case .success:
-                NotificationCenter.default.post(
-                    name: .init(rawValue: Constants.shouldRefreshView),
-                    object: nil
+        Task { @MainActor in
+            do {
+                let carePlanUUID = try await appDelegate.store.fetchCurrentCarePlanUUID()
+                var task = makeRegularTask(
+                    title: taskTitle,
+                    instructions: taskInstructions,
+                    schedule: schedule,
+                    cardType: cardType,
+                    payload: payload
                 )
+                task.carePlanUUID = carePlanUUID
 
-            case .failure(let error):
-                Logger.profile.error("Could not save OCKTask: \(error)")
+                appDelegate.store.addTasks([task]) { result in
+                    switch result {
+                    case .success:
+                        NotificationCenter.default.post(
+                            name: .init(rawValue: Constants.shouldRefreshView),
+                            object: nil
+                        )
+
+                    case .failure(let error):
+                        Logger.profile.error("Could not save OCKTask: \(error)")
+                    }
+                }
+            } catch {
+                Logger.profile.error("Could not find care plan for OCKTask: \(error)")
             }
         }
     }

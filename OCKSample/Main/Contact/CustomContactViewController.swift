@@ -112,7 +112,7 @@ final class CustomContactViewController: OCKListViewController, @unchecked Senda
     @MainActor
     private func displayContacts(_ contacts: [OCKContact]) {
         for contact in contacts {
-            let contactViewController = SimpleContactCardViewController(contact: contact)
+            let contactViewController = SimpleContactCardViewController(contact: contact, store: store)
             appendViewController(contactViewController, animated: false)
         }
     }
@@ -151,9 +151,11 @@ final class CustomContactViewController: OCKListViewController, @unchecked Senda
 
 private final class SimpleContactCardViewController: UIViewController {
     private let contact: OCKContact
+    private let store: OCKAnyStoreProtocol
 
-    init(contact: OCKContact) {
+    init(contact: OCKContact, store: OCKAnyStoreProtocol) {
         self.contact = contact
+        self.store = store
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -167,6 +169,7 @@ private final class SimpleContactCardViewController: UIViewController {
         cardView.backgroundColor = .systemBackground
         cardView.layer.cornerRadius = 14
         cardView.layer.masksToBounds = true
+        cardView.isUserInteractionEnabled = true
 
         let iconView = UIImageView(image: UIImage(systemName: "person.crop.circle.fill"))
         iconView.translatesAutoresizingMaskIntoConstraints = false
@@ -209,7 +212,24 @@ private final class SimpleContactCardViewController: UIViewController {
             contentStack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -16)
         ])
 
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(showDetails))
+        cardView.addGestureRecognizer(tapGesture)
+
         view = cardView
+    }
+
+    @objc
+    private func showDetails() {
+        var query = OCKContactQuery(for: Date())
+        query.ids = [contact.id]
+        query.limit = 1
+
+        let detailViewController = OCKDetailedContactViewController(
+            query: query,
+            store: store,
+            viewSynchronizer: OCKDetailedContactViewSynchronizer()
+        )
+        navigationController?.pushViewController(detailViewController, animated: true)
     }
 }
 

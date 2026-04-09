@@ -121,7 +121,7 @@ class ProfileViewModel: ObservableObject {
             city = user.city ?? ""
             state = user.state ?? ""
             postalCode = user.postalCode ?? ""
-            avatarURL = user.profileImage?.url
+            avatarURL = user.profilePicture?.url
 #if canImport(UIKit)
             avatarImage = nil
 #endif
@@ -233,7 +233,7 @@ private extension ProfileViewModel {
                 mimeType: "image/jpeg"
             )
             let savedFile = try await avatarFile.save()
-            user.profileImage = savedFile
+            user.profilePicture = savedFile
             userHasBeenUpdated = true
         }
 
@@ -252,10 +252,10 @@ private extension ProfileViewModel {
         city = savedUser.city ?? ""
         state = savedUser.state ?? ""
         postalCode = savedUser.postalCode ?? ""
-        avatarURL = savedUser.profileImage?.url
+        avatarURL = savedUser.profilePicture?.url
         pendingAvatarData = nil
 #if canImport(UIKit)
-        if savedUser.profileImage != nil {
+        if savedUser.profilePicture != nil {
             avatarImage = nil
         }
 #endif

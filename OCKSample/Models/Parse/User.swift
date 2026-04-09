@@ -30,7 +30,7 @@ struct User: ParseUser {
     var city: String?
     var state: String?
     var postalCode: String?
-    var profileImage: ParseFile?
+    var profilePicture: ParseFile?
 }
 
 // MARK: Default Implementation
@@ -65,9 +65,9 @@ extension User {
                                      original: object) {
             updated.postalCode = object.postalCode
         }
-        if updated.shouldRestoreKey(\.profileImage,
+        if updated.shouldRestoreKey(\.profilePicture,
                                      original: object) {
-            updated.profileImage = object.profileImage
+            updated.profilePicture = object.profilePicture
         }
         return updated
     }

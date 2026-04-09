@@ -459,9 +459,14 @@ extension OCKStore {
             )
 
             let questions = [questionOne, questionTwo, questionThree, questionFour, questionFive, questionSix]
+            let taskAsset = "brain.head.profile"
+            let taskTitle = String(localized: "QUALITY_OF_LIFE")
             let stepOne = SurveyStep(
                 id: "\(symptomTrackingTaskId)-step-1",
-                questions: questions
+                questions: questions,
+                asset: taskAsset,
+                title: taskTitle,
+                subtitle: String(localized: "ANSWER_HONESTLY")
             )
 
             var symptomTracking = OCKTask(
@@ -740,4 +745,23 @@ extension OCKStore {
         return startDate...endDate
     }
 
+}
+
+extension OCKStore {
+
+    func fetchCurrentCarePlanUUID() async throws -> UUID {
+        if let remoteUUID = try? await Utility.getRemoteClockUUID() {
+            let carePlan = try await fetchCarePlan(withID: remoteUUID.uuidString)
+            return carePlan.uuid
+        }
+
+        var query = OCKCarePlanQuery(for: Date())
+        query.limit = 1
+        query.sortDescriptors = [.effectiveDate(ascending: false)]
+
+        guard let carePlan = try await fetchCarePlans(query: query).first else {
+            throw AppError.couldntBeUnwrapped
+        }
+        return carePlan.uuid
+    }
 }

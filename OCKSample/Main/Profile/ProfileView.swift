@@ -24,7 +24,12 @@ struct ProfileView: View {
     @CareStoreFetchRequest(query: ProfileViewModel.queryContacts()) private var contacts
     @StateObject private var viewModel = ProfileViewModel()
     @ObservedObject var loginViewModel: LoginViewModel
+
+    // MARK: Navigation
     @State var isPresentingAddTask = false
+    @State var isShowingSaveAlert = false
+    @State var isPresentingContact = false
+    @State var isPresentingImagePicker = false
     @State var isPresentingDeleteTasks = false
     @State private var isPresentingMyContact = false
 #if canImport(PhotosUI)
@@ -36,6 +41,8 @@ struct ProfileView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     avatarSection
+
+                    ProfileImageView(viewModel: viewModel)
 
                     VStack(spacing: 14) {
                         profileField(title: "Login") {
@@ -115,11 +122,7 @@ struct ProfileView: View {
 
                     Button(action: {
                         Task {
-                            do {
-                                try await viewModel.saveProfile()
-                            } catch {
-                                Logger.profile.error("Error saving profile: \(error)")
-                            }
+                            await viewModel.saveProfile()
                         }
                     }, label: {
                         Text("Save Profile")
@@ -193,10 +196,12 @@ struct ProfileView: View {
                     await viewModel.loadCurrentUser()
                 }
             }
-            .onChange(of: patients.count) { _, _ in
-                if let patient = patients.first?.result {
-                    viewModel.updatePatient(patient)
-                }
+            .alert(isPresented: $viewModel.isShowingSaveAlert) {
+                return Alert(title: Text("Update"),
+                             message: Text(viewModel.alertMessage),
+                             dismissButton: .default(Text("Ok"), action: {
+                                viewModel.isShowingSaveAlert = false
+                             }))
             }
             .onReceive(contacts.publisher) { publishedContact in
                 viewModel.updateContact(publishedContact.result)
@@ -305,6 +310,12 @@ private struct ProfileAvatarView: View {
                     .frame(width: 92, height: 92)
             }
 #endif
+        }
+        .onReceive(patients.publisher) { publishedPatient in
+            viewModel.updatePatient(publishedPatient.result)
+        }
+        .onReceive(contacts.publisher) { publishedContact in
+            viewModel.updateContact(publishedContact.result)
         }
     }
 
@@ -567,6 +578,7 @@ struct DeleteTasksView: View {
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
         ProfileView(loginViewModel: .init())
+            .accentColor(Color.accentColor)
             .environment(\.careStore, Utility.createPreviewStore())
     }
 }

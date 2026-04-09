@@ -25,10 +25,17 @@ class CareKitTaskViewModel: ObservableObject {
             error = AppError.couldntBeUnwrapped
             return
         }
+        let carePlanUUID: UUID
+        do {
+            carePlanUUID = try await appDelegate.store.fetchCurrentCarePlanUUID()
+        } catch {
+            self.error = AppError.errorString("Could not find care plan: \(error.localizedDescription)")
+            return
+        }
         let uniqueId = UUID().uuidString // Create a unique id for each task
         var task = OCKTask(id: uniqueId,
                            title: title,
-                           carePlanUUID: nil,
+                           carePlanUUID: carePlanUUID,
                            schedule: .dailyAtTime(hour: 0,
                                                   minutes: 0,
                                                   start: Date(),
@@ -55,10 +62,17 @@ class CareKitTaskViewModel: ObservableObject {
             error = AppError.couldntBeUnwrapped
             return
         }
+        let carePlanUUID: UUID
+        do {
+            carePlanUUID = try await appDelegate.store.fetchCurrentCarePlanUUID()
+        } catch {
+            self.error = AppError.errorString("Could not find care plan: \(error.localizedDescription)")
+            return
+        }
         let uniqueId = UUID().uuidString // Create a unique id for each task
         var healthKitTask = OCKHealthKitTask(id: uniqueId,
                                              title: title,
-                                             carePlanUUID: nil,
+                                             carePlanUUID: carePlanUUID,
                                              schedule: .dailyAtTime(hour: 0,
                                                                     minutes: 0,
                                                                     start: Date(),

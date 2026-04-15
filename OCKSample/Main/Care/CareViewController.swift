@@ -299,12 +299,15 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                         return [card]
 
                     case .featured:
-                        // Can be implememented based off of midterm.
-                        return nil
+                        let card = featuredTaskViewController(for: standardTask)
+                        return [card]
 
                     case .grid:
-                        // Can be implememented based off of midterm.
-                        return nil
+                        let card = OCKGridTaskViewController(
+                            query: query,
+                            store: self.store
+                        )
+                        return [card]
 
                     case .instruction:
                         let card = EventQueryView<InstructionsTaskView>(
@@ -316,8 +319,8 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                         return [card]
 
                     case .link:
-                        // Can be implememented based off of midterm.
-                        return nil
+                        let card = linkTaskViewController(for: standardTask)
+                        return [card]
 
                     case .simple:
 
@@ -381,8 +384,12 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                     switch healthTask.card {
 
                     case .labeledValue:
-                        // Can be implememented based off of midterm.
-                        return nil
+                        let card = EventQueryView<LabeledValueTaskView>(
+                            query: query
+                        )
+                        .padding(.vertical, swiftUIPadding)
+                        .formattedHostingController()
+                        return [card]
 
                     case .numericProgress:
                         let card = EventQueryView<NumericProgressTaskView>(

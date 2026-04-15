@@ -40,7 +40,7 @@ struct LoginView: View {
     var body: some View {
         VStack {
             VStack(spacing: 10) {
-                Image("heart")
+                Image("projAppIcon")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 90, height: 90, alignment: .center)

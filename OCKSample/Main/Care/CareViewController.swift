@@ -592,7 +592,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     #endif
 }
 
-#if os(iOS)
+// #if os(iOS)
 @MainActor private func featuredTaskViewController(
     for task: OCKTask?
 ) -> UIViewController {
@@ -687,7 +687,7 @@ private func normalizedHTTPURLString(_ value: String?) -> String? {
     tipView.customStyle = CustomStylerKey.defaultValue
     listViewController.appendView(tipView, animated: false)
 }
-#endif
+// #endif
 
 @MainActor private func customHealthKitTaskViewControllers(
     for task: any OCKAnyTask,

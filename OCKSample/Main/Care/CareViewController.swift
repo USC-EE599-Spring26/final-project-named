@@ -36,6 +36,8 @@ import os.log
 import ResearchKitSwiftUI
 import SwiftUI
 import UIKit
+@preconcurrency import ResearchKit
+@preconcurrency import ResearchKitActiveTask
 // swiftlint:disable type_body_length
 
 @MainActor
@@ -253,6 +255,11 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             return []
         }
     }
+
+    @objc private func handleKneeModelTap() {
+        presentThyroidModel()
+    }
+
     // swiftlint:disable:next cyclomatic_complexity
     private func taskViewControllers(
         _ task: any OCKAnyTask,
@@ -399,6 +406,17 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 
                             return [card]
                         }
+                    case .thyroidModel:
+                        let card = OCKSimpleTaskViewController(
+                                query: query,
+                                store: self.store
+                            )
+                        
+                        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleKneeModelTap))
+                        card.view.addGestureRecognizer(tapGesture)
+                        card.view.isUserInteractionEnabled = true
+
+                        return [card]
 
                     default:
                         return nil
@@ -495,6 +513,30 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         }
         self.isLoading = false
     }
+
+    /// Create Thyroid 3D Model Visualization Task
+    func createThyroidModelTask() -> ORKTask {
+        let instructionStep = ORKInstructionStep(identifier: "thyroid.instruction")
+        instructionStep.title = "Your Thyroid Post-Op Anatomy"
+        instructionStep.detailText = "A 3D model will be presented to help you understand"
+        instructionStep.iconImage = UIImage(systemName: "waveform.path.ecg")
+
+        // Replace "thyroid_model" with your actual USDZ model file name
+        let modelLoc: String = "Thyroid"
+        let modelManager = ORKUSDZModelManager(usdzFileName: modelLoc)
+        let modelStep = ORK3DModelStep(identifier: "thyroid.model", modelManager: modelManager)
+
+        return ORKOrderedTask(identifier: "thyroid.visualization", steps: [instructionStep, modelStep])
+    }
+
+    /// Present Thyroid 3D Model
+    func presentThyroidModel() {
+        let task = createThyroidModelTask()
+        let taskViewController = ORKTaskViewController(task: task, taskRun: nil)
+        taskViewController.delegate = self
+        present(taskViewController, animated: true)
+    }
+
 }
 
 @MainActor private func customTaskViewControllers(
@@ -741,12 +783,37 @@ private func normalizedHTTPURLString(_ value: String?) -> String? {
     return [card]
 }
 
+class ThyroidModelTaskViewController: OCKInstructionsTaskViewController {
+    override func taskView(
+        _ taskView: UIView & OCKTaskDisplayable,
+        didCompleteEvent isComplete: Bool,
+        at indexPath: IndexPath,
+        sender: Any?
+    ) {
+
+        if let parent = parent as? CareViewController {
+            parent.presentThyroidModel()
+        }
+    }
+}
+
 @MainActor private extension View {
     /// Convert SwiftUI view to UIKit view.
     func formattedHostingController() -> UIHostingController<Self> {
         let viewController = UIHostingController(rootView: self)
         viewController.view.backgroundColor = .clear
         return viewController
+    }
+}
+extension CareViewController: ORKTaskViewControllerDelegate {
+    nonisolated func taskViewController(
+        _ taskViewController: ORKTaskViewController,
+        didFinishWith reason: ORKTaskFinishReason,
+        error: Error?
+    ) {
+        DispatchQueue.main.async {
+            taskViewController.dismiss(animated: true, completion: nil)
+        }
     }
 }
 // swiftlint:disable type_body_length

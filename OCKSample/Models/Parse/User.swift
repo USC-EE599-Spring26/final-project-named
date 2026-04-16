@@ -25,6 +25,11 @@ struct User: ParseUser {
     // Custom properties
     var lastTypeSelected: String?
     var userTypeUUIDs: [String: UUID]?
+    var phoneNumber: String?
+    var street: String?
+    var city: String?
+    var state: String?
+    var postalCode: String?
     var profilePicture: ParseFile?
 }
 
@@ -40,8 +45,28 @@ extension User {
                                      original: object) {
             updated.userTypeUUIDs = object.userTypeUUIDs
         }
+        if updated.shouldRestoreKey(\.phoneNumber,
+                                     original: object) {
+            updated.phoneNumber = object.phoneNumber
+        }
+        if updated.shouldRestoreKey(\.street,
+                                     original: object) {
+            updated.street = object.street
+        }
+        if updated.shouldRestoreKey(\.city,
+                                     original: object) {
+            updated.city = object.city
+        }
+        if updated.shouldRestoreKey(\.state,
+                                     original: object) {
+            updated.state = object.state
+        }
+        if updated.shouldRestoreKey(\.postalCode,
+                                     original: object) {
+            updated.postalCode = object.postalCode
+        }
         if updated.shouldRestoreKey(\.profilePicture,
-                                             original: object) {
+                                     original: object) {
             updated.profilePicture = object.profilePicture
         }
         return updated

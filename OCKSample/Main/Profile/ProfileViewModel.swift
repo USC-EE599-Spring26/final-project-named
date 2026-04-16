@@ -11,8 +11,12 @@ import CareKitStore
 import CareKitEssentials
 import ParseSwift
 import HealthKit
+import ParseSwift
 import SwiftUI
 import os.log
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct RegularTaskPayload {
     let assetName: String
@@ -41,65 +45,37 @@ struct TaskScheduleConfiguration {
 @MainActor
 class ProfileViewModel: ObservableObject {
 
-    // MARK: Public read/write properties
+    var firstName = ""
+    var lastName = ""
+    var birthday = Date()
+    var loginName = ""
+    var email = ""
+    var phoneNumber = ""
+    var street = ""
+    var city = ""
+    var state = ""
+    var postalCode = ""
+#if canImport(UIKit)
+    var avatarImage: UIImage?
+#endif
+    var avatarURL: URL?
+    private var pendingAvatarData: Data?
+    private var currentUser: User?
+    private var contact: OCKContact?
 
-    @Published var firstName = ""
-    @Published var lastName = ""
-    @Published var birthday = Date()
-    @Published var sex: OCKBiologicalSex = .other("other")
-    @Published var sexOtherField = "other"
-    @Published var note = ""
-    @Published var street = ""
-    @Published var city = ""
-    @Published var state = ""
-    @Published var zipcode = ""
-    @Published var country = ""
-    @Published var isShowingSaveAlert = false
-    @Published var isPresentingAddTask = false
-    @Published var isPresentingContact = false
-    @Published var isPresentingImagePicker = false
-    @Published var profileUIImage = UIImage(systemName: "person.fill") {
-        willSet {
-            guard self.profileUIImage != newValue,
-                let inputImage = newValue else {
-                return
-            }
+    var displayName: String {
+        let trimmedFirst = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedLast = lastName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let combinedName = [trimmedFirst, trimmedLast]
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
 
-            if !isSettingProfilePictureForFirstTime {
-                Task {
-                    guard var currentUser = (try? await User.current()),
-                          let image = inputImage.jpegData(compressionQuality: 0.25) else {
-                        Logger.profile.error("User is not logged in or could not compress image")
-                        return
-                    }
-
-                    let newProfilePicture = ParseFile(name: "profile.jpg", data: image)
-                    // Use `.set()` to update ParseObject's that have already been saved before.
-                    currentUser = currentUser.set(\.profilePicture, to: newProfilePicture)
-                    do {
-                        _ = try await currentUser.save()
-                        Logger.profile.info("Saved updated profile picture successfully.")
-                    } catch {
-                        Logger.profile.error("Could not save profile picture: \(error.localizedDescription)")
-                    }
-                }
-            }
+        if !combinedName.isEmpty {
+            return combinedName
         }
-    }
-    @Published private(set) var error: Error?
-    private(set) var alertMessage = "All changs saved successfully!"
-    private var contact: OCKContact? {
-        willSet {
-            street = newValue?.address?.street ?? ""
-            city = newValue?.address?.city ?? ""
-            state = newValue?.address?.state ?? ""
-            zipcode = newValue?.address?.postalCode ?? ""
-            country = newValue?.address?.country ?? ""
-        }
-    }
 
-    // MARK: Private read/write properties
-    private var isSettingProfilePictureForFirstTime = true
+        return loginName.isEmpty ? "Anonymous" : loginName
+    }
 
     var patient: OCKPatient? {
         willSet {
@@ -121,8 +97,6 @@ class ProfileViewModel: ObservableObject {
         }
     }
 
-    // MARK: Helpers (public)
-
     func updatePatient(_ patient: OCKAnyPatient) {
         guard let patient = patient as? OCKPatient,
               // Only update if we have a newer version.
@@ -142,16 +116,48 @@ class ProfileViewModel: ObservableObject {
     }
 
     func updateContact(_ contact: OCKAnyContact) {
-        guard let currentPatient = self.patient,
+        guard let currentPatient = patient,
               let contact = contact as? OCKContact,
-              // Has to be my contact.
               contact.id == currentPatient.id,
-              // Only update if we have a newer version.
               contact.uuid != self.contact?.uuid else {
             return
         }
+
         self.contact = contact
     }
+
+    func loadCurrentUser() async {
+        do {
+            let user = try await User.current()
+            objectWillChange.send()
+            currentUser = user
+            loginName = user.username ?? "Anonymous"
+            email = user.email ?? ""
+            phoneNumber = user.phoneNumber ?? ""
+            street = user.street ?? ""
+            city = user.city ?? ""
+            state = user.state ?? ""
+            postalCode = user.postalCode ?? ""
+            avatarURL = user.profilePicture?.url
+#if canImport(UIKit)
+            avatarImage = nil
+#endif
+            pendingAvatarData = nil
+        } catch {
+            Logger.profile.error("Could not load current user: \(error)")
+        }
+    }
+
+#if canImport(UIKit)
+    func updateAvatar(data: Data) {
+        guard let image = UIImage(data: data) else {
+            return
+        }
+        objectWillChange.send()
+        avatarImage = image
+        pendingAvatarData = data
+    }
+#endif
 
     @MainActor
     private func fetchProfilePicture() async throws {
@@ -162,19 +168,11 @@ class ProfileViewModel: ObservableObject {
             return
         }
 
-        if let pictureFile = currentUser.profilePicture {
+        var patientHasBeenUpdated = false
 
-            // Download picture from server if needed
-            do {
-                let profilePicture = try await pictureFile.fetch()
-                guard let path = profilePicture.localURL?.relativePath else {
-                    Logger.profile.error("Could not find relative path for profile picture.")
-                    return
-                }
-                self.profileUIImage = UIImage(contentsOfFile: path)
-            } catch {
-                Logger.profile.error("Could not fetch profile picture: \(error.localizedDescription).")
-            }
+        if patient?.name.givenName != firstName {
+            patientHasBeenUpdated = true
+            patientToUpdate.name.givenName = firstName
         }
         self.isSettingProfilePictureForFirstTime = false
     }
@@ -311,6 +309,174 @@ class ProfileViewModel: ObservableObject {
             _ = try await AppDelegateKey.defaultValue?.store.addAnyContact(newContact)
             Logger.profile.info("Succesffully saved new contact")
         }
+
+        try await saveCurrentUserProfile()
+        try await saveContact()
+    }
+}
+
+extension ProfileViewModel {
+    func prepareMyContactForPresentation() async {
+        do {
+            try await saveContact()
+        } catch {
+            Logger.profile.error("Could not prepare My Contact: \(error)")
+        }
+    }
+}
+
+private extension ProfileViewModel {
+    private func saveCurrentUserProfile() async throws {
+        var user = try await User.current()
+        var userHasBeenUpdated = false
+
+        if user.email != normalizedOptionalValue(email) {
+            userHasBeenUpdated = true
+            user.email = normalizedOptionalValue(email)
+        }
+
+        if user.phoneNumber != normalizedOptionalValue(phoneNumber) {
+            userHasBeenUpdated = true
+            user.phoneNumber = normalizedOptionalValue(phoneNumber)
+        }
+
+        if user.street != normalizedOptionalValue(street) {
+            userHasBeenUpdated = true
+            user.street = normalizedOptionalValue(street)
+        }
+
+        if user.city != normalizedOptionalValue(city) {
+            userHasBeenUpdated = true
+            user.city = normalizedOptionalValue(city)
+        }
+
+        if user.state != normalizedOptionalValue(state) {
+            userHasBeenUpdated = true
+            user.state = normalizedOptionalValue(state)
+        }
+
+        if user.postalCode != normalizedOptionalValue(postalCode) {
+            userHasBeenUpdated = true
+            user.postalCode = normalizedOptionalValue(postalCode)
+        }
+
+        if let pendingAvatarData {
+            let avatarFile = ParseFile(
+                name: "profile-avatar-\(UUID().uuidString).jpg",
+                data: pendingAvatarData,
+                mimeType: "image/jpeg"
+            )
+            let savedFile = try await avatarFile.save()
+            user.profilePicture = savedFile
+            userHasBeenUpdated = true
+        }
+
+        guard userHasBeenUpdated else {
+            currentUser = user
+            return
+        }
+
+        let savedUser = try await user.save()
+        objectWillChange.send()
+        currentUser = savedUser
+        loginName = savedUser.username ?? "Anonymous"
+        email = savedUser.email ?? ""
+        phoneNumber = savedUser.phoneNumber ?? ""
+        street = savedUser.street ?? ""
+        city = savedUser.city ?? ""
+        state = savedUser.state ?? ""
+        postalCode = savedUser.postalCode ?? ""
+        avatarURL = savedUser.profilePicture?.url
+        pendingAvatarData = nil
+#if canImport(UIKit)
+        if savedUser.profilePicture != nil {
+            avatarImage = nil
+        }
+#endif
+    }
+
+    private func saveContact() async throws {
+        guard let store = AppDelegateKey.defaultValue?.store else {
+            throw AppError.couldntBeUnwrapped
+        }
+
+        let remoteUUID = try await Utility.getRemoteClockUUID().uuidString
+        var fallbackName = PersonNameComponents()
+        fallbackName.givenName = firstName
+        fallbackName.familyName = lastName
+        let patientName = patient?.name ?? fallbackName
+        let emailValue = normalizedOptionalValue(email)
+        let phoneValue = normalizedOptionalValue(phoneNumber)
+
+        let address = OCKPostalAddress(
+            street: normalizedOptionalValue(street) ?? "",
+            city: normalizedOptionalValue(city) ?? "",
+            state: normalizedOptionalValue(state) ?? "",
+            postalCode: normalizedOptionalValue(postalCode) ?? "",
+            country: ""
+        )
+
+        let emailAddresses = emailValue.map { [OCKLabeledValue(label: "email", value: $0)] }
+        let phoneNumbers = phoneValue.map { [OCKLabeledValue(label: "phone", value: $0)] }
+
+        if var contactToUpdate = contact {
+            var contactHasBeenUpdated = false
+
+            if contactToUpdate.name.givenName != patientName.givenName ||
+                contactToUpdate.name.familyName != patientName.familyName {
+                contactHasBeenUpdated = true
+                contactToUpdate.name = patientName
+            }
+
+            if contactToUpdate.address?.street != address.street ||
+                contactToUpdate.address?.city != address.city ||
+                contactToUpdate.address?.state != address.state ||
+                contactToUpdate.address?.postalCode != address.postalCode {
+                contactHasBeenUpdated = true
+                contactToUpdate.address = address
+            }
+
+            let currentEmail = contactToUpdate.emailAddresses?.first?.value
+            if currentEmail != emailValue {
+                contactHasBeenUpdated = true
+                contactToUpdate.emailAddresses = emailAddresses
+            }
+
+            let currentPhone = contactToUpdate.phoneNumbers?.first?.value
+            if currentPhone != phoneValue {
+                contactHasBeenUpdated = true
+                contactToUpdate.phoneNumbers = phoneNumbers
+                contactToUpdate.messagingNumbers = phoneNumbers
+            }
+
+            if contactHasBeenUpdated,
+               let updatedContact = try await store.updateAnyContact(contactToUpdate) as? OCKContact {
+                objectWillChange.send()
+                contact = updatedContact
+            }
+        } else {
+            var newContact = OCKContact(id: remoteUUID, name: patientName, carePlanUUID: nil)
+            newContact.address = address
+            newContact.emailAddresses = emailAddresses
+            newContact.phoneNumbers = phoneNumbers
+            newContact.messagingNumbers = phoneNumbers
+
+            let savedContact = try await store.addAnyContact(newContact) as? OCKContact
+            objectWillChange.send()
+            contact = savedContact
+        }
+    }
+
+    private func normalizedOptionalValue(_ value: String) -> String? {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+}
+
+extension ProfileViewModel {
+    static func queryContacts() -> OCKContactQuery {
+        OCKContactQuery(for: Date())
     }
 
     static func queryPatient() -> OCKPatientQuery {
@@ -325,7 +491,6 @@ class ProfileViewModel: ObservableObject {
 
 @MainActor
 class AddHealthKitTaskViewModel: ObservableObject {
-    // OCKHealthKitTask
     func saveTask(
         title: String,
         instructions: String,
@@ -333,7 +498,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
         cardType: CareKitCard,
         payload: HealthKitTaskPayload
     ) {
-        // Validate form input.
         let taskTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let taskInstructions = instructions.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -341,7 +505,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
             return
         }
 
-        // Get the shared stores.
         guard let appDelegate = AppDelegateKey.defaultValue else {
             return
         }
@@ -350,15 +513,21 @@ class AddHealthKitTaskViewModel: ObservableObject {
             return
         }
 
-        Task { @MainActor in
-            do {
-                let carePlanUUID = try await appDelegate.store.fetchCurrentCarePlanUUID()
-                var task = makeHealthKitTask(
-                    title: taskTitle,
-                    instructions: taskInstructions,
-                    schedule: schedule,
-                    cardType: cardType,
-                    payload: payload
+        let task = makeHealthKitTask(
+            title: taskTitle,
+            instructions: taskInstructions,
+            schedule: schedule,
+            cardType: cardType,
+            payload: payload
+        )
+
+        healthKitStore.addTasks([task]) { result in
+            switch result {
+            case .success:
+                healthKitStore.requestHealthKitPermissionsForAllTasksInStore()
+                NotificationCenter.default.post(
+                    name: .init(rawValue: Constants.shouldRefreshView),
+                    object: nil
                 )
                 task.carePlanUUID = carePlanUUID
 
@@ -388,7 +557,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
         cardType: CareKitCard,
         payload: RegularTaskPayload
     ) {
-        // Validate form input.
         let taskTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let taskInstructions = instructions.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -396,20 +564,24 @@ class AddHealthKitTaskViewModel: ObservableObject {
             return
         }
 
-        // Get the shared stores.
         guard let appDelegate = AppDelegateKey.defaultValue else {
             return
         }
 
-        Task { @MainActor in
-            do {
-                let carePlanUUID = try await appDelegate.store.fetchCurrentCarePlanUUID()
-                var task = makeRegularTask(
-                    title: taskTitle,
-                    instructions: taskInstructions,
-                    schedule: schedule,
-                    cardType: cardType,
-                    payload: payload
+        let task = makeRegularTask(
+            title: taskTitle,
+            instructions: taskInstructions,
+            schedule: schedule,
+            cardType: cardType,
+            payload: payload
+        )
+
+        appDelegate.store.addTasks([task]) { result in
+            switch result {
+            case .success:
+                NotificationCenter.default.post(
+                    name: .init(rawValue: Constants.shouldRefreshView),
+                    object: nil
                 )
                 task.carePlanUUID = carePlanUUID
 
@@ -430,7 +602,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
             }
         }
     }
-    // MARK: Helpers (private)
 
     private func makeHealthKitTask(
         title: String,
@@ -530,7 +701,6 @@ class AddHealthKitTaskViewModel: ObservableObject {
         task.impactsAdherence = true
         return task
     }
-
 }
 
 @MainActor
@@ -543,8 +713,6 @@ class DeleteTasksViewModel: ObservableObject {
             return
         }
 
-        // Keep the delete sheet aligned with the Care page by only showing
-        // tasks that are currently effective today.
         var query = OCKTaskQuery(for: Date())
         query.sortDescriptors = [.title(ascending: true)]
 

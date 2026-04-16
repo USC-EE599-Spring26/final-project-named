@@ -3,52 +3,40 @@
 //  OCKSample
 //
 //  Created by Corey Baker on 4/2/26.
-//  Copyright © 2026 Network Reconnaissance Lab. All rights reserved.
+//  Copyright (c) 2026 Network Reconnaissance Lab. All rights reserved.
 //
 
-#if !os(visionOS)
-
-import UIKit
-import CareKitStore
+#if canImport(UIKit) && canImport(ContactsUI)
 import CareKit
+import CareKitStore
+import CareKitUI
 import Contacts
 import ContactsUI
 import ParseSwift
-import ParseCareKit
 import os.log
+import UIKit
 
-class CustomContactViewController: OCKListViewController, @unchecked Sendable {
-
-    fileprivate var allContacts = [OCKContact]()
+final class CustomContactViewController: OCKListViewController, @unchecked Sendable {
+    private var allContacts = [OCKContact]()
     var contacts: [CareStoreFetchedResult<OCKAnyContact>]? {
         didSet {
             reloadView()
         }
     }
 
-    /// The store the view controller uses for synchronization.
-    fileprivate let store: OCKAnyStoreProtocol
-    fileprivate let viewSynchronizer: OCKSimpleContactViewSynchronizer
+    private let store: OCKAnyStoreProtocol
 
-    /// Create an instance of the view controller. Will hook up the calendar to the tasks collection,
-    /// and query and display the tasks.
-    ///
-    /// - Parameter store: The store from which to query the tasks.
-    /// - Parameter contacts: The current contacts queryied.
-    /// - Parameter viewSynchronizer: The type of view to show
     init(
         store: OCKAnyStoreProtocol,
-        contacts: [CareStoreFetchedResult<OCKAnyContact>]? = nil,
-        viewSynchronizer: OCKSimpleContactViewSynchronizer
+        contacts: [CareStoreFetchedResult<OCKAnyContact>]? = nil
     ) {
         self.store = store
         self.contacts = contacts
-        self.viewSynchronizer = viewSynchronizer
         super.init(nibName: nil, bundle: nil)
     }
 
     @available(*, unavailable)
-    public required init?(coder: NSCoder) {
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -56,107 +44,93 @@ class CustomContactViewController: OCKListViewController, @unchecked Sendable {
         super.viewDidLoad()
 
         let searchController = UISearchController(searchResultsController: nil)
-        searchController.searchBar.searchBarStyle = UISearchBar.Style.prominent
+        searchController.searchBar.searchBarStyle = .prominent
         searchController.searchBar.placeholder = " Search Contacts"
         searchController.searchBar.showsCancelButton = true
         searchController.searchBar.delegate = self
         navigationItem.searchController = searchController
         definesPresentationContext = true
-
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
-                                                           target: self,
-                                                           action: #selector(presentContactsListViewController))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .add,
+            target: self,
+            action: #selector(presentContactsListViewController)
+        )
 
         reloadView()
     }
 
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         reloadView()
     }
 
-    @objc private func presentContactsListViewController() {
-
+    @objc
+    private func presentContactsListViewController() {
         let contactPicker = CNContactPickerViewController()
         contactPicker.delegate = self
-        contactPicker.predicateForEnablingContact = NSPredicate(
-          format: "phoneNumbers.@count > 0")
-        present(contactPicker, animated: true, completion: nil)
+        contactPicker.predicateForEnablingContact = NSPredicate(format: "phoneNumbers.@count > 0")
+        present(contactPicker, animated: true)
     }
 
-    @objc private func dismissViewController() {
-        dismiss(animated: true, completion: nil)
-    }
-
-    func clearAndKeepSearchBar() {
+    private func clearAndKeepSearchBar() {
         clear()
     }
 
-    func reloadView() {
+    private func reloadView() {
         Task {
             try? await updateContacts()
         }
     }
 
     @MainActor
-    func updateContacts() async throws {
-
+    private func updateContacts() async throws {
         guard (try? await User.current()) != nil else {
             Logger.contact.error("User not logged in")
+            clearAndKeepSearchBar()
+            allContacts = []
             return
         }
 
-        guard let personUUIDString = (try? await Utility.getRemoteClockUUID())?.uuidString else {
-            Logger.contact.error("Could not get logged in personUUID")
-            return
-        }
+        let personUUIDString = try await Utility.getRemoteClockUUID().uuidString
 
-        guard let contacts = contacts else {
+        guard let contacts else {
             Logger.contact.error("No contacts to display")
+            clearAndKeepSearchBar()
+            allContacts = []
             return
         }
 
-        let filterdContacts = contacts.filter { convertedContact in
-            Logger.contact.info("Contact filtered: \(convertedContact.id)")
-            return convertedContact.id != personUUIDString
-        }
+        let filteredContacts = contacts
+            .compactMap { $0.result as? OCKContact }
+            .filter { $0.id != personUUIDString }
 
-        self.clearAndKeepSearchBar()
-        // Map all filtered contacts to a direct contact.
-        self.allContacts = filterdContacts.compactMap { $0.result as? OCKContact }
-        self.displayContacts(self.allContacts)
+        clearAndKeepSearchBar()
+        allContacts = filteredContacts
+        displayContacts(filteredContacts)
     }
 
     @MainActor
-    func displayContacts(_ contacts: [OCKAnyContact]) {
-
+    private func displayContacts(_ contacts: [OCKContact]) {
         for contact in contacts {
-            var query = OCKContactQuery(for: Date())
-            query.ids = [contact.id]
-            query.limit = 1
-            let contactViewController = OCKSimpleContactViewController(
-                query: query,
-                store: store,
-                viewSynchronizer: viewSynchronizer
-            )
-            self.appendViewController(contactViewController, animated: false)
+            let contactViewController = SimpleContactCardViewController(contact: contact, store: store)
+            appendViewController(contactViewController, animated: false)
         }
     }
 
-    func convertDeviceContacts(_ contact: CNContact) -> OCKAnyContact {
-
-        var convertedContact = OCKContact(id: contact.identifier, givenName: contact.givenName,
-                                          familyName: contact.familyName, carePlanUUID: nil)
+    private func convertDeviceContact(_ contact: CNContact) -> OCKContact {
+        var convertedContact = OCKContact(
+            id: contact.identifier,
+            givenName: contact.givenName,
+            familyName: contact.familyName,
+            carePlanUUID: nil
+        )
         convertedContact.title = contact.jobTitle
-
-        var emails = [OCKLabeledValue]()
-        contact.emailAddresses.forEach {
-            emails.append(OCKLabeledValue(label: $0.label ?? "email", value: $0.value as String))
+        convertedContact.emailAddresses = contact.emailAddresses.map {
+            OCKLabeledValue(label: $0.label ?? "email", value: $0.value as String)
         }
-        convertedContact.emailAddresses = emails
 
-        var phoneNumbers = [OCKLabeledValue]()
-        contact.phoneNumbers.forEach {
-            phoneNumbers.append(OCKLabeledValue(label: $0.label ?? "phone", value: $0.value.stringValue))
+        let phoneNumbers = contact.phoneNumbers.map {
+            OCKLabeledValue(label: $0.label ?? "phone", value: $0.value.stringValue)
         }
         convertedContact.phoneNumbers = phoneNumbers
         convertedContact.messagingNumbers = phoneNumbers
@@ -175,12 +149,125 @@ class CustomContactViewController: OCKListViewController, @unchecked Sendable {
     }
 }
 
+private final class SimpleContactCardViewController: UIViewController {
+    private let contact: OCKContact
+    private let store: OCKAnyStoreProtocol
+
+    init(contact: OCKContact, store: OCKAnyStoreProtocol) {
+        self.contact = contact
+        self.store = store
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func loadView() {
+        let cardView = UIView()
+        cardView.backgroundColor = .systemBackground
+        cardView.layer.cornerRadius = 14
+        cardView.layer.masksToBounds = true
+        cardView.isUserInteractionEnabled = true
+
+        let iconView = UIImageView(image: UIImage(systemName: "person.crop.circle.fill"))
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        iconView.tintColor = .systemGray3
+        iconView.contentMode = .scaleAspectFit
+
+        let titleLabel = UILabel()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.font = .preferredFont(forTextStyle: .headline)
+        titleLabel.textColor = .label
+        titleLabel.text = contact.displayNameText
+
+        let subtitleLabel = UILabel()
+        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        subtitleLabel.font = .preferredFont(forTextStyle: .subheadline)
+        subtitleLabel.textColor = .secondaryLabel
+        subtitleLabel.text = contact.subtitleText
+        subtitleLabel.numberOfLines = 0
+
+        let labelStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
+        labelStack.translatesAutoresizingMaskIntoConstraints = false
+        labelStack.axis = .vertical
+        labelStack.spacing = 4
+
+        let contentStack = UIStackView(arrangedSubviews: [iconView, labelStack])
+        contentStack.translatesAutoresizingMaskIntoConstraints = false
+        contentStack.axis = .horizontal
+        contentStack.alignment = .center
+        contentStack.spacing = 12
+
+        cardView.addSubview(contentStack)
+
+        NSLayoutConstraint.activate([
+            iconView.widthAnchor.constraint(equalToConstant: 40),
+            iconView.heightAnchor.constraint(equalToConstant: 40),
+
+            contentStack.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 16),
+            contentStack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 16),
+            contentStack.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -16),
+            contentStack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -16)
+        ])
+
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(showDetails))
+        cardView.addGestureRecognizer(tapGesture)
+
+        view = cardView
+    }
+
+    @objc
+    private func showDetails() {
+        var query = OCKContactQuery(for: Date())
+        query.ids = [contact.id]
+        query.limit = 1
+
+        let detailViewController = OCKDetailedContactViewController(
+            query: query,
+            store: store,
+            viewSynchronizer: OCKDetailedContactViewSynchronizer()
+        )
+        navigationController?.pushViewController(detailViewController, animated: true)
+    }
+}
+
+private extension OCKContact {
+    var displayNameText: String {
+        let components = [name.givenName, name.familyName]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+
+        if !components.isEmpty {
+            return components.joined(separator: " ")
+        }
+
+        if let title, !title.isEmpty {
+            return title
+        }
+
+        return id
+    }
+
+    var subtitleText: String? {
+        if let title, !title.isEmpty {
+            return title
+        }
+
+        if let role, !role.isEmpty {
+            return role
+        }
+
+        return nil
+    }
+}
+
 extension CustomContactViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         Logger.contact.debug("Searching text is '\(searchText)'")
 
-        if searchBar.text!.isEmpty {
-            // Show all contacts
+        guard !searchText.isEmpty else {
             clearAndKeepSearchBar()
             displayContacts(allContacts)
             return
@@ -188,15 +275,12 @@ extension CustomContactViewController: UISearchBarDelegate {
 
         clearAndKeepSearchBar()
 
-        let filteredContacts = allContacts.filter { (contact: OCKAnyContact) -> Bool in
-
-            if let givenName = contact.name.givenName {
-                return givenName.lowercased().contains(searchText.lowercased())
-            } else if let familyName = contact.name.familyName {
-                return familyName.lowercased().contains(searchText.lowercased())
-            } else {
-                return false
-            }
+        let lowercasedSearchText = searchText.lowercased()
+        let filteredContacts = allContacts.filter { contact in
+            let givenName = contact.name.givenName?.lowercased() ?? ""
+            let familyName = contact.name.familyName?.lowercased() ?? ""
+            return givenName.contains(lowercasedSearchText) ||
+                familyName.contains(lowercasedSearchText)
         }
         displayContacts(filteredContacts)
     }
@@ -208,13 +292,12 @@ extension CustomContactViewController: UISearchBarDelegate {
 }
 
 extension CustomContactViewController: @MainActor CNContactPickerDelegate {
-
     func contactPicker(
         _ picker: CNContactPickerViewController,
         didSelect contact: CNContact
     ) {
-        let contactToAdd = convertDeviceContacts(contact)
-        let allContacts = self.allContacts
+        let contactToAdd = convertDeviceContact(contact)
+        let existingContacts = allContacts
 
         Task {
             guard (try? await User.current()) != nil else {
@@ -222,15 +305,14 @@ extension CustomContactViewController: @MainActor CNContactPickerDelegate {
                 return
             }
 
-            if !(allContacts.contains { $0.id == contactToAdd.id }) {
+            guard !existingContacts.contains(where: { $0.id == contactToAdd.id }) else {
+                return
+            }
 
-                // Note - once the functionality is added to edit a contact,
-                // let the user potentially edit before the save
-                do {
-                    _ = try await store.addAnyContact(contactToAdd)
-                } catch {
-                    Logger.contact.error("Could not add contact: \(error.localizedDescription)")
-                }
+            do {
+                _ = try await store.addAnyContact(contactToAdd)
+            } catch {
+                Logger.contact.error("Could not add contact: \(error.localizedDescription)")
             }
         }
     }
@@ -239,10 +321,8 @@ extension CustomContactViewController: @MainActor CNContactPickerDelegate {
         _ picker: CNContactPickerViewController,
         didSelect contacts: [CNContact]
     ) {
-        let newContacts = contacts.compactMap {
-            convertDeviceContacts($0)
-        }
-        let allContacts = self.allContacts
+        let newContacts = contacts.map(convertDeviceContact)
+        let existingContacts = allContacts
 
         Task {
             guard (try? await User.current()) != nil else {
@@ -250,15 +330,15 @@ extension CustomContactViewController: @MainActor CNContactPickerDelegate {
                 return
             }
 
-            var contactsToAdd = [OCKAnyContact]()
-            for newContact in newContacts {
-                // swiftlint:disable:next for_where
-                if allContacts.first(where: { $0.id == newContact.id }) == nil {
-                    contactsToAdd.append(newContact)
-                }
+            let contactsToAdd = newContacts.filter { newContact in
+                existingContacts.first(where: { $0.id == newContact.id }) == nil
             }
 
-            let immutableContactsToAdd = contactsToAdd
+            guard !contactsToAdd.isEmpty else {
+                return
+            }
+
+            let immutableContactsToAdd: [OCKAnyContact] = contactsToAdd.map { $0 }
 
             do {
                 _ = try await store.addAnyContacts(immutableContactsToAdd)
@@ -268,5 +348,4 @@ extension CustomContactViewController: @MainActor CNContactPickerDelegate {
         }
     }
 }
-
 #endif

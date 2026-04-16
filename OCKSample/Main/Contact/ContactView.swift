@@ -9,8 +9,10 @@
 import CareKit
 import CareKitEssentials
 import CareKitStore
+import CareKitUI
 import os.log
 import SwiftUI
+#if canImport(UIKit) && canImport(ContactsUI)
 import UIKit
 
 #if os(visionOS)
@@ -30,14 +32,14 @@ struct ContactView: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> some UIViewController {
         let viewController = createViewController()
-        let navigationController = UINavigationController(
-            rootViewController: viewController
-        )
+        let navigationController = UINavigationController(rootViewController: viewController)
         return navigationController
     }
 
-    func updateUIViewController(_ uiViewController: UIViewControllerType,
-                                context: Context) {
+    func updateUIViewController(
+        _ uiViewController: UIViewControllerType,
+        context: Context
+    ) {
         guard let navigationController = uiViewController as? UINavigationController else {
             Logger.feed.error("ContactView should have been a UINavigationController")
             return
@@ -46,30 +48,26 @@ struct ContactView: UIViewControllerRepresentable {
     }
 
     func createViewController() -> UIViewController {
-        let currentContacts = contacts.latest
-        let viewController = CustomContactViewController(
+        CustomContactViewController(
             store: careStore,
-            contacts: currentContacts,
-            viewSynchronizer: OCKSimpleContactViewSynchronizer()
+            contacts: contacts.latest
         )
-        return viewController
     }
 
     static func query() -> OCKContactQuery {
-        let query = OCKContactQuery(for: Date())
-        // BAKER: Appears to be a bug in CareKit, commenting these out for now
-        /*query.sortDescriptors.append(
-            .familyName(ascending: true)
-        )
-        query.sortDescriptors.append(
-            .givenName(ascending: true)
-        ) */
-        return query
+        OCKContactQuery(for: Date())
     }
 }
+#else
+struct ContactView: View {
+    var body: some View {
+        Text("Contacts are unavailable on this platform.")
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+#endif
 
 struct ContactView_Previews: PreviewProvider {
-
     static var previews: some View {
         ContactView()
             .environment(\.careStore, Utility.createPreviewStore())

@@ -12,7 +12,7 @@ import UIKit
 struct DimensionStyler: OCKDimensionStyler {
     #if os(iOS)
 
-    var separatorHeight: CGFloat { 1.0 / UIScreen.main.scale }
+    var separatorHeight: CGFloat { 1.0 / max(UITraitCollection.current.displayScale, 1.0) }
 
     #endif
 

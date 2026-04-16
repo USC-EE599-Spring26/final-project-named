@@ -3,39 +3,29 @@
 //  OCKSample
 //
 //  Created by Corey Baker on 4/2/26.
-//  Copyright © 2026 Network Reconnaissance Lab. All rights reserved.
+//  Copyright (c) 2026 Network Reconnaissance Lab. All rights reserved.
 //
 
-#if !os(visionOS)
-
-import UIKit
+#if os(iOS) || targetEnvironment(macCatalyst)
+import CareKit
 import CareKitStore
 import CareKitUI
-import CareKit
-import Contacts
-import ContactsUI
 import ParseSwift
-import ParseCareKit
 import os.log
+import UIKit
 
-class MyContactViewController: OCKListViewController {
+final class MyContactViewController: OCKListViewController {
+    private var contacts = [OCKAnyContact]()
+    private let store: OCKAnyStoreProtocol
+    private let viewSynchronizer = OCKDetailedContactViewSynchronizer()
 
-    fileprivate var contacts = [OCKAnyContact]()
-    fileprivate let store: OCKAnyStoreProtocol
-    fileprivate let viewSynchronizer = OCKDetailedContactViewSynchronizer()
-
-    /// Initialize using a store manager. All of the contacts in the store manager will be queried and dispalyed.
-    ///
-    /// - Parameter store: The store from which to query the tasks.
-    /// - Parameter viewSynchronizer: The type of view to show
-    init(store: OCKAnyStoreProtocol
-    ) {
+    init(store: OCKAnyStoreProtocol) {
         self.store = store
         super.init(nibName: nil, bundle: nil)
     }
 
     @available(*, unavailable)
-    public required init?(coder: NSCoder) {
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -47,6 +37,7 @@ class MyContactViewController: OCKListViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         Task {
             try? await fetchMyContact()
         }
@@ -57,33 +48,32 @@ class MyContactViewController: OCKListViewController {
         animated: Bool
     ) {
         super.appendViewController(viewController, animated: animated)
-        // Make sure this contact card matches app style when possible
-        if let carekitView = viewController.view as? OCKView {
-            carekitView.customStyle = CustomStylerKey.defaultValue
+        if let careKitView = viewController.view as? OCKView {
+            careKitView.customStyle = CustomStylerKey.defaultValue
         }
     }
 
-    func fetchMyContact() async throws {
-
-        guard (try? await User.current()) != nil,
-              let personUUIDString = (try? await Utility.getRemoteClockUUID())?.uuidString else {
-            Logger.myContact.error("User not logged in")
-            self.contacts.removeAll()
-            self.displayContacts()
+    private func fetchMyContact() async throws {
+        guard (try? await User.current()) != nil else {
+            Logger.contact.error("User not logged in")
+            contacts.removeAll()
+            displayContacts()
             return
         }
 
+        let personUUIDString = try await Utility.getRemoteClockUUID().uuidString
         var query = OCKContactQuery(for: Date())
         query.ids = [personUUIDString]
         query.limit = 1
 
-        self.contacts = try await store.fetchAnyContacts(query: query)
-        self.displayContacts()
+        contacts = try await store.fetchAnyContacts(query: query)
+        displayContacts()
     }
 
-    func displayContacts() {
-        self.clear()
-        for contact in self.contacts {
+    private func displayContacts() {
+        clear()
+
+        for contact in contacts {
             var contactQuery = OCKContactQuery(for: Date())
             contactQuery.ids = [contact.id]
             contactQuery.limit = 1
@@ -92,9 +82,8 @@ class MyContactViewController: OCKListViewController {
                 store: store,
                 viewSynchronizer: viewSynchronizer
             )
-            self.appendViewController(contactViewController, animated: false)
+            appendViewController(contactViewController, animated: false)
         }
     }
 }
-
 #endif

@@ -36,10 +36,11 @@ import os.log
 import ResearchKitSwiftUI
 import SwiftUI
 import UIKit
+#if os(iOS)
 @preconcurrency import ResearchKit
 @preconcurrency import ResearchKitActiveTask
+#endif
 // swiftlint:disable type_body_length
-
 @MainActor
 final class CareViewController: OCKDailyPageViewController, @unchecked Sendable {
 
@@ -255,11 +256,11 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             return []
         }
     }
-
+    #if os(iOS)
     @objc private func handleKneeModelTap() {
         presentThyroidModel()
     }
-
+    #endif
     // swiftlint:disable:next cyclomatic_complexity
     private func taskViewControllers(
         _ task: any OCKAnyTask,
@@ -406,18 +407,20 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 
                             return [card]
                         }
+                    #if os(iOS)
                     case .thyroidModel:
+
                         let card = OCKSimpleTaskViewController(
                                 query: query,
                                 store: self.store
                             )
-                        
+
                         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleKneeModelTap))
                         card.view.addGestureRecognizer(tapGesture)
                         card.view.isUserInteractionEnabled = true
 
                         return [card]
-
+                        #endif
                     default:
                         return nil
                     }
@@ -513,7 +516,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         }
         self.isLoading = false
     }
-
+    #if os(iOS)
     /// Create Thyroid 3D Model Visualization Task
     func createThyroidModelTask() -> ORKTask {
         let instructionStep = ORKInstructionStep(identifier: "thyroid.instruction")
@@ -536,6 +539,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         taskViewController.delegate = self
         present(taskViewController, animated: true)
     }
+    #endif
 
 }
 
@@ -782,7 +786,7 @@ private func normalizedHTTPURLString(_ value: String?) -> String? {
     .formattedHostingController()
     return [card]
 }
-
+#if os(iOS)
 class ThyroidModelTaskViewController: OCKInstructionsTaskViewController {
     override func taskView(
         _ taskView: UIView & OCKTaskDisplayable,
@@ -796,7 +800,7 @@ class ThyroidModelTaskViewController: OCKInstructionsTaskViewController {
         }
     }
 }
-
+#endif
 @MainActor private extension View {
     /// Convert SwiftUI view to UIKit view.
     func formattedHostingController() -> UIHostingController<Self> {
@@ -805,6 +809,8 @@ class ThyroidModelTaskViewController: OCKInstructionsTaskViewController {
         return viewController
     }
 }
+// swiftlint:disable type_body_length
+#if os(iOS)
 extension CareViewController: ORKTaskViewControllerDelegate {
     nonisolated func taskViewController(
         _ taskViewController: ORKTaskViewController,
@@ -816,4 +822,4 @@ extension CareViewController: ORKTaskViewControllerDelegate {
         }
     }
 }
-// swiftlint:disable type_body_length
+#endif

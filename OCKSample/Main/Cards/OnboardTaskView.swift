@@ -165,7 +165,7 @@ private struct OnboardTaskController: UIViewControllerRepresentable {
             "Thank you for joining. " +
             "Tap Next to review the onboarding information before you start."
 
-        let consentReviewStep = makeConsentReviewStep()
+        let consentSignatureStep = makeConsentSignatureStep()
 
         let requestPermissionsStep = ORKRequestPermissionsStep(
             identifier: "onboard.permissions",
@@ -186,23 +186,15 @@ private struct OnboardTaskController: UIViewControllerRepresentable {
             identifier: TaskID.onboard,
             steps: [
                 welcomeStep,
-                consentReviewStep,
+                consentSignatureStep,
                 requestPermissionsStep,
                 completionStep
             ]
         )
     }
 
-    private func makeConsentReviewStep() -> ORKConsentReviewStep {
-        let consentDocument = ORKConsentDocument()
-        consentDocument.title = "Informed Consent"
-        consentDocument.signaturePageTitle = "Informed Consent"
-        consentDocument.signaturePageContent =
-            "By signing below, I acknowledge that I have read this consent carefully, " +
-            "that I understand all of its terms, and that I enter into this study voluntarily. " +
-            "I understand that my information will only be used and disclosed for the purposes " +
-            "described in the consent and I can withdraw from the study at any time."
-        consentDocument.htmlReviewContent = """
+    private func makeConsentSignatureStep() -> ORKWebViewStep {
+        let consentHTML = """
         <html>
         <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -250,25 +242,14 @@ private struct OnboardTaskController: UIViewControllerRepresentable {
         </html>
         """
 
-        let participantSignature = ORKConsentSignature(
-            forPersonWithTitle: "Participant",
-            dateFormatString: nil,
-            identifier: "onboard.participantSignature"
+        let consentSignatureStep = ORKWebViewStep(
+            identifier: "onboard.signatureCapture",
+            html: consentHTML
         )
-        participantSignature.requiresName = false
-        participantSignature.requiresSignatureImage = true
-        consentDocument.addSignature(participantSignature)
-
-        let consentReviewStep = ORKConsentReviewStep(
-            identifier: "onboard.consentReview",
-            signature: participantSignature,
-            in: consentDocument
-        )
-        consentReviewStep.text = "Please review and sign the informed consent below."
-        consentReviewStep.reasonForConsent =
-            "I have read the consent and agree to participate in this study."
-        consentReviewStep.requiresScrollToBottom = true
-        return consentReviewStep
+        consentSignatureStep.title = "Informed Consent"
+        consentSignatureStep.text = "Please review and sign the informed consent below."
+        consentSignatureStep.showSignatureAfterContent = true
+        return consentSignatureStep
     }
 
     private func makePermissionTypes() -> [ORKPermissionType] {

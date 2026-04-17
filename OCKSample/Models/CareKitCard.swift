@@ -21,6 +21,7 @@ enum CareKitCard: String, CaseIterable, Identifiable {
     case simple = "TODO"
     case survey = "Survey"
     case custom = "Custom"
+    case thyroidModel = "thyroidModel"
 
     static func fromStoredValue(_ value: String) -> CareKitCard? {
         if let currentValue = CareKitCard(rawValue: value) {

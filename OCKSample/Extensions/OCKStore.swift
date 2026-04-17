@@ -210,6 +210,33 @@ extension OCKStore {
         neckMobility.card = .custom
         neckMobility.priority = 4
 
+        // 3D module (Active Survey Card)
+        let thyroidModelSchedule = OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: Calendar.current.startOfDay(for: Date()),
+                    end: nil,
+                    interval: DateComponents(day: 1),
+                    text: "Tap to view 3D model",
+                    targetValues: [],
+                    duration: .allDay
+                )
+            ]
+        )
+
+        var thyroidModelTask = OCKTask(
+            id: TaskID.thyroidModel,
+            title: "Thyroid 3D Model",
+            carePlanUUID: carePlanUUID,
+            schedule: thyroidModelSchedule
+        )
+        thyroidModelTask.impactsAdherence = false
+        thyroidModelTask.instructions = "View an 3D model of your thyroid anatomy for post-surgery recovery"
+        thyroidModelTask.asset = "waveform.path.ecg"
+        thyroidModelTask.card = .thyroidModel
+        thyroidModelTask.priority = 10
+
+        // Range of Motion
         let rangeOfMotionSchedule = OCKSchedule(
             composing: [
                 OCKScheduleElement(
@@ -259,7 +286,8 @@ extension OCKStore {
                 rangeOfMotion,
                 keckResource,
                 symptomTracking,
-                symptomTrackingWeekly
+                symptomTrackingWeekly,
+                thyroidModelTask
             ]
         )
 

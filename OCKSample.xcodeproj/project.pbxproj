@@ -196,6 +196,9 @@
 		794F112E2F7E03CB00EDB0F1 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7036E63F25717F85006E9A3C /* Constants.swift */; };
 		794F112F2F7E03CB00EDB0F1 /* NeckMobilityTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F112A2F7E005C00EDB0F1 /* NeckMobilityTaskView.swift */; };
 		794F11302F7E03CB00EDB0F1 /* OnboardTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10782F7CE7E800EDB0F1 /* OnboardTaskView.swift */; };
+		79FA61FC2F91496600B8A0D1 /* Thyroid.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 79FA61FB2F91496600B8A0D1 /* Thyroid.usdz */; };
+		79FA61FD2F91496600B8A0D1 /* Thyroid.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 79FA61FB2F91496600B8A0D1 /* Thyroid.usdz */; };
+		79FA61FE2F91496600B8A0D1 /* Thyroid.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 79FA61FB2F91496600B8A0D1 /* Thyroid.usdz */; };
 		9103AA5227B8C913002C921E /* FontColorKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F03AA727860E7700E5AFB4 /* FontColorKey.swift */; };
 		91693818271B5E1600A634ED /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7036E63F25717F85006E9A3C /* Constants.swift */; };
 		9169381B271B64E100A634ED /* Styler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9169381A271B64E100A634ED /* Styler.swift */; };
@@ -426,6 +429,7 @@
 		7984E9792F63C282007F9CB5 /* ResearchKitSwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKitSwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7984E97C2F63C2AF007F9CB5 /* ResearchKitSwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKitSwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7984E9802F63C2C0007F9CB5 /* ResearchKitSwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKitSwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		79FA61FB2F91496600B8A0D1 /* Thyroid.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = Thyroid.usdz; sourceTree = "<group>"; };
 		9169381A271B64E100A634ED /* Styler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Styler.swift; sourceTree = "<group>"; };
 		9169381C271B650700A634ED /* ColorStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorStyler.swift; sourceTree = "<group>"; };
 		9169381F271B80EA00A634ED /* CONTRIBUTING.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
@@ -883,6 +887,7 @@
 			children = (
 				9169381F271B80EA00A634ED /* CONTRIBUTING.md */,
 				91AD922324A461D200925D4D /* README.md */,
+				79FA61FB2F91496600B8A0D1 /* Thyroid.usdz */,
 				7984E8CF2F63C104007F9CB5 /* ResearchKit.xcodeproj */,
 				7984E9072F63C18D007F9CB5 /* ResearchKitSwiftUI.xcodeproj */,
 				0520468223C3C1F2004F0F36 /* OCKSample.xctestplan */,
@@ -1174,6 +1179,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				707D296F2DCBE68600980253 /* Assets.xcassets in Resources */,
+				79FA61FD2F91496600B8A0D1 /* Thyroid.usdz in Resources */,
 				707D29702DCBE68600980253 /* ParseCareKit.plist in Resources */,
 				707D29722DCBE6AC00980253 /* Localizable.stringsdict in Resources */,
 				707D29732DCBE6AC00980253 /* Localizable.strings in Resources */,
@@ -1194,6 +1200,7 @@
 				707CC715254DA91900116728 /* Localizable.strings in Resources */,
 				91AD924624A4C42E00925D4D /* Preview Assets.xcassets in Resources */,
 				91AD922D24A4C42D00925D4D /* Assets.xcassets in Resources */,
+				79FA61FE2F91496600B8A0D1 /* Thyroid.usdz in Resources */,
 				70F03AB42788C76700E5AFB4 /* ParseCareKit.plist in Resources */,
 				704352422DB09A5C00A12187 /* Assets.xcassets in Resources */,
 				91AD924324A4C42E00925D4D /* Assets.xcassets in Resources */,
@@ -1208,6 +1215,7 @@
 				707CC714254DA91900116728 /* Localizable.strings in Resources */,
 				E7C4CA0B22809AD500ECC3D7 /* Assets.xcassets in Resources */,
 				91AD922224A45A3900925D4D /* ParseCareKit.plist in Resources */,
+				79FA61FC2F91496600B8A0D1 /* Thyroid.usdz in Resources */,
 				91AD922424A461D200925D4D /* README.md in Resources */,
 				91693820271B80EA00A634ED /* CONTRIBUTING.md in Resources */,
 				E72B2C14226939E4009A9438 /* LaunchScreen.storyboard in Resources */,

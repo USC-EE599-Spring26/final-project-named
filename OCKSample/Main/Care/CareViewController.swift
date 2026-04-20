@@ -424,6 +424,17 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                         return [card]
                         #endif
 
+                        let card = OCKSimpleTaskViewController(
+                                query: query,
+                                store: self.store
+                            )
+
+                        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleKneeModelTap))
+                        card.view.addGestureRecognizer(tapGesture)
+                        card.view.isUserInteractionEnabled = true
+
+                        return [card]
+                        #endif
                     default:
                         return nil
                     }

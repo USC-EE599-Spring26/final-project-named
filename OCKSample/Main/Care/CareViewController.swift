@@ -260,6 +260,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     @objc private func handleKneeModelTap() {
         presentThyroidModel()
         fetchAndPrintResults(for: TaskID.symptomTracking)
+        fetchAllOutcomes()
         fetchAndPrintResult(for: TaskID.symptomTracking)
     }
     #endif
@@ -424,17 +425,6 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                         return [card]
                         #endif
 
-                        let card = OCKSimpleTaskViewController(
-                                query: query,
-                                store: self.store
-                            )
-
-                        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleKneeModelTap))
-                        card.view.addGestureRecognizer(tapGesture)
-                        card.view.isUserInteractionEnabled = true
-
-                        return [card]
-                        #endif
                     default:
                         return nil
                     }
@@ -573,6 +563,38 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                 }
             case .failure(let error):
                 print("Read Failed: \(error)")
+            }
+        }
+    }
+
+    private func fetchAllOutcomes() {
+        let query = OCKOutcomeQuery()
+        store.fetchAnyOutcomes(query: query, callbackQueue: .main) { result in
+            switch result {
+            case .success(let outcomes):
+                print("Total \(outcomes.count) results")
+                for outcome in outcomes {
+                    // Get Task ID
+                    let taskUUID = outcome.taskUUID
+                    var taskQuery = OCKTaskQuery()
+                    taskQuery.uuids = [taskUUID]
+                    self.store.fetchAnyTasks(query: taskQuery, callbackQueue: .main) { taskResult in
+                        switch taskResult {
+                        case .success(let tasks):
+                            let taskId = tasks.first?.id ?? "unknown"
+                            print("Task ID: \(taskId)")
+                        case .failure:
+                            print("Task ID: Failed")
+                        }
+                    }
+
+                print("values: \(outcome.values)")
+                print("---")
+            }
+            case .failure(let error):
+                print("Failed: \(error)")
+            default:
+                print("felt")
             }
         }
     }

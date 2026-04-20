@@ -29,7 +29,7 @@ enum TaskID {
     }
 
     static var orderedObjective: [String] {
-        [ Self.steps, Self.ovulationTestResult ]
+        [ Self.steps, Self.ovulationTestResult]
     }
 
     static var orderedSubjective: [String] {
@@ -37,6 +37,6 @@ enum TaskID {
     }
 
     static var orderedWatchOS: [String] {
-        [ Self.doxylamine, Self.kegels, Self.stretch ]
+        [ Self.doxylamine, Self.kegels]
     }
 }

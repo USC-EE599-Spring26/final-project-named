@@ -438,7 +438,7 @@ extension OCKStore {
             )
 
             var symptomTracking = OCKTask(
-                id: "\(symptomTrackingTaskId)-stress",
+                id: (symptomTrackingTaskId),
                 title: String(localized: "SYMPTOM_TRACKING"),
                 carePlanUUID: carePlanUUID,
                 schedule: symptomTrackingSchedule
@@ -692,7 +692,7 @@ extension OCKStore {
                 questions: questions2
             )
             var weeklyEvaluation = OCKTask(
-                id: "\(weeklyEvaluationTaskId)-weeklyEvaluation",
+                id: (weeklyEvaluationTaskId),
                 title: String(localized: "Weekly Evaluation"),
                 carePlanUUID: carePlanUUID,
                 schedule: weeklyEvaluationSchedule

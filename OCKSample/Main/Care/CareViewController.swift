@@ -259,6 +259,9 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     #if os(iOS)
     @objc private func handleKneeModelTap() {
         presentThyroidModel()
+        fetchAndPrintResults(for: TaskID.symptomTracking)
+        fetchAllOutcomes()
+        fetchAndPrintResult(for: TaskID.symptomTracking)
     }
     #endif
     // swiftlint:disable:next cyclomatic_complexity
@@ -421,6 +424,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
 
                         return [card]
                         #endif
+
                     default:
                         return nil
                     }
@@ -452,7 +456,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                 }
 
     }
-
+    /*
     private func researchSurveyViewController(
             query: OCKEventQuery,
             task: OCKTask
@@ -484,8 +488,117 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             .formattedHostingController()
 
             return surveyViewController
+        }*/
+
+    private func fetchAndPrintResults(for taskId: String) {
+        var query = OCKOutcomeQuery()
+        query.taskIDs = [taskId]
+
+        store.fetchAnyOutcomes(query: query, callbackQueue: .main) { result in
+            switch result {
+            case .success(let outcomes):
+                print("========== Survey Results ==========")
+                for outcome in outcomes {
+                    for value in outcome.values {
+                        print("Answer: \(value.value)")
+                    }
+                }
+                print("==============================")
+            case .failure(let error):
+                print("Read Failed: \(error)")
+            }
+        }
+    }
+
+    private func researchSurveyViewController(
+            query: OCKEventQuery,
+            task: OCKTask
+        ) -> UIViewController? {
+
+            guard let steps = task.surveySteps else {
+                return nil
+            }
+
+            let surveyViewController = EventQueryContentView<ResearchSurveyView>(
+                query: query
+            ) {
+                EventQueryContentView<ResearchCareForm>(
+                    query: query
+                ) {
+                    ForEach(steps) { step in
+                        ResearchFormStep(
+                            title: task.title,
+                            subtitle: task.instructions
+                        ) {
+                            ForEach(step.questions) { question in
+                                question.view()
+
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.vertical, swiftUIPadding)
+            .formattedHostingController()
+
+            return surveyViewController
         }
 
+    private func fetchAndPrintResult(for taskId: String) {
+        let query = OCKOutcomeQuery()
+        // query.taskIDs = [taskId]
+
+        store.fetchAnyOutcomes(query: query, callbackQueue: .main) { result in
+            switch result {
+            case .success(let outcomes):
+                for outcome in outcomes {
+                    for value in outcome.values {
+
+                        if let kind = value.kind {
+                            print("Question: \(kind), Answer: \(value.value)")
+                        } else {
+                            print("Answer: \(value.value)")
+                        }
+                    }
+                }
+            case .failure(let error):
+                print("Read Failed: \(error)")
+            }
+        }
+    }
+    #if os(iOS)
+    private func fetchAllOutcomes() {
+        let query = OCKOutcomeQuery()
+        store.fetchAnyOutcomes(query: query, callbackQueue: .main) { result in
+            switch result {
+            case .success(let outcomes):
+                print("Total \(outcomes.count) results")
+                for outcome in outcomes {
+                    // Get Task ID
+                    let taskUUID = outcome.taskUUID
+                    var taskQuery = OCKTaskQuery()
+                    taskQuery.uuids = [taskUUID]
+                    self.store.fetchAnyTasks(query: taskQuery, callbackQueue: .main) { taskResult in
+                        switch taskResult {
+                        case .success(let tasks):
+                            let taskId = tasks.first?.id ?? "unknown"
+                            print("Task ID: \(taskId)")
+                        case .failure:
+                            print("Task ID: Failed")
+                        }
+                    }
+
+                print("values: \(outcome.values)")
+                print("---")
+            }
+            case .failure(let error):
+                print("Failed: \(error)")
+            default:
+                print("felt")
+            }
+        }
+    }
+    #endif
     private func appendTasks(
         _ tasks: [any OCKAnyTask],
         to listViewController: OCKListViewController,

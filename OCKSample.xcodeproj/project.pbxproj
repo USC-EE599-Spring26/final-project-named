@@ -595,6 +595,7 @@
 			children = (
 				70221F2728D7809800971195 /* MainTabView.swift */,
 				7036E4D2256EBE35006E9A3C /* MainView.swift */,
+				918FDEB3271B402F0045A0EF /* Models */,
 				7055725A2DC33AAC008E5B0A /* SplashScreenView.swift */,
 				70E3422C2DB058A7005124F9 /* Cards */,
 				70308878258272CD00FFABB6 /* Care */,
@@ -928,7 +929,6 @@
 				918FDEC1271B4E710045A0EF /* Environment */,
 				918FDEBA271B4DF60045A0EF /* Extensions */,
 				703088772582727500FFABB6 /* Main */,
-				918FDEB3271B402F0045A0EF /* Models */,
 				71A79C8A2294FBA1002B96D3 /* Supporting Files */,
 				70F921AA27CABDE900368CEC /* WatchConnectivity */,
 			);

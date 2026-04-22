@@ -566,7 +566,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             }
         }
     }
-
+    #if os(iOS)
     private func fetchAllOutcomes() {
         let query = OCKOutcomeQuery()
         store.fetchAnyOutcomes(query: query, callbackQueue: .main) { result in
@@ -598,7 +598,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
             }
         }
     }
-
+    #endif
     private func appendTasks(
         _ tasks: [any OCKAnyTask],
         to listViewController: OCKListViewController,

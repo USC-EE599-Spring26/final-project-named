@@ -370,7 +370,7 @@ struct InsightsView: View {
             event.computeProgress(by: .maxOutcomeValue(kind: "\(TaskID.symptomTracking)-temp"))
         }
 
-        // sawllowing
+        // 吞咽困难
         let swallowingConfig = CKEDataSeriesConfiguration(
             taskID: taskId,
             dataStrategy: .mean,
@@ -382,7 +382,7 @@ struct InsightsView: View {
             event.computeProgress(by: .maxOutcomeValue(kind: "\(TaskID.symptomTracking)-swallowing"))
         }
 
-        // Temp
+        // 体温
         let tempConfig = CKEDataSeriesConfiguration(
             taskID: taskId,
             dataStrategy: .mean,
@@ -552,6 +552,6 @@ struct SingleScatterView: View {
 
 #Preview {
     InsightsView()
-		.environment(\.careStore, Utility.createPreviewStore())
-		.careKitStyle(Styler())
+        .environment(\.careStore, Utility.createPreviewStore())
+        .careKitStyle(Styler())
 }

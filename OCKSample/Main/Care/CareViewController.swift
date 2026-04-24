@@ -869,6 +869,16 @@ private func normalizedHTTPURLString(_ value: String?) -> String? {
     tipView.imageView.backgroundColor = UIColor(red: 0.99, green: 0.97, blue: 0.93, alpha: 1.0)
     tipView.customStyle = CustomStylerKey.defaultValue
     listViewController.appendView(tipView, animated: false)
+
+    let customFeaturedView = CustomFeaturedContentViewController(
+        image: UIImage(named: "TheroPatientEdu.jpg") ?? UIImage(),
+        text: "Thyroid Cancer Education",
+        textColor: .white,
+        imageOverlayStyle: .unspecified
+    )
+    customFeaturedView.url = URL(string: "https://mtceducate.org/")
+    customFeaturedView.customStyle = CustomStylerKey.defaultValue
+    listViewController.appendView(customFeaturedView, animated: false)
 }
 #endif
 

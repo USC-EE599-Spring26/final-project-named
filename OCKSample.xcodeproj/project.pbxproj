@@ -196,6 +196,9 @@
 		794F112E2F7E03CB00EDB0F1 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7036E63F25717F85006E9A3C /* Constants.swift */; };
 		794F112F2F7E03CB00EDB0F1 /* NeckMobilityTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F112A2F7E005C00EDB0F1 /* NeckMobilityTaskView.swift */; };
 		794F11302F7E03CB00EDB0F1 /* OnboardTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10782F7CE7E800EDB0F1 /* OnboardTaskView.swift */; };
+		798E81392F9BBEA4004479E3 /* CustomFeaturedContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798E81312F9BBEA1004479E3 /* CustomFeaturedContentViewController.swift */; };
+		798E813A2F9BBEA4004479E3 /* CustomFeaturedContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798E81312F9BBEA1004479E3 /* CustomFeaturedContentViewController.swift */; };
+		798E813B2F9BBEA4004479E3 /* CustomFeaturedContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798E81312F9BBEA1004479E3 /* CustomFeaturedContentViewController.swift */; };
 		79FA61FC2F91496600B8A0D1 /* Thyroid.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 79FA61FB2F91496600B8A0D1 /* Thyroid.usdz */; };
 		79FA61FD2F91496600B8A0D1 /* Thyroid.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 79FA61FB2F91496600B8A0D1 /* Thyroid.usdz */; };
 		79FA61FE2F91496600B8A0D1 /* Thyroid.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 79FA61FB2F91496600B8A0D1 /* Thyroid.usdz */; };
@@ -429,6 +432,7 @@
 		7984E9792F63C282007F9CB5 /* ResearchKitSwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKitSwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7984E97C2F63C2AF007F9CB5 /* ResearchKitSwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKitSwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7984E9802F63C2C0007F9CB5 /* ResearchKitSwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKitSwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		798E81312F9BBEA1004479E3 /* CustomFeaturedContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFeaturedContentViewController.swift; sourceTree = "<group>"; };
 		79FA61FB2F91496600B8A0D1 /* Thyroid.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = Thyroid.usdz; sourceTree = "<group>"; };
 		9169381A271B64E100A634ED /* Styler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Styler.swift; sourceTree = "<group>"; };
 		9169381C271B650700A634ED /* ColorStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorStyler.swift; sourceTree = "<group>"; };
@@ -723,6 +727,7 @@
 		70E3422C2DB058A7005124F9 /* Cards */ = {
 			isa = PBXGroup;
 			children = (
+				798E81312F9BBEA1004479E3 /* CustomFeaturedContentViewController.swift */,
 				794F112A2F7E005C00EDB0F1 /* NeckMobilityTaskView.swift */,
 				794F10782F7CE7E800EDB0F1 /* OnboardTaskView.swift */,
 				794F10792F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift */,
@@ -1299,6 +1304,7 @@
 				1CA9EE012F5221CE00C82A4F /* CareKitCard.swift in Sources */,
 				707D295F2DCBE68500980253 /* OCKSampleApp.swift in Sources */,
 				1C34E27E2F501CF800A29A18 /* AnimationStyler.swift in Sources */,
+				798E813B2F9BBEA4004479E3 /* CustomFeaturedContentViewController.swift in Sources */,
 				707D29602DCBE68500980253 /* SessionDelegate.swift in Sources */,
 				7949037F2F685A7F009B32C3 /* CardEnabledEnvironmentKey.swift in Sources */,
 				707D29612DCBE68500980253 /* Styler.swift in Sources */,
@@ -1385,6 +1391,7 @@
 				70308886258273D400FFABB6 /* LoginViewModel.swift in Sources */,
 				70F921B127CAC16E00368CEC /* SessionDelegate.swift in Sources */,
 				794F107E2F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift in Sources */,
+				798E81392F9BBEA4004479E3 /* CustomFeaturedContentViewController.swift in Sources */,
 				794F107F2F7CE7E800EDB0F1 /* OnboardTaskView.swift in Sources */,
 				794F112B2F7E005C00EDB0F1 /* NeckMobilityTaskView.swift in Sources */,
 			);
@@ -1430,6 +1437,7 @@
 				70CF66E428E1E74C00FAE977 /* TintColorFlipKey.swift in Sources */,
 				70F03AA327860AFF00E5AFB4 /* OCKPatient+Parse.swift in Sources */,
 				7099D1FF29E98D900037CD8E /* AppError.swift in Sources */,
+				798E813A2F9BBEA4004479E3 /* CustomFeaturedContentViewController.swift in Sources */,
 				70F0EFE828C2EC050005B5A2 /* OCKSampleApp.swift in Sources */,
 				1CEFD08A2F86141E0075F83A /* MyContactViewController.swift in Sources */,
 				918FDEB7271B41FF0045A0EF /* Logger.swift in Sources */,

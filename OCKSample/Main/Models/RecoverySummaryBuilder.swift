@@ -137,6 +137,21 @@ final class RecoverySummaryBuilder {
         return nil
     }
 
+    // Returns summaries for the most recent windowDays days
+    // Order: [today, yesterday, day before, ...]
+    func buildRecentSummaries(windowDays: Int = 3) async throws -> [DailyRecoverySummary] {
+        var summaries: [DailyRecoverySummary] = []
+        let today = Date()
+
+        for dayOffset in 0..<windowDays {
+            let targetDate = Calendar.current.date(byAdding: .day, value: -dayOffset, to: today)!
+            let summary = try await buildSummary(for: targetDate)
+            summaries.append(summary)
+        }
+
+        return summaries
+    }
+
     private func doubleValue(for taskID: String, in events: [OCKAnyEvent]) -> Double? {
         let taskEvents = events.filter { $0.task.id == taskID }
 

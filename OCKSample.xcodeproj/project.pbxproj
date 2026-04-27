@@ -21,6 +21,16 @@
 		1C34E2822F501D1A00A29A18 /* AppearanceStyler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C34E2812F501D1800A29A18 /* AppearanceStyler.swift */; };
 		1C34E2832F501D1A00A29A18 /* AppearanceStyler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C34E2812F501D1800A29A18 /* AppearanceStyler.swift */; };
 		1C34E2842F501D1A00A29A18 /* AppearanceStyler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C34E2812F501D1800A29A18 /* AppearanceStyler.swift */; };
+		1C706FCF2F9DCC3E00BDC565 /* ResearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E99E2F63C324007F9CB5 /* ResearchKit.framework */; platformFilter = ios; };
+		1C706FD02F9DCC3E00BDC565 /* ResearchKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E99E2F63C324007F9CB5 /* ResearchKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1C706FD22F9DCC4400BDC565 /* ResearchKitActiveTask.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A42F63C324007F9CB5 /* ResearchKitActiveTask.framework */; platformFilter = ios; };
+		1C706FD32F9DCC4400BDC565 /* ResearchKitActiveTask.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A42F63C324007F9CB5 /* ResearchKitActiveTask.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1C706FD42F9DCC4A00BDC565 /* ResearchKitSwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; platformFilters = (ios, xros, ); };
+		1C706FD52F9DCC4A00BDC565 /* ResearchKitSwiftUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1C706FD62F9DCC5100BDC565 /* ResearchKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A22F63C324007F9CB5 /* ResearchKitUI.framework */; platformFilter = ios; };
+		1C706FD72F9DCC5100BDC565 /* ResearchKitUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A22F63C324007F9CB5 /* ResearchKitUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1C706FD82F9DCC6400BDC565 /* ResearchKitSwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; };
+		1C706FD92F9DCC6400BDC565 /* ResearchKitSwiftUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1C8B5D122F8610C80028EACE /* CustomContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C8B5D0A2F8610B80028EACE /* CustomContactViewController.swift */; };
 		1C8B5D132F8610C80028EACE /* CustomContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C8B5D0A2F8610B80028EACE /* CustomContactViewController.swift */; };
 		1CA9EDF82F52214E00C82A4F /* OCKHealthKitTask+Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CA9EDF72F52213600C82A4F /* OCKHealthKitTask+Card.swift */; };
@@ -36,11 +46,16 @@
 		1CA9EE062F52276E00C82A4F /* CareKitTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CA9EE042F52276B00C82A4F /* CareKitTaskView.swift */; };
 		1CA9EE082F52278200C82A4F /* CareKitTaskViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CA9EE072F52277F00C82A4F /* CareKitTaskViewModel.swift */; };
 		1CA9EE092F52278200C82A4F /* CareKitTaskViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CA9EE072F52277F00C82A4F /* CareKitTaskViewModel.swift */; };
-		1CAA1EF62F6E574900935823 /* ResearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E99E2F63C324007F9CB5 /* ResearchKit.framework */; platformFilter = ios; };
-		1CAA1EF82F6E574900935823 /* ResearchKitActiveTask.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A42F63C324007F9CB5 /* ResearchKitActiveTask.framework */; platformFilter = ios; };
-		1CAA1EFA2F6E574900935823 /* ResearchKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A22F63C324007F9CB5 /* ResearchKitUI.framework */; platformFilter = ios; };
-		1CAA1EFC2F6E574900935823 /* ResearchKitSwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; platformFilters = (ios, xros, ); };
 		1CAA1EFF2F6E578000935823 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51F6343923D2877B00FE576E /* HealthKit.framework */; };
+		1CEA13282F9DD6710013BE46 /* RecoveryAdvisoryResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEA13202F9DD66E0013BE46 /* RecoveryAdvisoryResult.swift */; };
+		1CEA13292F9DD6710013BE46 /* RecoveryAdvisoryResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEA13202F9DD66E0013BE46 /* RecoveryAdvisoryResult.swift */; };
+		1CEA132A2F9DD6710013BE46 /* RecoveryAdvisoryResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEA13202F9DD66E0013BE46 /* RecoveryAdvisoryResult.swift */; };
+		1CEA132C2F9DD6920013BE46 /* RecoveryAdvisorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEA132B2F9DD6910013BE46 /* RecoveryAdvisorService.swift */; };
+		1CEA132D2F9DD6920013BE46 /* RecoveryAdvisorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEA132B2F9DD6910013BE46 /* RecoveryAdvisorService.swift */; };
+		1CEA132E2F9DD6920013BE46 /* RecoveryAdvisorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEA132B2F9DD6910013BE46 /* RecoveryAdvisorService.swift */; };
+		1CEA13312F9DD7880013BE46 /* AdvisoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEA13302F9DD7870013BE46 /* AdvisoryView.swift */; };
+		1CEA13322F9DD7880013BE46 /* AdvisoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEA13302F9DD7870013BE46 /* AdvisoryView.swift */; };
+		1CEA13332F9DD7880013BE46 /* AdvisoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEA13302F9DD7870013BE46 /* AdvisoryView.swift */; };
 		1CEFD0872F8613F10075F83A /* MyContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEFD0862F8613EA0075F83A /* MyContactView.swift */; };
 		1CEFD0882F8613F10075F83A /* MyContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEFD0862F8613EA0075F83A /* MyContactView.swift */; };
 		1CEFD08A2F86141E0075F83A /* MyContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEFD0892F8614140075F83A /* MyContactViewController.swift */; };
@@ -169,23 +184,13 @@
 		70F921B127CAC16E00368CEC /* SessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F921AB27CABE3000368CEC /* SessionDelegate.swift */; };
 		70F921B227CAC16E00368CEC /* RemoteSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F921AD27CABE7700368CEC /* RemoteSessionDelegate.swift */; };
 		70F921B327CAC16E00368CEC /* LocalSyncSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F921AF27CABED600368CEC /* LocalSyncSessionDelegate.swift */; };
-		7916634A2F66990600F49F3E /* ResearchKitActiveTask.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A42F63C324007F9CB5 /* ResearchKitActiveTask.framework */; platformFilter = ios; };
-		7916634B2F66990600F49F3E /* ResearchKitActiveTask.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A42F63C324007F9CB5 /* ResearchKitActiveTask.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7916634C2F66990D00F49F3E /* ResearchKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A22F63C324007F9CB5 /* ResearchKitUI.framework */; platformFilter = ios; };
-		7916634D2F66990D00F49F3E /* ResearchKitUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E9A22F63C324007F9CB5 /* ResearchKitUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7949037E2F685A7F009B32C3 /* CardEnabledEnvironmentKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7949037D2F685A7F009B32C3 /* CardEnabledEnvironmentKey.swift */; };
 		7949037F2F685A7F009B32C3 /* CardEnabledEnvironmentKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7949037D2F685A7F009B32C3 /* CardEnabledEnvironmentKey.swift */; };
 		794903802F685A7F009B32C3 /* CardEnabledEnvironmentKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7949037D2F685A7F009B32C3 /* CardEnabledEnvironmentKey.swift */; };
 		794903822F685B03009B32C3 /* MyCustomCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794903812F685AFA009B32C3 /* MyCustomCardView.swift */; };
 		794903832F685B03009B32C3 /* MyCustomCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794903812F685AFA009B32C3 /* MyCustomCardView.swift */; };
-		794903842F68697D009B32C3 /* ResearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E99E2F63C324007F9CB5 /* ResearchKit.framework */; platformFilter = ios; };
-		794903852F68697D009B32C3 /* ResearchKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7984E99E2F63C324007F9CB5 /* ResearchKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		794903B22F686AF6009B32C3 /* ResearchKitSwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; };
-		794903B32F686AF6009B32C3 /* ResearchKitSwiftUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		794903E42F686C46009B32C3 /* ResearchKitSwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; };
 		794903E52F686C46009B32C3 /* ResearchKitSwiftUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		794903E72F686E0E009B32C3 /* ResearchKitSwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; platformFilters = (ios, xros, ); };
-		794903E82F686E0E009B32C3 /* ResearchKitSwiftUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 791663442F66989700F49F3E /* ResearchKitSwiftUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		794F107A2F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10792F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift */; };
 		794F107C2F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10792F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift */; };
 		794F107D2F7CE7E800EDB0F1 /* OnboardTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 794F10782F7CE7E800EDB0F1 /* OnboardTaskView.swift */; };
@@ -300,27 +305,27 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		791663492F66990100F49F3E /* Embed Frameworks */ = {
+		1C706FD12F9DCC3E00BDC565 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				794903E82F686E0E009B32C3 /* ResearchKitSwiftUI.framework in Embed Frameworks */,
-				7916634D2F66990D00F49F3E /* ResearchKitUI.framework in Embed Frameworks */,
-				794903852F68697D009B32C3 /* ResearchKit.framework in Embed Frameworks */,
-				7916634B2F66990600F49F3E /* ResearchKitActiveTask.framework in Embed Frameworks */,
+				1C706FD02F9DCC3E00BDC565 /* ResearchKit.framework in Embed Frameworks */,
+				1C706FD32F9DCC4400BDC565 /* ResearchKitActiveTask.framework in Embed Frameworks */,
+				1C706FD72F9DCC5100BDC565 /* ResearchKitUI.framework in Embed Frameworks */,
+				1C706FD52F9DCC4A00BDC565 /* ResearchKitSwiftUI.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		794903B42F686AF6009B32C3 /* Embed Frameworks */ = {
+		1C706FDA2F9DCC6400BDC565 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				794903B32F686AF6009B32C3 /* ResearchKitSwiftUI.framework in Embed Frameworks */,
+				1C706FD92F9DCC6400BDC565 /* ResearchKitSwiftUI.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -365,6 +370,9 @@
 		1CA9EDFF2F5221C600C82A4F /* CareKitCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKitCard.swift; sourceTree = "<group>"; };
 		1CA9EE042F52276B00C82A4F /* CareKitTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKitTaskView.swift; sourceTree = "<group>"; };
 		1CA9EE072F52277F00C82A4F /* CareKitTaskViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKitTaskViewModel.swift; sourceTree = "<group>"; };
+		1CEA13202F9DD66E0013BE46 /* RecoveryAdvisoryResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryAdvisoryResult.swift; sourceTree = "<group>"; };
+		1CEA132B2F9DD6910013BE46 /* RecoveryAdvisorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryAdvisorService.swift; sourceTree = "<group>"; };
+		1CEA13302F9DD7870013BE46 /* AdvisoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvisoryView.swift; sourceTree = "<group>"; };
 		1CEFD0862F8613EA0075F83A /* MyContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyContactView.swift; sourceTree = "<group>"; };
 		1CEFD0892F8614140075F83A /* MyContactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyContactViewController.swift; sourceTree = "<group>"; };
 		1CEFD08C2F86144A0075F83A /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
@@ -485,16 +493,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1CAA1EF62F6E574900935823 /* ResearchKit.framework in Frameworks */,
-				1CAA1EF82F6E574900935823 /* ResearchKitActiveTask.framework in Frameworks */,
-				1CAA1EFA2F6E574900935823 /* ResearchKitUI.framework in Frameworks */,
+				1C706FD62F9DCC5100BDC565 /* ResearchKitUI.framework in Frameworks */,
 				1CAA1EFF2F6E578000935823 /* HealthKit.framework in Frameworks */,
-				1CAA1EFC2F6E574900935823 /* ResearchKitSwiftUI.framework in Frameworks */,
 				918FDEAF271B3F8F0045A0EF /* ParseCareKit in Frameworks */,
-				7916634C2F66990D00F49F3E /* ResearchKitUI.framework in Frameworks */,
-				794903E72F686E0E009B32C3 /* ResearchKitSwiftUI.framework in Frameworks */,
-				794903842F68697D009B32C3 /* ResearchKit.framework in Frameworks */,
-				7916634A2F66990600F49F3E /* ResearchKitActiveTask.framework in Frameworks */,
+				1C706FCF2F9DCC3E00BDC565 /* ResearchKit.framework in Frameworks */,
+				1C706FD42F9DCC4A00BDC565 /* ResearchKitSwiftUI.framework in Frameworks */,
+				1C706FD22F9DCC4400BDC565 /* ResearchKitActiveTask.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -521,7 +525,7 @@
 			files = (
 				918FDEB1271B3F9B0045A0EF /* ParseCareKit in Frameworks */,
 				70202EC7280733BC00CF73FB /* CareKit in Frameworks */,
-				794903B22F686AF6009B32C3 /* ResearchKitSwiftUI.framework in Frameworks */,
+				1C706FD82F9DCC6400BDC565 /* ResearchKitSwiftUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -542,6 +546,14 @@
 				1CA9EE042F52276B00C82A4F /* CareKitTaskView.swift */,
 			);
 			path = CareKitTaskView;
+			sourceTree = "<group>";
+		};
+		1CEA132F2F9DD7730013BE46 /* Advisory */ = {
+			isa = PBXGroup;
+			children = (
+				1CEA13302F9DD7870013BE46 /* AdvisoryView.swift */,
+			);
+			path = Advisory;
 			sourceTree = "<group>";
 		};
 		1CEFD07E2F8613CA0075F83A /* MyContact */ = {
@@ -597,6 +609,7 @@
 		703088772582727500FFABB6 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				1CEA132F2F9DD7730013BE46 /* Advisory */,
 				70221F2728D7809800971195 /* MainTabView.swift */,
 				7036E4D2256EBE35006E9A3C /* MainView.swift */,
 				918FDEB3271B402F0045A0EF /* Models */,
@@ -812,6 +825,8 @@
 		918FDEB3271B402F0045A0EF /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				1CEA132B2F9DD6910013BE46 /* RecoveryAdvisorService.swift */,
+				1CEA13202F9DD66E0013BE46 /* RecoveryAdvisoryResult.swift */,
 				1C15B0902F70837800E8E3F6 /* RecoverySummaryBuilder.swift */,
 				1C15B0852F70832300E8E3F6 /* DailyRecoverySummary.swift */,
 				1CA9EDFF2F5221C600C82A4F /* CareKitCard.swift */,
@@ -1017,7 +1032,7 @@
 				91AD922524A4C42B00925D4D /* Resources */,
 				8E2FA4969104CA618976C1EC /* Frameworks */,
 				91AD922F24A4C42D00925D4D /* Sources */,
-				794903B42F686AF6009B32C3 /* Embed Frameworks */,
+				1C706FDA2F9DCC6400BDC565 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1042,7 +1057,7 @@
 				51431FA123D166AE006A7CFD /* Frameworks */,
 				91AD924C24A4C42E00925D4D /* Embed Watch Content */,
 				9169381E271B6E2100A634ED /* SwiftLint */,
-				791663492F66990100F49F3E /* Embed Frameworks */,
+				1C706FD12F9DCC3E00BDC565 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1271,6 +1286,7 @@
 				794F107C2F7CE7E800EDB0F1 /* RangeOfMotionTaskView.swift in Sources */,
 				794F107D2F7CE7E800EDB0F1 /* OnboardTaskView.swift in Sources */,
 				707D29492DCBE68500980253 /* MainView.swift in Sources */,
+				1CEA13282F9DD6710013BE46 /* RecoveryAdvisoryResult.swift in Sources */,
 				1C15B0932F70837B00E8E3F6 /* RecoverySummaryBuilder.swift in Sources */,
 				707D294A2DCBE68500980253 /* CustomStylerKey.swift in Sources */,
 				707D294B2DCBE68500980253 /* TipView.swift in Sources */,
@@ -1296,6 +1312,7 @@
 				794903822F685B03009B32C3 /* MyCustomCardView.swift in Sources */,
 				707D29592DCBE68500980253 /* AppError.swift in Sources */,
 				707D295A2DCBE68500980253 /* InstallationChannel.swift in Sources */,
+				1CEA132C2F9DD6920013BE46 /* RecoveryAdvisorService.swift in Sources */,
 				707D295B2DCBE68500980253 /* LoginView.swift in Sources */,
 				707D295C2DCBE68500980253 /* AppDelegate.swift in Sources */,
 				707D295D2DCBE68500980253 /* LoginViewModel.swift in Sources */,
@@ -1315,6 +1332,7 @@
 				1CEFD0872F8613F10075F83A /* MyContactView.swift in Sources */,
 				707D29642DCBE68500980253 /* CareViewController.swift in Sources */,
 				707D29652DCBE68500980253 /* PCKUtility.swift in Sources */,
+				1CEA13312F9DD7880013BE46 /* AdvisoryView.swift in Sources */,
 				1C34E2842F501D1A00A29A18 /* AppearanceStyler.swift in Sources */,
 				794F112C2F7E005C00EDB0F1 /* NeckMobilityTaskView.swift in Sources */,
 				1CEFD08E2F8614500075F83A /* ImagePicker.swift in Sources */,
@@ -1343,6 +1361,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1CEA13292F9DD6710013BE46 /* RecoveryAdvisoryResult.swift in Sources */,
 				70F921B327CAC16E00368CEC /* LocalSyncSessionDelegate.swift in Sources */,
 				70221F3928D8C10800971195 /* StoreCoordinatorKey.swift in Sources */,
 				7099D20029E98D900037CD8E /* AppError.swift in Sources */,
@@ -1353,6 +1372,7 @@
 				70F921A927CA9A4000368CEC /* CustomStylerKey.swift in Sources */,
 				7099D20629E98DFF0037CD8E /* TaskID.swift in Sources */,
 				7075151E28DE1A8300A57A0C /* MainView.swift in Sources */,
+				1CEA132E2F9DD6920013BE46 /* RecoveryAdvisorService.swift in Sources */,
 				707D28D02DCA8AAB00980253 /* OCKStore+SampleData.swift in Sources */,
 				70B8E0A72F0EC1CA00440FCA /* Mutex.swift in Sources */,
 				70A98D62278A2683009B58F2 /* Styler.swift in Sources */,
@@ -1361,6 +1381,7 @@
 				1CA9EDFC2F52217F00C82A4F /* OCKTask+Card.swift in Sources */,
 				7075152028DE1BB400A57A0C /* LoginView.swift in Sources */,
 				70E342292DB05813005124F9 /* ProfileView.swift in Sources */,
+				1CEA13322F9DD7880013BE46 /* AdvisoryView.swift in Sources */,
 				70F921B227CAC16E00368CEC /* RemoteSessionDelegate.swift in Sources */,
 				70E342302DB062F8005124F9 /* NoHighlightStyle.swift in Sources */,
 				1CA9EDF82F52214E00C82A4F /* OCKHealthKitTask+Card.swift in Sources */,
@@ -1404,7 +1425,9 @@
 				1CEFD0902F86149F0075F83A /* ProfileImageView.swift in Sources */,
 				794F112E2F7E03CB00EDB0F1 /* Constants.swift in Sources */,
 				794F112F2F7E03CB00EDB0F1 /* NeckMobilityTaskView.swift in Sources */,
+				1CEA132D2F9DD6920013BE46 /* RecoveryAdvisorService.swift in Sources */,
 				794F11302F7E03CB00EDB0F1 /* OnboardTaskView.swift in Sources */,
+				1CEA13332F9DD7880013BE46 /* AdvisoryView.swift in Sources */,
 				1CEFD08D2F8614500075F83A /* ImagePicker.swift in Sources */,
 				E7440E4F229477F7007AD30A /* CareViewController.swift in Sources */,
 				918FDEB5271B40590045A0EF /* Installation.swift in Sources */,
@@ -1456,6 +1479,7 @@
 				7036E4C9256E1A6F006E9A3C /* ProfileView.swift in Sources */,
 				1CA9EE052F52276E00C82A4F /* CareKitTaskView.swift in Sources */,
 				7083A856279CA40A00B3832E /* PCKUtility.swift in Sources */,
+				1CEA132A2F9DD6710013BE46 /* RecoveryAdvisoryResult.swift in Sources */,
 				70B8E0A52F0EC1CA00440FCA /* Mutex.swift in Sources */,
 				1CEFD0882F8613F10075F83A /* MyContactView.swift in Sources */,
 				1CA9EDFA2F52214E00C82A4F /* OCKHealthKitTask+Card.swift in Sources */,

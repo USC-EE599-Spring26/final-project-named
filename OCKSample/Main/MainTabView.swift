@@ -24,47 +24,60 @@ struct MainTabView: View {
                         Image(systemName: "chart.line.text.clipboard")
                             .renderingMode(.template)
                     } else {
-						Image(systemName: "chart.line.text.clipboard.fill")
+                        Image(systemName: "chart.line.text.clipboard.fill")
                             .renderingMode(.template)
                     }
                 }
                 .tag(0)
 
-			InsightsView()
-				.tabItem {
-					if selectedTab == 1 {
-						Image(systemName: "chart.pie.fill")
-							.renderingMode(.template)
-					} else {
-						Image(systemName: "chart.pie")
-							.renderingMode(.template)
-					}
-				}
-				.tag(1)
+            InsightsView()
+                .tabItem {
+                    if selectedTab == 1 {
+                        Image(systemName: "chart.pie.fill")
+                            .renderingMode(.template)
+                    } else {
+                        Image(systemName: "chart.pie")
+                            .renderingMode(.template)
+                    }
+                }
+                .tag(1)
 
-			ContactView()
-				.tabItem {
-					if selectedTab == 2 {
-						Image(systemName: "phone.bubble.fill")
-							.renderingMode(.template)
-					} else {
-						Image(systemName: "phone.bubble")
-							.renderingMode(.template)
-					}
-				}
-				.tag(2)
+            ContactView()
+                .tabItem {
+                    if selectedTab == 2 {
+                        Image(systemName: "phone.bubble.fill")
+                            .renderingMode(.template)
+                    } else {
+                        Image(systemName: "phone.bubble")
+                            .renderingMode(.template)
+                    }
+                }
+                .tag(2)
 
-			ProfileView(loginViewModel: loginViewModel)
-				.tabItem {
-					if selectedTab == 3 {
-						Image(systemName: "person.circle.fill")
-							.renderingMode(.template)
-					} else {
-						Image(systemName: "person.circle")
-							.renderingMode(.template)
-					}
-				}
-				.tag(3)
+            ProfileView(loginViewModel: loginViewModel)
+                .tabItem {
+                    if selectedTab == 3 {
+                        Image(systemName: "person.circle.fill")
+                            .renderingMode(.template)
+                    } else {
+                        Image(systemName: "person.circle")
+                            .renderingMode(.template)
+                    }
+                }
+                .tag(3)
+
+            // AI Recovery Advice Tab
+            AdvisoryView()
+                .tabItem {
+                    if selectedTab == 4 {
+                        Image(systemName: "brain.fill")
+                            .renderingMode(.template)
+                    } else {
+                        Image(systemName: "brain")
+                            .renderingMode(.template)
+                    }
+                }
+                .tag(4)
         }
     }
 }
@@ -72,8 +85,8 @@ struct MainTabView: View {
 struct MainTabView_Previews: PreviewProvider {
     static var previews: some View {
         MainTabView(loginViewModel: .init())
-			.environment(\.appDelegate, AppDelegate())
+            .environment(\.appDelegate, AppDelegate())
             .environment(\.careStore, Utility.createPreviewStore())
-			.careKitStyle(Styler())
+            .careKitStyle(Styler())
     }
 }

@@ -537,25 +537,12 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                 return nil
             }
 
-            let surveyViewController = EventQueryContentView<ResearchSurveyView>(
-                query: query
-            ) {
-                EventQueryContentView<ResearchCareForm>(
-                    query: query
-                ) {
-                    ForEach(steps) { step in
-                        ResearchFormStep(
-                            title: task.title,
-                            subtitle: task.instructions
-                        ) {
-                            ForEach(step.questions) { question in
-                                question.view()
-
-                            }
-                        }
-                    }
-                }
-            }
+            let surveyViewController = SurveyCardWithAnswersView(
+                query: query,
+                taskTitle: task.title ?? "Survey",
+                taskInstructions: task.instructions,
+                steps: steps
+            )
             .padding(.vertical, swiftUIPadding)
             .formattedHostingController()
 
@@ -672,6 +659,245 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     }
     #endif
 
+}
+
+private struct SurveyCardWithAnswersView: View {
+    @CareStoreFetchRequest private var events: CareStoreFetchedResults<OCKAnyEvent, OCKEventQuery>
+    @State private var isPresentingAnswers = false
+
+    let query: OCKEventQuery
+    let taskTitle: String
+    let taskInstructions: String?
+    let steps: [SurveyStep]
+
+    init(
+        query: OCKEventQuery,
+        taskTitle: String,
+        taskInstructions: String?,
+        steps: [SurveyStep]
+    ) {
+        self.query = query
+        self.taskTitle = taskTitle
+        self.taskInstructions = taskInstructions
+        self.steps = steps
+        _events = CareStoreFetchRequest(query: query)
+    }
+
+    var body: some View {
+        if let event = events.latest.first?.result, event.isComplete {
+            CompletedSurveyCardView(
+                event: event,
+                isPresentingAnswers: $isPresentingAnswers
+            )
+            .sheet(isPresented: $isPresentingAnswers) {
+                NavigationStack {
+                    ScrollView {
+                        SurveyAnswerSummaryView(
+                            event: event,
+                            questions: steps.flatMap(\.questions),
+                            showsEmptyState: true
+                        )
+                        .padding()
+                    }
+                    .navigationTitle("Survey Answers")
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") {
+                                isPresentingAnswers = false
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            EventQueryContentView<ResearchSurveyView>(
+                query: query
+            ) {
+                EventQueryContentView<ResearchCareForm>(
+                    query: query
+                ) {
+                    ForEach(steps) { step in
+                        ResearchFormStep(
+                            title: taskTitle,
+                            subtitle: taskInstructions
+                        ) {
+                            ForEach(step.questions) { question in
+                                question.view()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct CompletedSurveyCardView: View {
+    let event: OCKAnyEvent
+    @Binding var isPresentingAnswers: Bool
+
+    var body: some View {
+        CardView {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(event.title)
+                            .font(.headline)
+                        Text(scheduleText)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.secondary)
+                }
+
+                Divider()
+
+                HStack(spacing: 10) {
+                    Text("Completed")
+                        .font(.headline)
+                        .foregroundColor(Color(red: 0.70, green: 0.18, blue: 0.20))
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .background(Color.secondary.opacity(0.10))
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                    Button {
+                        isPresentingAnswers = true
+                    } label: {
+                        Label("Survey Answers", systemImage: "list.bullet.clipboard")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, minHeight: 48)
+                    }
+                    .background(Color.accentColor.opacity(0.14))
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                }
+            }
+            .padding()
+        }
+    }
+
+    private var scheduleText: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm"
+        let start = formatter.string(from: event.scheduleEvent.start)
+        let end = formatter.string(from: event.scheduleEvent.end)
+        return "\(start) to \(end)"
+    }
+}
+
+private struct SurveyAnswerSummaryView: View {
+    let event: OCKAnyEvent
+    let questions: [SurveyQuestion]
+    var showsEmptyState = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Survey Answers", systemImage: "list.bullet.clipboard")
+                .font(.headline)
+
+            if answerRows.isEmpty, showsEmptyState {
+                Text("Complete the survey to see your answers here.")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else if !answerRows.isEmpty {
+                ForEach(answerRows) { row in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(row.question)
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(.secondary)
+                        Text(row.answer)
+                            .font(.subheadline)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(10)
+                    .background(Color.secondary.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                }
+            }
+        }
+        .padding(14)
+        .background(Color.accentColor.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private var answerRows: [SurveyAnswerRow] {
+        guard let values = event.outcome?.values else {
+            return []
+        }
+
+        return values.enumerated().compactMap { index, value in
+            let answer = formattedAnswer(for: value)
+            guard !answer.isEmpty else {
+                return nil
+            }
+
+            let question = questionTitle(for: value.kind) ?? "Answer"
+            return SurveyAnswerRow(
+                id: "\(value.kind ?? "answer")-\(index)",
+                question: question,
+                answer: answer
+            )
+        }
+    }
+
+    private func questionTitle(for kind: String?) -> String? {
+        guard let kind else {
+            return nil
+        }
+        return questions.first { $0.id == kind }?.title
+    }
+
+    private func formattedAnswer(for value: OCKOutcomeValue) -> String {
+        if let string = value.value as? String {
+            return string
+        }
+        if let strings = value.value as? [String] {
+            return strings.joined(separator: ", ")
+        }
+        if let strings = value.value as? Set<String> {
+            return strings.sorted().joined(separator: ", ")
+        }
+        if let bool = value.value as? Bool {
+            return bool ? "Yes" : "No"
+        }
+        if let int = value.integerValue {
+            return String(int)
+        }
+        if let double = value.doubleValue {
+            return formattedNumber(double)
+        }
+        if let date = value.value as? Date {
+            return DateFormatter.localizedString(
+                from: date,
+                dateStyle: .medium,
+                timeStyle: .short
+            )
+        }
+        if let data = value.value as? Data {
+            return "\(data.count) bytes"
+        }
+        return String(describing: value.value)
+    }
+
+    private func formattedNumber(_ value: Double) -> String {
+        let rounded = value.rounded()
+        if abs(value - rounded) < 0.001 {
+            return String(Int(rounded))
+        }
+        return String(format: "%.1f", value)
+    }
+}
+
+private struct SurveyAnswerRow: Identifiable {
+    let id: String
+    let question: String
+    let answer: String
 }
 
 @MainActor private func customTaskViewControllers(

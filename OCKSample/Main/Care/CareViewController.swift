@@ -857,12 +857,6 @@ private struct SurveyAnswerSummaryView: View {
         if let string = value.value as? String {
             return string
         }
-        if let strings = value.value as? [String] {
-            return strings.joined(separator: ", ")
-        }
-        if let strings = value.value as? Set<String> {
-            return strings.sorted().joined(separator: ", ")
-        }
         if let bool = value.value as? Bool {
             return bool ? "Yes" : "No"
         }

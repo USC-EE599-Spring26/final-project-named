@@ -261,6 +261,54 @@ extension OCKStore {
         rangeOfMotion.card = .custom
         rangeOfMotion.priority = 4
 
+        let recoveryNoteSchedule = OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: beforeBreakfast,
+                    end: nil,
+                    interval: DateComponents(day: 1),
+                    text: String(localized: "ANYTIME_DURING_DAY"),
+                    targetValues: [],
+                    duration: .allDay
+                )
+            ]
+        )
+        var recoveryNote = OCKTask(
+            id: TaskID.recoveryNote,
+            title: "Recovery Note",
+            carePlanUUID: carePlanUUID,
+            schedule: recoveryNoteSchedule
+        )
+        recoveryNote.impactsAdherence = true
+        recoveryNote.instructions = "Write a short note about your voice, swallowing, or energy today."
+        recoveryNote.asset = "text.bubble.fill"
+        recoveryNote.card = .custom
+        recoveryNote.priority = 6
+
+        let comfortScoreSchedule = OCKSchedule(
+            composing: [
+                OCKScheduleElement(
+                    start: beforeBreakfast,
+                    end: nil,
+                    interval: DateComponents(day: 1),
+                    text: String(localized: "ANYTIME_DURING_DAY"),
+                    targetValues: [],
+                    duration: .allDay
+                )
+            ]
+        )
+        var comfortScore = OCKTask(
+            id: TaskID.comfortScore,
+            title: "Comfort Score",
+            carePlanUUID: carePlanUUID,
+            schedule: comfortScoreSchedule
+        )
+        comfortScore.impactsAdherence = true
+        comfortScore.instructions = "Rate your overall throat and neck comfort from 0 to 10."
+        comfortScore.asset = "gauge"
+        comfortScore.card = .custom
+        comfortScore.priority = 7
+
         var keckResource = OCKTask(
             id: TaskID.keckResource,
             title: "Open Keck Medicine",
@@ -284,6 +332,8 @@ extension OCKStore {
                 neckMobility,
                 stretch,
                 rangeOfMotion,
+                recoveryNote,
+                comfortScore,
                 keckResource,
                 symptomTracking,
                 symptomTrackingWeekly,

@@ -400,6 +400,24 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                             .formattedHostingController()
 
                             return [card]
+                        } else if standardTask.id == TaskID.neckMobility {
+                            let card = EventQueryView<NeckMobilityTaskView>(
+                                query: query
+                            )
+                            .cardEnabled(shouldEnableInteraction)
+                            .padding(.vertical, swiftUIPadding)
+                            .formattedHostingController()
+
+                            return [card]
+                        } else if standardTask.id == TaskID.comfortScore {
+                            let card = EventQueryView<ComfortScoreCardView>(
+                                query: query
+                            )
+                            .cardEnabled(shouldEnableInteraction)
+                            .padding(.vertical, swiftUIPadding)
+                            .formattedHostingController()
+
+                            return [card]
                         } else {
                             let card = EventQueryView<MyCustomCardView>(
                                 query: query

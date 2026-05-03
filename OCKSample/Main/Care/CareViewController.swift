@@ -575,31 +575,30 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
     private func fetchAllOutcomes() {
         let query = OCKOutcomeQuery()
         store.fetchAnyOutcomes(query: query, callbackQueue: .main) { result in
-            switch result {
-            case .success(let outcomes):
-                print("Total \(outcomes.count) results")
-                for outcome in outcomes {
-                    // Get Task ID
-                    let taskUUID = outcome.taskUUID
-                    var taskQuery = OCKTaskQuery()
-                    taskQuery.uuids = [taskUUID]
-                    self.store.fetchAnyTasks(query: taskQuery, callbackQueue: .main) { taskResult in
-                        switch taskResult {
-                        case .success(let tasks):
-                            let taskId = tasks.first?.id ?? "unknown"
-                            print("Task ID: \(taskId)")
-                        case .failure:
-                            print("Task ID: Failed")
+            Task { @MainActor in
+                switch result {
+                case .success(let outcomes):
+                    print("Total \(outcomes.count) results")
+                    for outcome in outcomes {
+                        let taskUUID = outcome.taskUUID
+                        var taskQuery = OCKTaskQuery()
+                        taskQuery.uuids = [taskUUID]
+                        self.store.fetchAnyTasks(query: taskQuery, callbackQueue: .main) { taskResult in
+                            switch taskResult {
+                            case .success(let tasks):
+                                let taskId = tasks.first?.id ?? "unknown"
+                                print("Task ID: \(taskId)")
+                            case .failure:
+                                print("Task ID: Failed")
+                            }
                         }
-                    }
 
-                print("values: \(outcome.values)")
-                print("---")
-            }
-            case .failure(let error):
-                print("Failed: \(error)")
-            default:
-                print("felt")
+                        print("values: \(outcome.values)")
+                        print("---")
+                    }
+                case .failure(let error):
+                    print("Failed: \(error)")
+                }
             }
         }
     }

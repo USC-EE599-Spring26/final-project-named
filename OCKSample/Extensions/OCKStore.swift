@@ -100,7 +100,7 @@ extension OCKStore {
         )
         nausea.impactsAdherence = false
         nausea.instructions = String(localized: "NAUSEA_INSTRUCTIONS")
-        nausea.asset = "waveform.path.ecg"
+        nausea.asset = "logVoice"
         nausea.card = .button
         nausea.priority = 5
 
@@ -206,7 +206,7 @@ extension OCKStore {
         )
         neckMobility.impactsAdherence = true
         neckMobility.instructions = "Tap Begin to follow a gentle guided neck mobility check."
-        neckMobility.asset = "heart.fill"
+        neckMobility.asset = "neckMobility"
         neckMobility.card = .custom
         neckMobility.priority = 4
 
@@ -748,7 +748,7 @@ extension OCKStore {
                 schedule: weeklyEvaluationSchedule
             )
             weeklyEvaluation.impactsAdherence = true
-            weeklyEvaluation.asset = "brain.head.profile"
+            weeklyEvaluation.asset = "weeklyIcon"
             weeklyEvaluation.card = .survey
             weeklyEvaluation.surveySteps = [stepOne, stepTwo]
             weeklyEvaluation.priority = 1

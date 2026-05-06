@@ -1,65 +1,109 @@
-# CareKitSample+ParseCareKit
-![Swift](https://img.shields.io/badge/swift-6.2-brightgreen.svg) ![Xcode 26.0+](https://img.shields.io/badge/xcode-26.0%2B-blue.svg) ![iOS 18.0+](https://img.shields.io/badge/iOS-18.0%2B-blue.svg) ![watchOS 11.0+](https://img.shields.io/badge/watchOS-11.0%2B-blue.svg) ![visionOS 2.4+](https://img.shields.io/badge/visionOS-2.4%2B-blue.svg) ![CareKit 4.0+](https://img.shields.io/badge/CareKit-4.0%2B-red.svg) [![ci](https://github.com/netreconlab/CareKitSample-ParseCareKit/actions/workflows/ci.yml/badge.svg)](https://github.com/netreconlab/CareKitSample-ParseCareKit/actions/workflows/ci.yml)
+<!--
+Name of your final project
+-->
+# ThyroRecover
+![Swift](https://img.shields.io/badge/swift-5.5-brightgreen.svg) ![Xcode 13.2+](https://img.shields.io/badge/xcode-13.2%2B-blue.svg) ![iOS 15.0+](https://img.shields.io/badge/iOS-15.0%2B-blue.svg) ![watchOS 8.0+](https://img.shields.io/badge/watchOS-8.0%2B-blue.svg) ![CareKit 2.1+](https://img.shields.io/badge/CareKit-2.1%2B-red.svg) ![ci](https://github.com/netreconlab/CareKitSample-ParseCareKit/workflows/ci/badge.svg?branch=main)
 
-An example application of [CareKit](https://github.com/carekit-apple/CareKit)'s OCKSample synchronizing CareKit data to the Cloud via [ParseCareKit](https://github.com/netreconlab/ParseCareKit). This project also depends on [CareKitEssentials](https://github.com/netreconlab/CareKitEssentials), which adds several cards and extensions for easier development with CareKit.
+## Description
+<!--
+Give a short description on what your project accomplishes and what tools is uses. Basically, what problems does it solve and why it's different from other apps in the app store.
+-->
+The five-year survival rate of thyroid cancer exceeds $97\%$, but long-term self-management after thyroidectomy remains critical for preventing complications and recurrence. However, existing mobile health applications for post-thyroidectomy rehabilitation lack targeted multidimensional support, particularly in personalized symptom tracking, intelligent follow-up scheduling, and psychological assistance. These gaps lead to significant deficiencies in out-of-hospital management, including suboptimal patient adherence, fragmented clinician-patient communication, and a scarcity of standardized self-management tools. 
+To address these challenges, we propose ThyroRecover, a specialized iOS rehabilitation application built on Apple’s open-source CareKit framework. Based on the OCKSample project, ThyroRecover provides ERAS-aligned recovery tasks, including voice and swallowing discomfort tracking, early ambulation goals, hydration reminders, and structured daily check-ins. The system further integrates ResearchKit to support thyroid anatomy education, neck range-of-motion assessment, and structured symptom surveys, while SwiftUI Charts are used to present multidimensional recovery trends. In addition, ThyroRecover incorporates authoritative patient education resources from MD Anderson Cancer Center and an AI recovery coach based on a small language model, which analyzes recent recovery signals to generate personalized trend summaries and recovery guidance. Together, these components provide a standardized, intelligent, and adaptive platform for post-thyroidectomy rehabilitation.
 
-<img src="https://github.com/netreconlab/CareKitSample-ParseCareKit/assets/8621344/4e57796b-5c81-474d-bd8d-dfd9f18327e3" width="300"> <img src="https://github.com/netreconlab/CareKitSample-ParseCareKit/assets/8621344/d60d194a-87a5-41e9-8ae4-41a847e91ea3" width="300"> <img src="https://github.com/netreconlab/CareKitSample-ParseCareKit/assets/8621344/ca0ac2e0-d17d-4bae-88fd-f59b94812419" width="300"><img src="https://github.com/netreconlab/CareKitSample-ParseCareKit/assets/8621344/3be47269-cfde-4de2-94ae-25a60f06cac9" width="300">
-<img src="https://github.com/user-attachments/assets/873c97a9-006d-4edf-a675-ffb1baeb29c8" width="600">
+### Demo Video
+<!--
+Add the public link to your YouTube or video posted elsewhere.
+-->
+To learn more about this application, watch the video below:
 
-**Similar to the [What's New in CareKit](https://developer.apple.com/videos/play/wwdc2020/10151/) WWDC20 video, this app syncs data between iOS and an Apple Watch (setting the flag `isSyncingWithRemote` in `Constants.swift` to `isSyncingWithRemote = false.` Different from the video, setting `isSyncingWithRemote = true` (default behavior) in the aforementioned file syncs iOS and watchOS to a Parse Server.**
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=mib_YioKAQQ
+" target="_blank"><img src="http://img.youtube.com/vi/mib_YioKAQQ/0.jpg" 
+alt="Sample demo video" width="240" height="180" border="10" /></a>
 
-**If you want to populate random sample OCKOutcomes for events in the past, for example to view data in the InsightsView when testing, set 
-`daysInThePastToGenerateSampleData` to a negative number in `Constants.swift`.**
+### Designed for the following users
+<!--
+Describe the types of users your app is designed for and who will benefit from your app.
+-->
 
-ParseCareKit synchronizes the following entities to Parse tables/classes using [Parse-Swift](https://github.com/netreconlab/Parse-Swift):
+<!--
+In addition, you can drop screenshots directly into your README file to add them to your README. Take these from your presentations.
+-->
+<img src="https://user-images.githubusercontent.com/8621344/101721031-06869500-3a75-11eb-9631-88927e9c8f00.png" width="300"> <img src="https://user-images.githubusercontent.com/8621344/101721111-33d34300-3a75-11eb-885e-4a6fc96dbd35.png" width="300"> <img src="https://user-images.githubusercontent.com/8621344/101721146-48afd680-3a75-11eb-955a-7848146a9d6f.png" width="300"><img src="https://user-images.githubusercontent.com/8621344/101721182-5cf3d380-3a75-11eb-99c9-bde40477acf3.png" width="300">
 
-- [x] OCKPatient <-> Patient
-- [x] OCKCarePlan <-> CarePlan
-- [x] OCKContact <-> Contact
+<!--
+List all of the members who developed the project and
+link to each members respective GitHub profile
+-->
+Developed by: 
+- [member1](https://github.com/Shoma-xyl) - `University of Southern California`, `MAJOR`
+- [member2](https://github.com/ruizhe-usc) - `University of Southern California`, `MAJOR`
+ParseCareKit synchronizes the following entities to Parse tables/classes using [Parse-Swift](https://github.com/parse-community/Parse-Swift):
+
 - [x] OCKTask <-> Task
 - [x] OCKHealthKitTask <-> HealthKitTask 
 - [x] OCKOutcome <-> Outcome
-- [x] OCKRevisionRecord <-> RevisionRecord
+- [x] OCKRevisionRecord.KnowledgeVector <-> Clock
+- [x] OCKPatient <-> Patient
+- [x] OCKCarePlan <-> CarePlan
+- [x] OCKContact <-> Contact
 
 **Use at your own risk. There is no promise that this is HIPAA compliant and we are not responsible for any mishandling of your data**
+
+<!--
+What features were added by you, this should be descriptions of features added from the [Code](https://uk.instructure.com/courses/2030626/assignments/11151475) and [Demo](https://uk.instructure.com/courses/2030626/assignments/11151413) parts of the final. Feel free to add any figures that may help describe a feature. Note that there should be information here about how the OCKTask/OCKHealthTask's and OCKCarePlan's you added pertain to your app.
+-->
+## Contributions/Features
+
+## Final Checklist
+<!--
+This is from the checkist from the final [Code](https://uk.instructure.com/courses/2030626/assignments/11151475). You should mark completed items with an x and leave non-completed items empty
+-->
+- [ ] Signup/Login screen tailored to app
+- [ ] Signup/Login with email address
+- [ ] Custom app logo
+- [ ] Custom styling
+- [ ] Add at least **5 new OCKTask/OCKHealthKitTasks** to your app
+  - [ ] Have a minimum of 7 OCKTask/OCKHealthKitTasks in your app
+  - [ ] 3/7 of OCKTasks should have different OCKSchedules than what's in the original app
+- [ ] Use at least 5/7 card below in your app
+  - [ ] InstructionsTaskView - typically used with a OCKTask
+  - [ ] SimpleTaskView - typically used with a OCKTask
+  - [ ] Checklist - typically used with a OCKTask
+  - [ ] Button Log - typically used with a OCKTask
+  - [ ] GridTaskView - typically used with a OCKTask
+  - [ ] NumericProgressTaskView (SwiftUI) - typically used with a OCKHealthKitTask
+  - [ ] LabeledValueTaskView (SwiftUI) - typically used with a OCKHealthKitTask
+- [ ] Add the LinkView (SwiftUI) card to your app
+- [ ] Replace the current TipView with a class with CustomFeaturedContentView that subclasses OCKFeaturedContentView. This card should have an initializer which takes any link
+- [ ] Tailor the ResearchKit Onboarding to reflect your application
+- [ ] Add tailored check-in ResearchKit survey to your app
+- [ ] Add a new tab called "Insights" to MainTabView
+- [ ] Replace current ContactView with Searchable contact view
+- [ ] Change the ProfileView to use a Form view
+- [ ] Add at least two OCKCarePlan's and tie them to their respective OCKTask's and OCContact's 
+
+## Wishlist features
+<!--
+Describe at least 3 features you want to add in the future before releasing your app in the app-store
+-->
+1. We hope we can impove our 3D module. In the future, we want to connect this feature with current hosptical medical image sytem that allows doctors directly send patients' thyroid 3D model to the application. In this way, patients can understand why and how their surgery operation go, which help patients have more confidence and power focus on reliabilitation. 
+2. feature two
+3. feature three
+
+## Challenges faced while developing
+<!--
+Describe any challenges you faced with learning Swift, your baseline app, or adding features. You can describe how you overcame them.
+-->
 
 ## Setup Your Parse Server
 
 ### Heroku
-The easiest way to setup your server is using the [one-button-click](https://github.com/netreconlab/parse-hipaa#heroku) deployment method for [parse-hipaa](https://github.com/netreconlab/parse-hipaa).
+The easiest way to setup your server is using the [one-button-click](https://github.com/netreconlab/parse-hipaa#heroku) deplyment method for [parse-hipaa](https://github.com/netreconlab/parse-hipaa).
 
-### Docker
-You can setup your [parse-hipaa](https://github.com/netreconlab/parse-hipaa) using Docker. Simply type the following to get parse-hipaa running with postgres locally:
-
-1. Fork [parse-hipaa](https://github.com/netreconlab/parse-hipaa)
-2. `cd parse-hipaa`
-3.  `docker-compose up` - this will take a couple of minutes to setup as it needs to initialize postgres, but as soon as you see `parse-server running on port 1337.`, it's ready to go. See [here](https://github.com/netreconlab/parse-hipaa#getting-started) for details
-4. If you would like to use mongo instead of postgres, in step 3, type `docker-compose -f docker-compose.mongo.yml up` instead of `docker-compose up`
-
-## Fork this repo to get the modified OCKSample app
-
-1. Fork [CareKitSample-ParseCareKit](https://github.com/netreconlab/CareKitSample-ParseCareKit)
-2. Open `OCKSample.xcodeproj` in Xcode
-3. You may need to configure your "Team" and "Bundle Identifier" in "Signing and Capabilities"
-4. Run the app and data will synchronize with parse-hipaa via http://localhost:1337/parse automatically
-5. You can edit Parse server setup in the ParseCareKit.plist file under "Supporting Files" in the Xcode browser
 
 ## View your data in Parse Dashboard
 
 ### Heroku
-The easiest way to setup your dashboard is using the [one-button-click](https://github.com/netreconlab/parse-hipaa-dashboard#heroku) deployment method for [parse-hipaa-dashboard](https://github.com/netreconlab/parse-hipaa-dashboard).
+The easiest way to setup your dashboard is using the [one-button-click](https://github.com/netreconlab/parse-hipaa-dashboard#heroku) deplyment method for [parse-hipaa-dashboard](https://github.com/netreconlab/parse-hipaa-dashboard).
 
-### Docker
-Parse Dashboard is the easiest way to view your data in the Cloud (or local machine in this example) and comes with [parse-hipaa](https://github.com/netreconlab/parse-hipaa). To access:
-1. Open your browser and go to http://localhost:4040/dashboard
-2. Username: `parse`
-3. Password: `1234`
-4. Be sure to refresh your browser to see new changes synched from your CareKitSample app
-
-Note that CareKit data is extremely sensitive and you are responsible for ensuring your parse-server meets HIPAA compliance.
-
-## Transitioning the sample app to a production app
-If you plan on using this app as a starting point for your produciton app. Once you have your parse-hipaa server in the Cloud behind ssl, you should open `ParseCareKit.plist` in Xcode and change the value for `Server` to point to your server(s) in the Cloud. You should also open `Info.plist` in Xcode and remove `App Transport Security Settings` and any key/value pairs under it as this was only in place to allow you to test the sample app to connect to a server setup on your local machine. iOS apps do not allow non-ssl connections in production, and even if you find a way to connect to non-ssl servers, it would not be HIPAA compliant.
-
-### Extra scripts for optimized Cloud queries
-You should run the extra scripts outlined on parse-hipaa [here](https://github.com/netreconlab/parse-hipaa#running-in-production-for-parsecarekit).

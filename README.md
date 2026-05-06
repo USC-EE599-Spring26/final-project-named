@@ -36,8 +36,9 @@ List all of the members who developed the project and
 link to each members respective GitHub profile
 -->
 Developed by: 
-- [Yuxin Xu](https://github.com/Shoma-xyl) - `University of Southern California`, `MAJOR`
-- [Ruizhe Zhou](https://github.com/ruizhe-usc) - `University of Southern California`, `MAJOR`
+- [Yuxin Xu](https://github.com/Shoma-xyl) - `University of Southern California`, `Computer Engineering`
+- [Ruizhe Zhou](https://github.com/ruizhe-usc) - `University of Southern California`, `Electrical Engineering`
+  
 ParseCareKit synchronizes the following entities to Parse tables/classes using [Parse-Swift](https://github.com/parse-community/Parse-Swift):
 
 - [x] OCKTask <-> Task

@@ -1,4 +1,3 @@
-<img width="962" height="300" alt="截屏2026-03-24 08 44 15" src="https://github.com/user-attachments/assets/6e2b6b55-8276-4171-ac57-9f6bb685dbe3" />
 <!--
 Name of your final project
 -->

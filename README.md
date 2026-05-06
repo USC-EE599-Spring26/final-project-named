@@ -1,3 +1,4 @@
+<img width="962" height="300" alt="截屏2026-03-24 08 44 15" src="https://github.com/user-attachments/assets/6e2b6b55-8276-4171-ac57-9f6bb685dbe3" />
 <!--
 Name of your final project
 -->
@@ -25,11 +26,11 @@ alt="Sample demo video" width="240" height="180" border="10" /></a>
 <!--
 Describe the types of users your app is designed for and who will benefit from your app.
 -->
-
+The app is designed to support individuals recovering from thyroid cancer surgery during the post-surgery aftercare and rehabilitation. Many patients face challenges such as managing medications, monitoring symptoms, and understanding their recovery. This application helps users track their daily and weekly symptoms, generate visual charts to monitor progress, and receive guidance on the next steps in their rehabilitation, making it easier to stay informed and actively manage their health.
 <!--
 In addition, you can drop screenshots directly into your README file to add them to your README. Take these from your presentations.
 -->
-<img src="https://user-images.githubusercontent.com/8621344/101721031-06869500-3a75-11eb-9631-88927e9c8f00.png" width="300"> <img src="https://user-images.githubusercontent.com/8621344/101721111-33d34300-3a75-11eb-885e-4a6fc96dbd35.png" width="300"> <img src="https://user-images.githubusercontent.com/8621344/101721146-48afd680-3a75-11eb-955a-7848146a9d6f.png" width="300"><img src="https://user-images.githubusercontent.com/8621344/101721182-5cf3d380-3a75-11eb-99c9-bde40477acf3.png" width="300">
+<img src="https://user-images.githubusercontent.com/8621344/101721031-06869500-3a75-11eb-9631-88927e9c8f00.png" width="300"> <img src="https://user-images.githubusercontent.com/8621344/101721111-33d34300-3a75-11eb-885e-4a6fc96dbd35.png" width="300"> <img src="https://user-images.githubusercontent.com/8621344/101721146-48afd680-3a75-11eb-955a-7848146a9d6f.png" width="300">
 
 <!--
 List all of the members who developed the project and

@@ -63,25 +63,25 @@ This is from the checkist from the final [Code](https://uk.instructure.com/cours
 - [x] Signup/Login with email address
 - [x] Custom app logo
 - [x] Custom styling
-- [ x] Add at least **5 new OCKTask/OCKHealthKitTasks** to your app
-  - [ x] Have a minimum of 7 OCKTask/OCKHealthKitTasks in your app
-  - [ x] 3/7 of OCKTasks should have different OCKSchedules than what's in the original app
-- [ x] Use at least 5/7 card below in your app
-  - [ x] InstructionsTaskView - typically used with a OCKTask
-  - [ ] SimpleTaskView - typically used with a OCKTask
-  - [ ] Checklist - typically used with a OCKTask
-  - [ ] Button Log - typically used with a OCKTask
+- [x] Add at least **5 new OCKTask/OCKHealthKitTasks** to your app
+  - [x] Have a minimum of 7 OCKTask/OCKHealthKitTasks in your app
+  - [x] 3/7 of OCKTasks should have different OCKSchedules than what's in the original app
+- [x] Use at least 5/7 card below in your app
+  - [x] InstructionsTaskView - typically used with a OCKTask
+  - [x] SimpleTaskView - typically used with a OCKTask
+  - [x] Checklist - typically used with a OCKTask
+  - [x] Button Log - typically used with a OCKTask
   - [ ] GridTaskView - typically used with a OCKTask
-  - [x ] NumericProgressTaskView (SwiftUI) - typically used with a OCKHealthKitTask
-  - [ x] LabeledValueTaskView (SwiftUI) - typically used with a OCKHealthKitTask
+  - [x] NumericProgressTaskView (SwiftUI) - typically used with a OCKHealthKitTask
+  - [x] LabeledValueTaskView (SwiftUI) - typically used with a OCKHealthKitTask
 - [x] Add the LinkView (SwiftUI) card to your app
-- [x ] Replace the current TipView with a class with CustomFeaturedContentView that subclasses OCKFeaturedContentView. This card should have an initializer which takes any link
-- [x ] Tailor the ResearchKit Onboarding to reflect your application
-- [ x] Add tailored check-in ResearchKit survey to your app
-- [ x] Add a new tab called "Insights" to MainTabView
-- [x ] Replace current ContactView with Searchable contact view
-- [ x] Change the ProfileView to use a Form view
-- [ x] Add at least two OCKCarePlan's and tie them to their respective OCKTask's and OCContact's 
+- [x] Replace the current TipView with a class with CustomFeaturedContentView that subclasses OCKFeaturedContentView. This card should have an initializer which takes any link
+- [x] Tailor the ResearchKit Onboarding to reflect your application
+- [x] Add tailored check-in ResearchKit survey to your app
+- [x] Add a new tab called "Insights" to MainTabView
+- [x] Replace current ContactView with Searchable contact view
+- [x] Change the ProfileView to use a Form view
+- [x] Add at least two OCKCarePlan's and tie them to their respective OCKTask's and OCContact's 
 
 ## Wishlist features
 <!--

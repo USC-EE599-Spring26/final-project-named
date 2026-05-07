@@ -133,6 +133,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
                     self.navigationItem.rightBarButtonItem?.tintColor = .red
                 } else {
                     self.navigationItem.rightBarButtonItem?.tintColor = self.navigationItem.leftBarButtonItem?.tintColor
+                    self.reload()
                 }
                 self.isSyncing = false
             }

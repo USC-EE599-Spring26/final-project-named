@@ -96,10 +96,6 @@ class LoginViewModel: ObservableObject {
         // Notify the SwiftUI view that the user is correctly logged in and to transition screens
         await checkStatus()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            NotificationCenter.default.post(.init(name: Notification.Name(rawValue: Constants.requestSync)))
-        }
-
         // Setup installation to receive push notifications
         await Utility.updateInstallationWithDeviceToken()
     }
@@ -120,6 +116,7 @@ class LoginViewModel: ObservableObject {
         guard let appDelegate = AppDelegateKey.defaultValue else {
             throw AppError.couldntBeUnwrapped
         }
+        await Utility.deleteCareStore(named: Constants.iOSParseCareStoreName)
         try await appDelegate.setupRemotes(uuid: remoteUUID)
 
         var newPatient = OCKPatient(
@@ -167,9 +164,6 @@ class LoginViewModel: ObservableObject {
             )
         }
         appDelegate.parseRemote.automaticallySynchronizes = true
-
-        // Post notification to sync
-        NotificationCenter.default.post(.init(name: Notification.Name(rawValue: Constants.requestSync)))
         Logger.login.info("Successfully added a new Patient")
         return savedPatient
     }
@@ -207,7 +201,12 @@ class LoginViewModel: ObservableObject {
             let patient = try await savePatientAfterSignUp(type,
                                                            firstName: firstName,
                                                            lastName: lastName)
-            try? await finishCompletingSignIn(patient)
+            try await finishCompletingSignIn(patient)
+            do {
+                try await Utility.synchronizeCurrentStore()
+            } catch {
+                Logger.login.error("Could not synchronize new patient data after signup: \(error)")
+            }
         } catch {
             Logger.login.error("Error details: \(error)")
             guard let parseError = error as? ParseError else {
@@ -277,7 +276,12 @@ class LoginViewModel: ObservableObject {
             let patient = try await savePatientAfterSignUp(.patient,
                                                            firstName: "Anonymous",
                                                            lastName: "Login")
-            try? await finishCompletingSignIn(patient)
+            try await finishCompletingSignIn(patient)
+            do {
+                try await Utility.synchronizeCurrentStore()
+            } catch {
+                Logger.login.error("Could not synchronize anonymous patient data after login: \(error)")
+            }
         } catch {
             // swiftlint:disable:next line_length
             Logger.login.error("*** Error logging into Parse Server. If you are still having problems check for help here: https://github.com/netreconlab/parse-hipaa#getting-started ***")

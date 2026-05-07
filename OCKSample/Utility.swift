@@ -14,13 +14,15 @@ import ParseSwift
 import os.log
 
 class Utility {
+    @MainActor
+    private static var isSynchronizingCurrentStore = false
 
     static func convertNonSendableDictionaryToSendable(_ dictionary: [String: Any]) -> [String: String] {
-		let sendableDictionary: [String: String] = dictionary.reduce(into: [:]) {
-			$0[$1.key] = $1.value as? String
-		}
-		return sendableDictionary
-	}
+        let sendableDictionary: [String: String] = dictionary.reduce(into: [:]) {
+            $0[$1.key] = $1.value as? String
+        }
+        return sendableDictionary
+    }
 
     static func prepareSyncMessageForWatch() -> [String: String] {
         var returnMessage = [String: String]()
@@ -63,8 +65,14 @@ class Utility {
             Logger.utility.error("Could not setup remotes, AppDelegate is nil")
             return
         }
+        await deleteCareStore(named: Constants.iOSParseCareStoreName)
         try await appDelegate.setupRemotes(uuid: remoteUUID)
         appDelegate.parseRemote.automaticallySynchronizes = true
+        do {
+            try await synchronizeCurrentStore()
+        } catch {
+            Logger.utility.error("Could not synchronize store after login: \(error)")
+        }
         return
     }
 
@@ -91,23 +99,23 @@ class Utility {
         }
         let installation = currentInstallation
         let isUpdatingInstallation = isUpdatingInstallationMutable
-		do {
-			if isUpdatingInstallation {
-				let updatedInstallation = try await installation.save()
-				Logger.utility.info("""
-					Updated installation: \(updatedInstallation, privacy: .private)
-				""")
-			} else {
-				let updatedInstallation = try await installation.create()
-				Logger.utility.info("""
-					Created installation: \(updatedInstallation, privacy: .private)
-				""")
-			}
-		} catch {
-			Logger.utility.error("""
-				Could not update installation: \(error)
-			""")
-		}
+        do {
+            if isUpdatingInstallation {
+                let updatedInstallation = try await installation.save()
+                Logger.utility.info("""
+                    Updated installation: \(updatedInstallation, privacy: .private)
+                """)
+            } else {
+                let updatedInstallation = try await installation.create()
+                Logger.utility.info("""
+                    Created installation: \(updatedInstallation, privacy: .private)
+                """)
+            }
+        } catch {
+            Logger.utility.error("""
+                Could not update installation: \(error)
+            """)
+        }
     }
 
     static func createPreviewStore() -> OCKStore {
@@ -119,27 +127,27 @@ class Utility {
                 _ = try await store.fetchPatient(withID: patientId)
             } catch {
                 var patient = OCKPatient(
-					id: patientId,
-					givenName: "Preview",
-					familyName: "Patient"
-				)
+                    id: patientId,
+                    givenName: "Preview",
+                    familyName: "Patient"
+                )
                 patient.birthday = Calendar.current.date(
-					byAdding: .year,
-					value: -20,
-					to: Date()
-				)
+                    byAdding: .year,
+                    value: -20,
+                    to: Date()
+                )
                 _ = try? await store.addPatient(patient)
-				let startDate = Calendar.current.date(
-					byAdding: .day,
-					value: -30,
-					to: Date()
-				)!
+                let startDate = Calendar.current.date(
+                    byAdding: .day,
+                    value: -30,
+                    to: Date()
+                )!
                 try? await store.populateDefaultCarePlansTasksContacts(
-					startDate: startDate
-				)
-				try? await store.populateSampleOutcomes(
-					startDate: startDate
-				)
+                    startDate: startDate
+                )
+                try? await store.populateSampleOutcomes(
+                    startDate: startDate
+                )
             }
         }
         return store
@@ -196,21 +204,63 @@ class Utility {
         }
     }
 
-	@MainActor
-	static func logoutAndResetAppState() async {
-		do {
-			try await User.logout()
-		} catch {
-			Logger.utility.error("Error logging out: \(error)")
-		}
-		AppDelegateKey.defaultValue?.resetAppToInitialState()
-		PCKUtility.removeCache()
-	}
+    @MainActor
+    static func logoutAndResetAppState() async {
+        if isSyncingWithRemote {
+            do {
+                try await synchronizeCurrentStore()
+            } catch {
+                Logger.utility.error("Could not synchronize store before logout: \(error)")
+            }
+        }
+        do {
+            try await User.logout()
+        } catch {
+            Logger.utility.error("Error logging out: \(error)")
+        }
+        AppDelegateKey.defaultValue?.resetAppToInitialState()
+        PCKUtility.removeCache()
+    }
+
+    @MainActor
+    static func synchronizeCurrentStore() async throws {
+        guard !isSynchronizingCurrentStore else {
+            return
+        }
+        guard let store = AppDelegateKey.defaultValue?.store else {
+            return
+        }
+
+        isSynchronizingCurrentStore = true
+        defer {
+            isSynchronizingCurrentStore = false
+        }
+
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            store.synchronize { error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
+        }
+    }
+
+    @MainActor
+    static func deleteCareStore(named storeName: String) async {
+        let store = OCKStore(name: storeName, type: .onDisk())
+        do {
+            try store.delete()
+        } catch {
+            Logger.utility.error("Could not delete OCKStore named \(storeName) because of error: \(error)")
+        }
+    }
 
     #if os(iOS) || os(visionOS)
-	@MainActor
-	static func requestHealthKitPermissions() {
-		AppDelegateKey.defaultValue?.healthKitStore.requestHealthKitPermissionsForAllTasksInStore { error in
+    @MainActor
+    static func requestHealthKitPermissions() {
+        AppDelegateKey.defaultValue?.healthKitStore.requestHealthKitPermissionsForAllTasksInStore { error in
             guard let error = error else {
                 DispatchQueue.main.async {
                     // swiftlint:disable:next line_length

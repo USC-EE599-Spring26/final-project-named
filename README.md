@@ -1,65 +1,156 @@
-# CareKitSample+ParseCareKit
-![Swift](https://img.shields.io/badge/swift-6.2-brightgreen.svg) ![Xcode 26.0+](https://img.shields.io/badge/xcode-26.0%2B-blue.svg) ![iOS 18.0+](https://img.shields.io/badge/iOS-18.0%2B-blue.svg) ![watchOS 11.0+](https://img.shields.io/badge/watchOS-11.0%2B-blue.svg) ![visionOS 2.4+](https://img.shields.io/badge/visionOS-2.4%2B-blue.svg) ![CareKit 4.0+](https://img.shields.io/badge/CareKit-4.0%2B-red.svg) [![ci](https://github.com/netreconlab/CareKitSample-ParseCareKit/actions/workflows/ci.yml/badge.svg)](https://github.com/netreconlab/CareKitSample-ParseCareKit/actions/workflows/ci.yml)
+<!--
+Name of your final project
+-->
+# ThyroRecover
+![Swift](https://img.shields.io/badge/swift-5.5-brightgreen.svg) ![Xcode 13.2+](https://img.shields.io/badge/xcode-13.2%2B-blue.svg) ![iOS 15.0+](https://img.shields.io/badge/iOS-15.0%2B-blue.svg) ![watchOS 8.0+](https://img.shields.io/badge/watchOS-8.0%2B-blue.svg) ![CareKit 2.1+](https://img.shields.io/badge/CareKit-2.1%2B-red.svg) ![ci](https://github.com/netreconlab/CareKitSample-ParseCareKit/workflows/ci/badge.svg?branch=main)
 
-An example application of [CareKit](https://github.com/carekit-apple/CareKit)'s OCKSample synchronizing CareKit data to the Cloud via [ParseCareKit](https://github.com/netreconlab/ParseCareKit). This project also depends on [CareKitEssentials](https://github.com/netreconlab/CareKitEssentials), which adds several cards and extensions for easier development with CareKit.
+## Description
+<!--
+Give a short description of what your project accomplishes and what tools it uses. Basically, what problems does it solve and why is it different from other apps in the app store?
+-->
+The five-year survival rate of thyroid cancer exceeds 97%, but long-term self-management after thyroidectomy remains critical for preventing complications and recurrence. However, existing mobile health applications for post-thyroidectomy rehabilitation lack targeted multidimensional support, particularly in personalized symptom tracking, intelligent follow-up scheduling, and psychological assistance. These gaps lead to significant deficiencies in out-of-hospital management, including suboptimal patient adherence, fragmented clinician-patient communication, and a scarcity of standardized self-management tools. 
+To address these challenges, we propose ThyroRecover, a specialized iOS rehabilitation application built on Apple’s open-source CareKit framework. Based on the OCKSample project, ThyroRecover provides ERAS-aligned recovery tasks, including tracking voice and swallowing discomfort, setting early ambulation goals, hydration reminders, and structured daily check-ins. The system further integrates ResearchKit to support thyroid anatomy education, neck range-of-motion assessment, and structured symptom surveys, while SwiftUI Charts are used to present multidimensional recovery trends. In addition, ThyroRecover incorporates authoritative patient education resources from MD Anderson Cancer Center and an AI recovery coach powered by a small language model that analyzes recent recovery signals to generate personalized trend summaries and recovery guidance. Together, these components provide a standardized, intelligent, and adaptive platform for post-thyroidectomy rehabilitation.
 
-<img src="https://github.com/netreconlab/CareKitSample-ParseCareKit/assets/8621344/4e57796b-5c81-474d-bd8d-dfd9f18327e3" width="300"> <img src="https://github.com/netreconlab/CareKitSample-ParseCareKit/assets/8621344/d60d194a-87a5-41e9-8ae4-41a847e91ea3" width="300"> <img src="https://github.com/netreconlab/CareKitSample-ParseCareKit/assets/8621344/ca0ac2e0-d17d-4bae-88fd-f59b94812419" width="300"><img src="https://github.com/netreconlab/CareKitSample-ParseCareKit/assets/8621344/3be47269-cfde-4de2-94ae-25a60f06cac9" width="300">
-<img src="https://github.com/user-attachments/assets/873c97a9-006d-4edf-a675-ffb1baeb29c8" width="600">
+### Demo Video
+<!--
+Add the public link to your YouTube or video posted elsewhere.
+-->
+To learn more about this application, watch the video below:
 
-**Similar to the [What's New in CareKit](https://developer.apple.com/videos/play/wwdc2020/10151/) WWDC20 video, this app syncs data between iOS and an Apple Watch (setting the flag `isSyncingWithRemote` in `Constants.swift` to `isSyncingWithRemote = false.` Different from the video, setting `isSyncingWithRemote = true` (default behavior) in the aforementioned file syncs iOS and watchOS to a Parse Server.**
+<a href="https://youtu.be/qLOPrCSr2uc" target="_blank"><img width="320" height="180" alt="mq1" src="https://github.com/user-attachments/assets/46215a27-7cf8-4183-a802-615165f5f672" /></a>
 
-**If you want to populate random sample OCKOutcomes for events in the past, for example to view data in the InsightsView when testing, set 
-`daysInThePastToGenerateSampleData` to a negative number in `Constants.swift`.**
 
-ParseCareKit synchronizes the following entities to Parse tables/classes using [Parse-Swift](https://github.com/netreconlab/Parse-Swift):
 
-- [x] OCKPatient <-> Patient
-- [x] OCKCarePlan <-> CarePlan
-- [x] OCKContact <-> Contact
+
+
+### Designed for the following users
+<!--
+Describe the types of users your app is designed for and who will benefit from your app.
+-->
+The app is designed to support individuals recovering from thyroid cancer surgery during the post-surgery aftercare and rehabilitation. Many patients face challenges such as managing medications, monitoring symptoms, and understanding their recovery. This application helps users track their daily and weekly symptoms, generate visual charts to monitor progress, and receive guidance on the next steps in their rehabilitation, making it easier to stay informed and actively manage their health.
+<!--
+In addition, you can drop screenshots directly into your README file to add them to your README. Take these from your presentations.
+-->
+- Login and Sign Up Page
+<img width="279" height="304" alt="image" src="https://github.com/user-attachments/assets/25a908e4-b6ce-4e6c-84cc-17d64a570f0d" />
+
+- Onboarding Page
+<img width="1352" height="582" alt="image" src="https://github.com/user-attachments/assets/345cb9c6-52ad-410e-840c-b8f0ab70a924" />
+
+- Home Page
+<img width="959" height="308" alt="image" src="https://github.com/user-attachments/assets/c70038fd-0602-4e41-b354-cafda0db182d" />
+
+- Insight Data Display
+<img width="137" height="289" alt="image" src="https://github.com/user-attachments/assets/bd8cb05d-7bb9-48ca-ba18-5cea882db6e7" />
+
+- Key Features:
+1. Daily and Weekly Survey
+<img width="697" height="295" alt="image" src="https://github.com/user-attachments/assets/ed8c9c0a-9d80-44ff-8c65-29a17b319c84" />
+
+2. 3D Education Model
+<img width="281" height="152" alt="image" src="https://github.com/user-attachments/assets/9ce3e8c0-1131-43ad-9019-a5c44741bdb5" />
+
+3. Recover Note
+<img width="236" height="257" alt="image" src="https://github.com/user-attachments/assets/a013c64a-9a86-4246-8f6f-72e6843e2ac3" />
+
+4. Comfort Score
+<img width="392" height="285" alt="image" src="https://github.com/user-attachments/assets/bfa90df9-6deb-4a82-b72f-875414738ccb" />
+
+5. Small Language Model (SLM) Suggestions
+<img width="897" height="239" alt="image" src="https://github.com/user-attachments/assets/746839cd-fb9f-4161-b5f0-6ed1e75b56b9" />
+
+The SLM took at least 3 days of data(as shown above) to analyze patients'  recovery treatment  and give suggestions as shown below
+
+<img width="169" height="352" alt="image" src="https://github.com/user-attachments/assets/1d6ee407-4c31-4d78-85cd-90213237a13d" />
+
+
+<!--
+List all of the members who developed the project and
+link to each members respective GitHub profile
+-->
+
+Developed by: 
+- [Yuxin Xu](https://github.com/Shoma-xyl) - `University of Southern California`, `Computer Engineering`
+- [Ruizhe Zhou](https://github.com/ruizhe-usc) - `University of Southern California`, `Electrical Engineering`
+  
+ParseCareKit synchronizes the following entities to Parse tables/classes using [Parse-Swift](https://github.com/parse-community/Parse-Swift):
+
 - [x] OCKTask <-> Task
 - [x] OCKHealthKitTask <-> HealthKitTask 
 - [x] OCKOutcome <-> Outcome
-- [x] OCKRevisionRecord <-> RevisionRecord
+- [x] OCKRevisionRecord.KnowledgeVector <-> Clock
+- [x] OCKPatient <-> Patient
+- [x] OCKCarePlan <-> CarePlan
+- [x] OCKContact <-> Contact
 
 **Use at your own risk. There is no promise that this is HIPAA compliant and we are not responsible for any mishandling of your data**
+
+<!--
+What features were added by you, this should be descriptions of features added from the [Code](https://uk.instructure.com/courses/2030626/assignments/11151475) and [Demo](https://uk.instructure.com/courses/2030626/assignments/11151413) parts of the final. Feel free to add any figures that may help describe a feature. Note that there should be information here about how the OCKTask/OCKHealthTask's and OCKCarePlan's you added pertain to your app.
+-->
+## Contributions/Features
+
+- Custom onboarding task using ResearchKit, including welcome step, consent/signature page, permission request, and completion flow.
+- Add onboarding that users must finish before the rest of the Care page tasks are shown.
+- Add Range of Motion and Neck Mobility custom CareKit tasks that launch ResearchKit active tasks and record device motion to neck check.
+- Add daily symptom tracking and weekly evaluation survey tasks for thyroid recovery, and display the answer
+- Add iOS Contacts import using `CNContactPickerViewController`, converting `CNContact` into `OCKContact`, and a searchable Contact page using `UISearchController`.
+- Added Profile editing for patient and contact/address information using a ViewModel-based structure.
+- Added custom task creation and task deletion from the Profile page.
+- Added HealthKit-backed task creation support for data like step count and resting heart rate.
+- Added Thyroid 3D Model education task using `Thyroid.usdz`, `ORKUSDZModelManager`, and `ORK3DModelStep`.
+- Added AI Recovery Advice tab that builds recent recovery summaries from CareKit data and calls a local Ollama model, `thyro-qwen3`.
+- Added thyroid recovery-specific UI content such as voice recovery tips, recovery resource links, and post-surgery-focused task instructions.
+
+## Final Checklist
+<!--
+This is from the checkist from the final [Code](https://uk.instructure.com/courses/2030626/assignments/11151475). You should mark completed items with an x and leave non-completed items empty
+-->
+- [x] Signup/Login screen tailored to app
+- [x] Signup/Login with email address
+- [x] Custom app logo
+- [x] Custom styling
+- [x] Add at least **5 new OCKTask/OCKHealthKitTasks** to your app
+  - [x] Have a minimum of 7 OCKTask/OCKHealthKitTasks in your app
+  - [x] 3/7 of OCKTasks should have different OCKSchedules than what's in the original app
+- [x] Use at least 5/7 card below in your app
+  - [x] InstructionsTaskView - typically used with a OCKTask
+  - [x] SimpleTaskView - typically used with a OCKTask
+  - [x] Checklist - typically used with a OCKTask
+  - [x] Button Log - typically used with a OCKTask
+  - [x] GridTaskView - typically used with a OCKTask
+  - [x] NumericProgressTaskView (SwiftUI) - typically used with a OCKHealthKitTask
+  - [x] LabeledValueTaskView (SwiftUI) - typically used with a OCKHealthKitTask
+- [x] Add the LinkView (SwiftUI) card to your app
+- [x] Replace the current TipView with a class with CustomFeaturedContentView that subclasses OCKFeaturedContentView. This card should have an initializer which takes any link
+- [x] Tailor the ResearchKit Onboarding to reflect your application
+- [x] Add tailored check-in ResearchKit survey to your app
+- [x] Add a new tab called "Insights" to MainTabView
+- [x] Replace current ContactView with Searchable contact view
+- [x] Change the ProfileView to use a Form view
+- [x] Add at least two OCKCarePlan's and tie them to their respective OCKTask's and OCContact's 
+
+## Wishlist features
+<!--
+Describe at least 3 features you want to add in the future before releasing your app in the app-store
+-->
+1. We hope we can improve our 3D module. In the future, we want to integrate this feature with the hospital's current medical image system, allowing doctors to directly send patients' thyroid 3D models to the application. In this way, patients can understand why and how their surgery operation goes, which helps patients have more confidence and focus on rehabilitation. 
+2. Currently, the SLM inference runs on a local server, which requires the patient and the server to be on the same network. In the future, we plan to deploy the fine-tuned model to a HIPAA-compliant cloud inference endpoint, enabling real-device usage without any local infrastructure. This would make ThyroRecover accessible to patients anywhere, at any time, while keeping patient data encrypted in transit and never shared with third-party AI services.
+3. The current model is fine-tuned on 1,000 synthetic patient records. In the future, we hope to collaborate with clinical partners to collect real, anonymized post-thyroidectomy recovery data and retrain the model. A clinically grounded training set would improve the accuracy and reliability of the model's trend assessments and recommendations, bringing the system closer to clinical-grade personalized guidance.
+
+## Challenges faced while developing
+<!--
+-->
+Learning Swift and integrating a fine-tuned Small Language Model into a CareKit-based application presented several challenges. The baseline app was built on Apple's OCKSample, which required significant time to understand due to its strict data model and Swift 6 concurrency requirements. The most significant challenge was deploying the fine-tuned Qwen3-4B model on device. Core ML's conversion toolchain does not yet stably support the Qwen3 architecture, and adding llama.cpp as a Swift Package caused dependency conflicts with existing frameworks. We resolved this by adopting a local inference server using Ollama. An additional issue was Qwen3's built-in thinking mode, which caused inference timeouts by generating lengthy internal reasoning before producing output. We overcame this by customizing the model's prompt template to suppress thinking mode, reducing response time to under thirty seconds. Finally, the SLM trigger logic required iteration, as early versions based on post-operative day count proved unreliable for new users, and we revised it to check for actual recovery data presence instead.
 
 ## Setup Your Parse Server
 
 ### Heroku
-The easiest way to setup your server is using the [one-button-click](https://github.com/netreconlab/parse-hipaa#heroku) deployment method for [parse-hipaa](https://github.com/netreconlab/parse-hipaa).
+The easiest way to setup your server is using the [one-button-click](https://github.com/netreconlab/parse-hipaa#heroku) deplyment method for [parse-hipaa](https://github.com/netreconlab/parse-hipaa).
 
-### Docker
-You can setup your [parse-hipaa](https://github.com/netreconlab/parse-hipaa) using Docker. Simply type the following to get parse-hipaa running with postgres locally:
-
-1. Fork [parse-hipaa](https://github.com/netreconlab/parse-hipaa)
-2. `cd parse-hipaa`
-3.  `docker-compose up` - this will take a couple of minutes to setup as it needs to initialize postgres, but as soon as you see `parse-server running on port 1337.`, it's ready to go. See [here](https://github.com/netreconlab/parse-hipaa#getting-started) for details
-4. If you would like to use mongo instead of postgres, in step 3, type `docker-compose -f docker-compose.mongo.yml up` instead of `docker-compose up`
-
-## Fork this repo to get the modified OCKSample app
-
-1. Fork [CareKitSample-ParseCareKit](https://github.com/netreconlab/CareKitSample-ParseCareKit)
-2. Open `OCKSample.xcodeproj` in Xcode
-3. You may need to configure your "Team" and "Bundle Identifier" in "Signing and Capabilities"
-4. Run the app and data will synchronize with parse-hipaa via http://localhost:1337/parse automatically
-5. You can edit Parse server setup in the ParseCareKit.plist file under "Supporting Files" in the Xcode browser
 
 ## View your data in Parse Dashboard
 
 ### Heroku
-The easiest way to setup your dashboard is using the [one-button-click](https://github.com/netreconlab/parse-hipaa-dashboard#heroku) deployment method for [parse-hipaa-dashboard](https://github.com/netreconlab/parse-hipaa-dashboard).
+The easiest way to setup your dashboard is using the [one-button-click](https://github.com/netreconlab/parse-hipaa-dashboard#heroku) deplyment method for [parse-hipaa-dashboard](https://github.com/netreconlab/parse-hipaa-dashboard).
 
-### Docker
-Parse Dashboard is the easiest way to view your data in the Cloud (or local machine in this example) and comes with [parse-hipaa](https://github.com/netreconlab/parse-hipaa). To access:
-1. Open your browser and go to http://localhost:4040/dashboard
-2. Username: `parse`
-3. Password: `1234`
-4. Be sure to refresh your browser to see new changes synched from your CareKitSample app
-
-Note that CareKit data is extremely sensitive and you are responsible for ensuring your parse-server meets HIPAA compliance.
-
-## Transitioning the sample app to a production app
-If you plan on using this app as a starting point for your produciton app. Once you have your parse-hipaa server in the Cloud behind ssl, you should open `ParseCareKit.plist` in Xcode and change the value for `Server` to point to your server(s) in the Cloud. You should also open `Info.plist` in Xcode and remove `App Transport Security Settings` and any key/value pairs under it as this was only in place to allow you to test the sample app to connect to a server setup on your local machine. iOS apps do not allow non-ssl connections in production, and even if you find a way to connect to non-ssl servers, it would not be HIPAA compliant.
-
-### Extra scripts for optimized Cloud queries
-You should run the extra scripts outlined on parse-hipaa [here](https://github.com/netreconlab/parse-hipaa#running-in-production-for-parsecarekit).

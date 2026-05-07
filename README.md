@@ -17,9 +17,11 @@ Add the public link to your YouTube or video posted elsewhere.
 -->
 To learn more about this application, watch the video below:
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=mib_YioKAQQ
-" target="_blank"><img src="http://img.youtube.com/vi/mib_YioKAQQ/0.jpg" 
+<a href="https://youtu.be/qLOPrCSr2uc" target="_blank"><img src="http://img.youtube.com/vi/mib_YioKAQQ/0.jpg" 
 alt="Sample demo video" width="240" height="180" border="10" /></a>
+
+
+
 
 ### Designed for the following users
 <!--
@@ -55,6 +57,21 @@ ParseCareKit synchronizes the following entities to Parse tables/classes using [
 What features were added by you, this should be descriptions of features added from the [Code](https://uk.instructure.com/courses/2030626/assignments/11151475) and [Demo](https://uk.instructure.com/courses/2030626/assignments/11151413) parts of the final. Feel free to add any figures that may help describe a feature. Note that there should be information here about how the OCKTask/OCKHealthTask's and OCKCarePlan's you added pertain to your app.
 -->
 ## Contributions/Features
+
+- Added custom onboarding task using ResearchKit, including welcome step, consent/signature page, permission request, and completion flow.
+- Added logic so users must complete onboarding before the rest of the Care page tasks are shown.
+- Added Range of Motion and Neck Mobility custom CareKit tasks that launch ResearchKit active tasks and record device motion.
+- Added custom CareKit outcome saving after active tasks are completed.
+- Added daily symptom tracking and weekly evaluation survey tasks for thyroid recovery.
+- Added Survey Answers display so completed survey responses can be reviewed from the Care page.
+- Added searchable Contact page using `UISearchController`.
+- Added iOS Contacts import using `CNContactPickerViewController`, converting `CNContact` into `OCKContact`.
+- Added Profile editing for patient and contact/address information using a ViewModel-based structure.
+- Added custom task creation and task deletion from the Profile page.
+- Added HealthKit-backed task creation support for data like step count and resting heart rate.
+- Added Thyroid 3D Model education task using `Thyroid.usdz`, `ORKUSDZModelManager`, and `ORK3DModelStep`.
+- Added AI Recovery Advice tab that builds recent recovery summaries from CareKit data and calls a local Ollama model, `thyro-qwen3`.
+- Added thyroid recovery-specific UI content such as voice recovery tips, recovery resource links, and post-surgery-focused task instructions.
 
 ## Final Checklist
 <!--

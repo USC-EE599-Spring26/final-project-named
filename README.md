@@ -31,12 +31,44 @@ The app is designed to support individuals recovering from thyroid cancer surger
 <!--
 In addition, you can drop screenshots directly into your README file to add them to your README. Take these from your presentations.
 -->
-<img src="https://user-images.githubusercontent.com/8621344/101721031-06869500-3a75-11eb-9631-88927e9c8f00.png" width="300"> <img src="https://user-images.githubusercontent.com/8621344/101721111-33d34300-3a75-11eb-885e-4a6fc96dbd35.png" width="300"> <img src="https://user-images.githubusercontent.com/8621344/101721146-48afd680-3a75-11eb-955a-7848146a9d6f.png" width="300">
+Login and Sign Up Page
+<img width="279" height="304" alt="image" src="https://github.com/user-attachments/assets/25a908e4-b6ce-4e6c-84cc-17d64a570f0d" />
+
+Onboarding Page
+<img width="1352" height="582" alt="image" src="https://github.com/user-attachments/assets/345cb9c6-52ad-410e-840c-b8f0ab70a924" />
+
+Home Page
+<img width="959" height="308" alt="image" src="https://github.com/user-attachments/assets/c70038fd-0602-4e41-b354-cafda0db182d" />
+
+Insight Data Display
+<img width="137" height="289" alt="image" src="https://github.com/user-attachments/assets/bd8cb05d-7bb9-48ca-ba18-5cea882db6e7" />
+
+Key Features:
+1. Daily and Weekly Survey
+<img width="697" height="295" alt="image" src="https://github.com/user-attachments/assets/ed8c9c0a-9d80-44ff-8c65-29a17b319c84" />
+
+2. 3D Education Model
+<img width="281" height="152" alt="image" src="https://github.com/user-attachments/assets/9ce3e8c0-1131-43ad-9019-a5c44741bdb5" />
+
+3. Recover Note
+<img width="236" height="257" alt="image" src="https://github.com/user-attachments/assets/a013c64a-9a86-4246-8f6f-72e6843e2ac3" />
+
+4. Comfort Score
+<img width="392" height="285" alt="image" src="https://github.com/user-attachments/assets/bfa90df9-6deb-4a82-b72f-875414738ccb" />
+
+5. Small Language Model (SLM) Suggestions
+<img width="897" height="239" alt="image" src="https://github.com/user-attachments/assets/746839cd-fb9f-4161-b5f0-6ed1e75b56b9" />
+
+The SLM took at least 3 days of data(as shown above) to analyze patients'  recovery treatment  and give suggestions as shown below
+
+<img width="169" height="352" alt="image" src="https://github.com/user-attachments/assets/1d6ee407-4c31-4d78-85cd-90213237a13d" />
+
 
 <!--
 List all of the members who developed the project and
 link to each members respective GitHub profile
 -->
+
 Developed by: 
 - [Yuxin Xu](https://github.com/Shoma-xyl) - `University of Southern California`, `Computer Engineering`
 - [Ruizhe Zhou](https://github.com/ruizhe-usc) - `University of Southern California`, `Electrical Engineering`

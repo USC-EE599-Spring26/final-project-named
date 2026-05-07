@@ -58,14 +58,11 @@ What features were added by you, this should be descriptions of features added f
 -->
 ## Contributions/Features
 
-- Added custom onboarding task using ResearchKit, including welcome step, consent/signature page, permission request, and completion flow.
-- Added logic so users must complete onboarding before the rest of the Care page tasks are shown.
-- Added Range of Motion and Neck Mobility custom CareKit tasks that launch ResearchKit active tasks and record device motion.
-- Added custom CareKit outcome saving after active tasks are completed.
-- Added daily symptom tracking and weekly evaluation survey tasks for thyroid recovery.
-- Added Survey Answers display so completed survey responses can be reviewed from the Care page.
-- Added searchable Contact page using `UISearchController`.
-- Added iOS Contacts import using `CNContactPickerViewController`, converting `CNContact` into `OCKContact`.
+- Custom onboarding task using ResearchKit, including welcome step, consent/signature page, permission request, and completion flow.
+- Add onboarding that users must finish before the rest of the Care page tasks are shown.
+- Add Range of Motion and Neck Mobility custom CareKit tasks that launch ResearchKit active tasks and record device motion to neck check.
+- Add daily symptom tracking and weekly evaluation survey tasks for thyroid recovery, and display the answer
+- Add iOS Contacts import using `CNContactPickerViewController`, converting `CNContact` into `OCKContact`, and a searchable Contact page using `UISearchController`.
 - Added Profile editing for patient and contact/address information using a ViewModel-based structure.
 - Added custom task creation and task deletion from the Profile page.
 - Added HealthKit-backed task creation support for data like step count and resting heart rate.

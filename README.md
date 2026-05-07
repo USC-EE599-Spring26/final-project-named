@@ -118,7 +118,7 @@ This is from the checkist from the final [Code](https://uk.instructure.com/cours
   - [x] SimpleTaskView - typically used with a OCKTask
   - [x] Checklist - typically used with a OCKTask
   - [x] Button Log - typically used with a OCKTask
-  - [ ] GridTaskView - typically used with a OCKTask
+  - [x] GridTaskView - typically used with a OCKTask
   - [x] NumericProgressTaskView (SwiftUI) - typically used with a OCKHealthKitTask
   - [x] LabeledValueTaskView (SwiftUI) - typically used with a OCKHealthKitTask
 - [x] Add the LinkView (SwiftUI) card to your app

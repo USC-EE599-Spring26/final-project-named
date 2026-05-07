@@ -31,19 +31,19 @@ The app is designed to support individuals recovering from thyroid cancer surger
 <!--
 In addition, you can drop screenshots directly into your README file to add them to your README. Take these from your presentations.
 -->
-Login and Sign Up Page
+- Login and Sign Up Page
 <img width="279" height="304" alt="image" src="https://github.com/user-attachments/assets/25a908e4-b6ce-4e6c-84cc-17d64a570f0d" />
 
-Onboarding Page
+- Onboarding Page
 <img width="1352" height="582" alt="image" src="https://github.com/user-attachments/assets/345cb9c6-52ad-410e-840c-b8f0ab70a924" />
 
-Home Page
+- Home Page
 <img width="959" height="308" alt="image" src="https://github.com/user-attachments/assets/c70038fd-0602-4e41-b354-cafda0db182d" />
 
-Insight Data Display
+- Insight Data Display
 <img width="137" height="289" alt="image" src="https://github.com/user-attachments/assets/bd8cb05d-7bb9-48ca-ba18-5cea882db6e7" />
 
-Key Features:
+- Key Features:
 1. Daily and Weekly Survey
 <img width="697" height="295" alt="image" src="https://github.com/user-attachments/assets/ed8c9c0a-9d80-44ff-8c65-29a17b319c84" />
 

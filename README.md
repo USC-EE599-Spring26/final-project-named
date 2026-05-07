@@ -17,8 +17,8 @@ Add the public link to your YouTube or video posted elsewhere.
 -->
 To learn more about this application, watch the video below:
 
-<a href="https://youtu.be/qLOPrCSr2uc" target="_blank"><img src="http://img.youtube.com/vi/mib_YioKAQQ/0.jpg" 
-alt="Sample demo video" width="240" height="180" border="10" /></a>
+<a href="https://youtu.be/qLOPrCSr2uc" target="_blank"><img width="320" height="180" alt="mq1" src="https://github.com/user-attachments/assets/46215a27-7cf8-4183-a802-615165f5f672" /></a>
+
 
 
 

@@ -31,11 +31,12 @@ extension AppDelegate: UIApplicationDelegate {
                     Logger.appDelegate.info("User is already signed in...")
                     do {
                         let uuid = try await Utility.getRemoteClockUUID()
-                        try? await setupRemotes(uuid: uuid)
+                        try await setupRemotes(uuid: uuid)
                         parseRemote.automaticallySynchronizes = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            // swiftlint:disable:next line_length
-                            NotificationCenter.default.post(.init(name: Notification.Name(rawValue: Constants.requestSync)))
+                        do {
+                            try await Utility.synchronizeCurrentStore()
+                        } catch {
+                            Logger.appDelegate.error("Could not synchronize store after launch: \(error)")
                         }
                     } catch {
                         Logger.appDelegate.error("User is logged in, but missing remoteId: \(error)")

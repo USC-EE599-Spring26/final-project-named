@@ -642,8 +642,7 @@ final class CareViewController: OCKDailyPageViewController, @unchecked Sendable 
         instructionStep.detailText = "A 3D model will be presented to help you understand"
         instructionStep.iconImage = UIImage(systemName: "waveform.path.ecg")
 
-        // Replace "thyroid_model" with your actual USDZ model file name
-        let modelLoc: String = "Thyroid"
+        let modelLoc: String = "Thyroid"// change to the model we use
         let modelManager = ORKUSDZModelManager(usdzFileName: modelLoc)
         let modelStep = ORK3DModelStep(identifier: "thyroid.model", modelManager: modelManager)
 

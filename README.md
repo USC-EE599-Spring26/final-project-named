@@ -135,12 +135,12 @@ This is from the checkist from the final [Code](https://uk.instructure.com/cours
 Describe at least 3 features you want to add in the future before releasing your app in the app-store
 -->
 1. We hope we can improve our 3D module. In the future, we want to integrate this feature with the hospital's current medical image system, allowing doctors to directly send patients' thyroid 3D models to the application. In this way, patients can understand why and how their surgery operation goes, which helps patients have more confidence and focus on rehabilitation. 
-2. feature two
-3. feature three
+2. Currently, the SLM inference runs on a local server, which requires the patient and the server to be on the same network. In the future, we plan to deploy the fine-tuned model to a HIPAA-compliant cloud inference endpoint, enabling real-device usage without any local infrastructure. This would make ThyroRecover accessible to patients anywhere, at any time, while keeping patient data encrypted in transit and never shared with third-party AI services.
+3. The current model is fine-tuned on 1,000 synthetic patient records. In the future, we hope to collaborate with clinical partners to collect real, anonymized post-thyroidectomy recovery data and retrain the model. A clinically grounded training set would improve the accuracy and reliability of the model's trend assessments and recommendations, bringing the system closer to clinical-grade personalized guidance.
 
 ## Challenges faced while developing
 <!--
-Describe any challenges you faced with learning Swift, your baseline app, or adding features. You can describe how you overcame them.
+Learning Swift and integrating a fine-tuned Small Language Model into a CareKit-based application presented several challenges. The baseline app was built on Apple's OCKSample, which required significant time to understand due to its strict data model and Swift 6 concurrency requirements. The most significant challenge was deploying the fine-tuned Qwen3-4B model on device. Core ML's conversion toolchain does not yet stably support the Qwen3 architecture, and adding llama.cpp as a Swift Package caused dependency conflicts with existing frameworks. We resolved this by adopting a local inference server using Ollama. An additional issue was Qwen3's built-in thinking mode, which caused inference timeouts by generating lengthy internal reasoning before producing output. We overcame this by customizing the model's prompt template to suppress thinking mode, reducing response time to under thirty seconds. Finally, the SLM trigger logic required iteration, as early versions based on post-operative day count proved unreliable for new users, and we revised it to check for actual recovery data presence instead.
 -->
 
 ## Setup Your Parse Server
